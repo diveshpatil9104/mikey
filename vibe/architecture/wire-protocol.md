@@ -27,6 +27,14 @@ Receivers **reject any length > 4 MiB** and close the connection (protects again
 | `0x04` | CONTROL | both | JSON, e.g. `{"audio":{"ns":true,"ns_strength":0.8,"aec":true,"gate_db":-45}}`, `{"video":{"on":true,"w":1280,"h":720}}` |
 | `0x05` | BYE | both | JSON: `reason` — clean shutdown, no timeout wait |
 
+### JSON field formats
+
+- All JSON payloads are UTF-8.
+- `proto`: integer, the major protocol version. Currently `1`.
+- `device_id`, `pc_id`: the random 128-bit id as 32 lowercase hex characters.
+- `caps` (phone): list of what the phone can send right now. `["audio"]` in Phase 1, `["audio", "video"]` from Phase 3.
+- Receivers ignore JSON fields and frame types they don't know, so either side can add new ones without breaking the other.
+
 ## Media header (inside AUDIO/VIDEO payloads)
 
 ```
