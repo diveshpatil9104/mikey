@@ -1,5 +1,5 @@
 use mikey::audio::pipeline::JitterBuffer;
-use mikey::audio::sink;
+use mikey::audio::{sink, test_tone};
 use mikey::protocol::PORT_TCP;
 use mikey::transport::{adb, tcp};
 use std::env;
@@ -9,6 +9,9 @@ use std::thread;
 use std::time::Duration;
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+    let test_mode = args.iter().any(|a| a == "--test-tone");
+
     println!("=== Mikey PC (Phase 1 Console) ===");
 
     let running = Arc::new(AtomicBool::new(true));
@@ -60,6 +63,13 @@ fn main() {
         }
     };
 
+    // --test-tone mode: play a 3-second tone to verify audio pipeline, then exit
+    if test_mode {
+        test_tone::play_test_tone(&jitter_buffer, 3);
+        thread::sleep(Duration::from_millis(500)); // drain buffer
+        return;
+    }
+
     // 4. Bind and run TCP listener on 0.0.0.0:PORT_TCP
     let listener = match tcp::bind_listener() {
         Ok(l) => l,
@@ -87,6 +97,7 @@ fn main() {
 
     println!("[tcp] Listening on 0.0.0.0:{}", PORT_TCP);
     println!("[ready] Waiting for Mikey Android client to connect...");
+    println!("[hint] Run with --test-tone to verify audio without a phone.");
 
     // Keep main thread alive
     while running.load(Ordering::Relaxed) {

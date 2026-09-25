@@ -1,2 +1,3 @@
 pub mod pipeline;
 pub mod sink;
+pub mod test_tone;
