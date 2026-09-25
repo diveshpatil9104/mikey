@@ -49,7 +49,7 @@ Full design: [architecture/architecture.md](vibe/architecture/architecture.md).
 - Formatting: ktlint (Android), rustfmt + clippy -D warnings (PC).
 - No AI slop: write lean, intentional code. No speculative future-proofing, unnecessary wrapper layers, generic helpers "for later", or chatty obvious comments.
 - Zero churn: keep diffs surgical. Never rewrite, reformat, reorder, or touch working code or files outside the task scope.
-- Strict Git safety: NEVER execute destructive or overwriting commands (`git push --force`, `git reset --hard`, `git clean -fd`, `git checkout .`, `git restore .`). Never overwrite remote history or clobber local working changes. Always inspect `git status` and diff before staging; never blind mass-stage (`git add .`, `git add -A`).
+- Strict Git safety: NEVER execute destructive or overwriting commands (`git push --force`, `git reset --hard`, `git clean -fd`, `git checkout .`, `git restore .`). Never overwrite remote history or clobber local working changes. Never commit without asking the user for confirmation first. Always inspect `git status` and diff before staging; never blind mass-stage (`git add .`, `git add -A`).
 - Scratch notes go in `vibe/scratchpad.md`. Never put code in `vibe/`.
 - All 18 coding rules: [coding-rules.md](vibe/rules/coding-rules.md).
 
