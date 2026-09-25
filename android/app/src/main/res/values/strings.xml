@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mikey</string>
+
+    <string name="notification_channel">Mic and camera</string>
+    <string name="notification_mic_on">Mic on</string>
+    <string name="notification_stop">Stop</string>
+
+    <string name="cd_camera">Camera</string>
+    <string name="cd_mic_off">Microphone off</string>
+    <string name="cd_mic_on">Microphone on</string>
+    <string name="cd_status_connected">Connected to PC</string>
+    <string name="cd_status_no_pc">No PC</string>
 </resources>
