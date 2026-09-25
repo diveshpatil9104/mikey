@@ -38,7 +38,7 @@ If you plug in a cable mid-call while on Wi-Fi, Mikey upgrades to USB with < 300
 
 ### 2 · Zero accounts, zero cloud, zero telemetry
 
-Everything travels over a direct local TCP socket. No relay server, no analytics, no login, no paid tier, no ads. The PC binary never phones home. The phone app never requests internet permission. What happens between your phone and your PC stays there.
+Everything travels over a direct local TCP socket. No relay server, no analytics, no login, no paid tier, no ads. The PC binary never phones home. The phone app only uses its network permission to reach your own PC. What happens between your phone and your PC stays there.
 
 ### 3 · Audio DSP lives on the PC, not the phone
 
