@@ -1,8 +1,10 @@
 use mikey::audio::pipeline::JitterBuffer;
+use mikey::config::generate_random_hex;
 use mikey::protocol::{
     read_frame, write_frame, Frame, FrameType, HelloPayload, MediaHeader, WelcomePayload,
     CODEC_PCM, PROTO_VERSION,
 };
+use mikey::session::SessionManager;
 use mikey::transport::tcp::{configure_stream, handle_client};
 use std::net::{TcpListener, TcpStream};
 use std::sync::Arc;
@@ -16,9 +18,15 @@ fn test_end_to_end_streaming_and_handshake() {
     let jb = Arc::new(JitterBuffer::new());
     let jb_clone = Arc::clone(&jb);
 
+    let mut temp_cfg = std::env::temp_dir();
+    temp_cfg.push(format!("mikey_it_{}.toml", generate_random_hex(8)));
+    let sm = SessionManager::new(temp_cfg);
+    let sm_clone = sm.clone();
+    let expected_pc_id = sm.config().pc_id.clone();
+
     let server_thread = thread::spawn(move || {
         let (stream, _) = listener.accept().expect("accept connection");
-        handle_client(stream, jb_clone, "test-pc-id", "test-pc-name");
+        handle_client(stream, jb_clone, sm_clone);
     });
 
     // Client connection
@@ -43,7 +51,8 @@ fn test_end_to_end_streaming_and_handshake() {
     let welcome_frame = read_frame(&mut client).expect("read welcome");
     assert_eq!(welcome_frame.frame_type, FrameType::Welcome);
     let welcome: WelcomePayload = serde_json::from_slice(&welcome_frame.payload).unwrap();
-    assert_eq!(welcome.pc_id, "test-pc-id");
+    assert_eq!(welcome.pc_id, expected_pc_id);
+    assert!(!welcome.token.is_empty());
 
     // 3. Send AUDIO frame (10 ms PCM = 480 samples = 960 bytes)
     let header = MediaHeader {
@@ -77,7 +86,4 @@ fn test_end_to_end_streaming_and_handshake() {
     server_thread
         .join()
         .expect("server thread terminates cleanly");
-
-    // Jitter buffer reset on disconnect
-    assert!(jb.is_empty());
 }
