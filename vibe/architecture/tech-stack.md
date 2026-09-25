@@ -16,6 +16,7 @@
 | Bluetooth | `BluetoothSocket` (RFCOMM) | Platform API |
 | Settings | `SharedPreferences` | No database, no DataStore needed |
 | Build | Min SDK 26, target = latest stable; R8 + resource shrinking; ABI splits (arm64-v8a, armeabi-v7a) | Small APK |
+| Tests | JUnit 4, unit tests only (never in the APK) | Proves the protocol byte layout matches the spec |
 
 **Permissions (all requested lazily, at the moment they are needed):**
 `RECORD_AUDIO`, `CAMERA`, `POST_NOTIFICATIONS` (13+), `BLUETOOTH_CONNECT` (12+) / `BLUETOOTH` (≤ 11), `INTERNET`, `ACCESS_NETWORK_STATE`, `ACCESS_WIFI_STATE`, `CHANGE_NETWORK_STATE`, `WAKE_LOCK`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MICROPHONE`, `FOREGROUND_SERVICE_CAMERA`, `FOREGROUND_SERVICE_CONNECTED_DEVICE`.
