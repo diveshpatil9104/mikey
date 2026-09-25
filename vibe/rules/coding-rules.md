@@ -19,5 +19,5 @@ These apply from Phase 1 onwards. They are not suggestions.
 15. **User-facing text is short, calm and actionable.** "Tap Allow on your phone", not "ADB authorization failed (error 3)".
 16. **No AI slop.** Write lean, intentional code. No speculative abstractions, boilerplate wrappers, hypothetical utilities, or narrative comments explaining syntax.
 17. **Zero code churn.** Keep diffs surgical and minimal. Never rewrite, reformat, or reorder working code or files outside the task scope. Never rewrite whole files when a small edit suffices.
-18. **Strict Git safety.** Never run destructive commands (`git push --force`, `git reset --hard`, `git clean -fd`, `git checkout .`, `git restore .`). Never overwrite remote branches or clobber local uncommitted changes. Inspect `git status` and diff before staging; never blind mass-stage.
+18. **Strict Git safety.** Never run destructive commands (`git push --force`, `git reset --hard`, `git clean -fd`, `git checkout .`, `git restore .`). Never overwrite remote branches or clobber local uncommitted changes. Never commit without asking the user for confirmation first. Inspect `git status` and diff before staging; never blind mass-stage.
 
