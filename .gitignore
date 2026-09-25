@@ -1,6 +1,3 @@
-# Planning doc — kept local, never committed
-MASTER.md
-
 # Android / Gradle
 android/app/build/
 android/build/
@@ -27,3 +24,4 @@ pc/target/
 # Secrets / local overrides
 *.local
 .env
+*x.md
