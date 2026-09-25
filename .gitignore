@@ -1,0 +1,29 @@
+# Planning doc — kept local, never committed
+MASTER.md
+
+# Android / Gradle
+android/app/build/
+android/build/
+android/.gradle/
+android/.kotlin/
+android/app/.cxx/
+android/captures/
+local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# PC / Rust
+pc/target/
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+
+# Secrets / local overrides
+*.local
+.env
