@@ -99,10 +99,11 @@ fn run_windows_rfcomm_listener(
     if bind_res != 0 {
         let err = unsafe { WSAGetLastError() };
         unsafe { closesocket(sock) };
-        println!(
-            "[bt] Failed to bind Bluetooth RFCOMM socket (error {})",
-            err
-        );
+        if err == 10050 {
+            println!("[bt] Bluetooth radio is turned off or disabled (WSA error 10050)");
+        } else {
+            println!("[bt] Bluetooth RFCOMM unavailable (error {})", err);
+        }
         return Ok(());
     }
 

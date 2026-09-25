@@ -115,7 +115,8 @@ impl TrayApp {
         );
 
         let virt_devices_submenu = Submenu::new("Virtual devices", true);
-        let mic_status = MenuItem::new("Microphone: Ready ✓", false, None);
+        let (_, mic_label) = crate::audio::sink::check_virtual_device_status();
+        let mic_status = MenuItem::new(mic_label, false, None);
         let cam_status = MenuItem::new("Camera: Ready ✓", false, None);
         let _ = virt_devices_submenu.append(&mic_status);
         let _ = virt_devices_submenu.append(&cam_status);
