@@ -1,5 +1,10 @@
+use std::collections::HashSet;
 use std::io::{self, Error, ErrorKind};
 use std::process::Command;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
 
 /// Verifies that the adb binary is accessible and returns its version string.
 pub fn check_adb() -> io::Result<String> {
@@ -69,6 +74,45 @@ pub fn setup_adb_reverse(serial: Option<&str>, port: u16) -> io::Result<()> {
     }
 
     Ok(())
+}
+
+/// Runs a background loop that monitors for connected Android devices and automatically
+/// ensures ADB reverse port forwarding is configured when plugged in.
+pub fn start_adb_watcher(port: u16, running: Arc<AtomicBool>) -> thread::JoinHandle<()> {
+    thread::spawn(move || {
+        let mut configured_devices: HashSet<String> = HashSet::new();
+
+        while running.load(Ordering::Relaxed) {
+            match list_devices() {
+                Ok(current_devices) => {
+                    let current_set: HashSet<String> = current_devices.into_iter().collect();
+
+                    // Detect newly attached devices
+                    for serial in &current_set {
+                        if !configured_devices.contains(serial) {
+                            match setup_adb_reverse(Some(serial), port) {
+                                Ok(()) => {
+                                    println!("[adb] Reversed tcp:{} on device {}", port, serial);
+                                    configured_devices.insert(serial.clone());
+                                }
+                                Err(e) => {
+                                    eprintln!("[adb] Failed to reverse port on {}: {}", serial, e);
+                                }
+                            }
+                        }
+                    }
+
+                    // Remove unplugged devices
+                    configured_devices.retain(|s| current_set.contains(s));
+                }
+                Err(_) => {
+                    // ADB daemon may be restarting or unavailable; retry after backoff
+                }
+            }
+
+            thread::sleep(Duration::from_secs(2));
+        }
+    })
 }
 
 #[cfg(test)]

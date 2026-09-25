@@ -1,9 +1,10 @@
-use cpal::traits::{DeviceTrait, HostTrait};
-use cpal::{Device, StreamConfig};
+use crate::audio::pipeline::JitterBuffer;
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use cpal::{Device, SampleFormat, Stream, StreamConfig};
 use std::io::{self, Error, ErrorKind};
+use std::sync::Arc;
 
 pub const SAMPLE_RATE: u32 = 48_000;
-pub const CHANNELS: u16 = 1;
 
 /// Finds the target audio output device.
 /// Priority:
@@ -40,12 +41,60 @@ pub fn find_output_device() -> io::Result<(Device, String, bool)> {
     }
 }
 
-/// Returns a default stream configuration for 48 kHz mono output if supported,
-/// or falls back to device's default config.
-pub fn get_stream_config(device: &Device) -> io::Result<StreamConfig> {
-    let default_config = device
+/// Starts the cpal audio output playback stream bound to the JitterBuffer.
+pub fn start_audio_stream(device: &Device, jitter_buffer: Arc<JitterBuffer>) -> io::Result<Stream> {
+    let supported_config = device
         .default_output_config()
         .map_err(|e| Error::other(format!("failed to get default audio config: {}", e)))?;
 
-    Ok(default_config.into())
+    let channels = supported_config.channels();
+    let sample_format = supported_config.sample_format();
+    let config: StreamConfig = supported_config.into();
+
+    let err_fn = |err| eprintln!("[audio] Stream error: {}", err);
+
+    let stream = match sample_format {
+        SampleFormat::F32 => {
+            let jb = Arc::clone(&jitter_buffer);
+            device
+                .build_output_stream(
+                    &config,
+                    move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
+                        jb.pop_samples(data, channels);
+                    },
+                    err_fn,
+                    None,
+                )
+                .map_err(|e| Error::other(format!("failed to build f32 audio stream: {}", e)))?
+        }
+        SampleFormat::I16 => {
+            let jb = Arc::clone(&jitter_buffer);
+            device
+                .build_output_stream(
+                    &config,
+                    move |data: &mut [i16], _: &cpal::OutputCallbackInfo| {
+                        let mut temp = vec![0.0f32; data.len()];
+                        jb.pop_samples(&mut temp, channels);
+                        for (d, &t) in data.iter_mut().zip(temp.iter()) {
+                            *d = (t * 32767.0).clamp(-32768.0, 32767.0) as i16;
+                        }
+                    },
+                    err_fn,
+                    None,
+                )
+                .map_err(|e| Error::other(format!("failed to build i16 audio stream: {}", e)))?
+        }
+        other => {
+            return Err(Error::other(format!(
+                "unsupported audio sample format: {:?}",
+                other
+            )));
+        }
+    };
+
+    stream
+        .play()
+        .map_err(|e| Error::other(format!("failed to start audio playback stream: {}", e)))?;
+
+    Ok(stream)
 }
