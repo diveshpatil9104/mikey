@@ -50,7 +50,7 @@ vibe/
 │   ├── design-language.md # Palette, typography, icon metrics & UI rules
 │   ├── performance-budgets.md # CPU, RAM, battery, binary size & latency budgets
 │   ├── test-matrix.md     # Real-device test suite across phones & host OSes
-│   ├── coding-rules.md    # The 15 non-negotiable coding rules
+│   ├── coding-rules.md    # The 18 non-negotiable coding rules
 │   └── agent-files.md     # Maintenance rules for AGENTS.md and CLAUDE.md
 │
 └── skills/                # Step-by-step operational playbooks
@@ -110,7 +110,7 @@ vibe/
 | [design-language.md](rules/design-language.md) | Colors, typography, icon sizes | Drawing anything |
 | [performance-budgets.md](rules/performance-budgets.md) | Size, CPU, RAM, battery, latency budgets | Adding weight; closing a phase |
 | [test-matrix.md](rules/test-matrix.md) | Real-device test cases | Closing a phase |
-| [coding-rules.md](rules/coding-rules.md) | The 15 coding rules | Always |
+| [coding-rules.md](rules/coding-rules.md) | The 18 coding rules | Always |
 | [agent-files.md](rules/agent-files.md) | What AGENTS.md / CLAUDE.md are and how they're kept | Editing either file |
 
 ### Skills — Workflows & Playbooks
