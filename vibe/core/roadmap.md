@@ -8,12 +8,12 @@ Each phase ends with a real-device test on at least two phones (one Pixel/near-s
 **Done when:** you plug in a phone with USB debugging on, open Mikey, tap mic, and a Zoom call hears you — without typing anything.
 
 Android
-- [ ] Single activity, two tap halves (no polish), status dot
-- [ ] `MikeyService` foreground service (mic type), notification with Stop
-- [ ] `AudioRecord` 48 kHz mono → PCM frames (10 ms) → TCP to `127.0.0.1:7653`
-- [ ] HELLO / WELCOME / HEARTBEAT / BYE (no tokens yet)
-- [ ] Manual IP field (debug only) for Wi‑Fi testing
-- [ ] Swipe-away from Recents stops everything
+- [x] Single activity, two tap halves (no polish), status dot
+- [x] `MikeyService` foreground service (mic type), notification with Stop
+- [x] `AudioRecord` 48 kHz mono → PCM frames (10 ms) → TCP to `127.0.0.1:7653`
+- [x] HELLO / WELCOME / HEARTBEAT / BYE (no tokens yet)
+- [x] Manual IP field (debug only) for Wi‑Fi testing
+- [x] Swipe-away from Recents stops everything
 
 PC
 - [x] Console binary (no tray yet): TCP listener, framing, handshake
