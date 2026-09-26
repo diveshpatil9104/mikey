@@ -1,10 +1,14 @@
 package com.mikey
 
 import android.Manifest
+import android.app.AlertDialog
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.text.InputType
+import android.widget.EditText
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -13,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestMultiple
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.mikey.service.MikeyService
+import com.mikey.settings.Settings
 import com.mikey.ui.SplitScreen
 
 class MainActivity : ComponentActivity() {
@@ -29,7 +34,11 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             val state by MikeyService.state.collectAsState()
-            SplitScreen(state, onMicTap = ::onMicTap)
+            SplitScreen(
+                state,
+                onMicTap = ::onMicTap,
+                onStatusLongPress = if (isDebuggable()) ::askPcAddress else null,
+            )
         }
     }
 
@@ -41,6 +50,25 @@ class MainActivity : ComponentActivity() {
             else -> requestMicPermission.launch(micPermissions())
         }
     }
+
+    /** Debug builds only: type the PC's address to test over Wi-Fi. Empty means USB. */
+    private fun askPcAddress() {
+        val settings = Settings(this)
+        val field = EditText(this).apply {
+            hint = getString(R.string.debug_pc_address_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+            setText(settings.manualPcAddress.orEmpty())
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.debug_pc_address_title)
+            .setMessage(R.string.debug_pc_address_message)
+            .setView(field)
+            .setPositiveButton(R.string.debug_pc_address_save) { _, _ -> settings.manualPcAddress = field.text.toString() }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun isDebuggable() = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 }
 
 /** Asked only on the first mic tap. Android 13+ also needs notification permission for the status notification. */
