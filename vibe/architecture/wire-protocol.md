@@ -62,6 +62,7 @@ Version rule: `proto` major mismatch → `REJECT(version)` and both sides tell t
 ## Liveness
 
 - Heartbeat every **2 s** in both directions when no other frame was sent in that window.
+- The phone sends its heartbeat every 2 s even while it streams audio, and the PC echoes each one. So each side hears from the other at least every 2 s, and the phone gets its round-trip time.
 - No frame received for **6 s** → transport considered dead → handover/reconnect logic.
 - Socket errors (e.g. cable pulled) trigger this immediately, without waiting.
 - Reconnect backoff: 0.5 s → 1 s → 2 s → 4 s → 5 s cap; resets on success.

@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +17,9 @@ import kotlinx.coroutines.flow.asStateFlow
  * stops it (stopWithTask in the manifest), and onDestroy puts everything back to off.
  */
 class MikeyService : Service() {
+    private val notifier = Notifier(this)
+    private val mainThread = Handler(Looper.getMainLooper())
+    private var session: SessionController? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -23,18 +28,31 @@ class MikeyService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
-        val notification = Notifier(this).build()
+        val notification = notifier.build(level = null)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             startForeground(Notifier.ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
         } else {
             startForeground(Notifier.ID, notification)
+        }
+        if (session == null) {
+            session = SessionController(this) { level -> mainThread.post { onLink(level) } }.also { it.start() }
         }
         mutableState.value = mutableState.value.copy(micOn = true)
         // Not sticky: if Android kills the app, the mic must stay off until the user turns it on again.
         return START_NOT_STICKY
     }
 
+    // Runs on the main thread, so it can't race with onDestroy.
+    private fun onLink(level: Int?) {
+        if (session == null) return
+        mutableState.value = mutableState.value.copy(connected = level != null)
+        notifier.show(level)
+    }
+
     override fun onDestroy() {
+        session?.stop()
+        session = null
+        mainThread.removeCallbacksAndMessages(null)
         mutableState.value = MikeyState()
         super.onDestroy()
     }

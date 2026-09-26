@@ -12,8 +12,14 @@ class Settings(context: Context) {
         get() = prefs.getString(KEY_DEVICE_ID, null)
             ?: newDeviceId().also { prefs.edit().putString(KEY_DEVICE_ID, it).apply() }
 
+    /** PC address typed in for Wi-Fi testing (debug builds only). Null means connect over USB. */
+    var manualPcAddress: String?
+        get() = prefs.getString(KEY_MANUAL_PC_ADDRESS, null)
+        set(value) = prefs.edit().putString(KEY_MANUAL_PC_ADDRESS, value?.trim()?.ifEmpty { null }).apply()
+
     private companion object {
         const val KEY_DEVICE_ID = "device.id"
+        const val KEY_MANUAL_PC_ADDRESS = "pc.manualAddress"
     }
 }
 
