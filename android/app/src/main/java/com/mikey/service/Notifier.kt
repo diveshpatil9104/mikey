@@ -12,7 +12,8 @@ import com.mikey.R
 /** The notification Android requires while MikeyService runs. */
 class Notifier(private val service: Service) {
 
-    fun build(): Notification {
+    /** [level] is where the mic is going: 1 = USB, 4 = Wi-Fi, null = still looking for the PC. */
+    fun build(level: Int?): Notification {
         service.getSystemService(NotificationManager::class.java).createNotificationChannel(
             NotificationChannel(
                 CHANNEL_ID,
@@ -35,11 +36,22 @@ class Notifier(private val service: Service) {
         return Notification.Builder(service, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_mic)
             .setContentTitle(service.getString(R.string.app_name))
-            .setContentText(service.getString(R.string.notification_mic_on))
+            .setContentText(service.getString(textFor(level)))
             .setContentIntent(open)
             .setOngoing(true)
             .addAction(Notification.Action.Builder(null, service.getString(R.string.notification_stop), stop).build())
             .build()
+    }
+
+    /** Replaces the notification's text. Shows nothing if the user turned notifications off. */
+    fun show(level: Int?) {
+        service.getSystemService(NotificationManager::class.java).notify(ID, build(level))
+    }
+
+    private fun textFor(level: Int?) = when (level) {
+        1 -> R.string.notification_mic_on_usb
+        4 -> R.string.notification_mic_on_wifi
+        else -> R.string.notification_mic_on_searching
     }
 
     companion object {

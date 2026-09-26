@@ -34,6 +34,10 @@ adb reverse tcp:7653 tcp:7653
 
 The phone's `127.0.0.1:7653` now reaches `localhost:7653` on the computer.
 
+## Wi-Fi testing (debug builds)
+
+Long-press the status dot and type the PC's address. Leave it empty to go back to USB. On the emulator, your computer is `10.0.2.2`.
+
 ## Before committing
 
 - Format with `ktlint` ([coding-rules.md](../rules/coding-rules.md), rule 8).
