@@ -9,10 +9,10 @@ The `vibe/` directory is the single source of truth for the Mikey project. It co
 
 ## Current Status
 
-- **Phase:** 1 — Mic over the simplest wire (Checklist: [core/roadmap.md](core/roadmap.md)).
+- **Phase:** 2 — The four levels, trust, and the real phone UI (Checklist: [core/roadmap.md](core/roadmap.md)).
 - **Android (`android/`):** Starter project with Gradle (Kotlin DSL, version catalog), Jetpack Compose, package `com.mikey`, min SDK 26. Builds with `./gradlew assembleDebug`.
-- **PC (`pc/`):** Standalone Rust tray binary (`mikey`). TCP :7653, UDP beacon :7654.
-- **Next immediate step:** Owner connects test phone with USB debugging enabled, begins Phase 1 Android checklist in [core/roadmap.md](core/roadmap.md).
+- **PC (`pc/`):** Multi-transport tray app (`mikey`). TCP :7653, UDP beacon :7654, BT RFCOMM, SessionManager, Opus decoding, adaptive jitter buffer, drift resampler, tray menu, installers.
+- **Next immediate step:** Android Phase 1 & 2 implementation (UI, MikeyService, AAudio/Opus capture, TransportManager).
 
 ---
 

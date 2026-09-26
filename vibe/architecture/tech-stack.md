@@ -33,7 +33,7 @@ No location, no storage, no contacts, no phone state.
 | Preview window | `minifb` | Tiny software-blitted window |
 | Audio I/O (Windows) | `cpal` (WASAPI output + loopback capture) | |
 | Audio I/O (Linux) | `libpulse-simple-binding` (works on PipeWire via pipewire-pulse) + `pactl` for module setup | |
-| Opus | `audiopus` (static libopus) | |
+| Opus | `opus-decoder` (pure Rust, RFC 8251) | Zero C/CMake build dependency; pure Rust safe decoder |
 | Resampling | `rubato` | Drift correction |
 | Noise suppression | `nnnoiseless` (pure Rust RNNoise) | |
 | AEC | SpeexDSP via small FFI (`aec.rs`, Cargo feature `aec`) | |

@@ -41,6 +41,24 @@ pub fn find_output_device() -> io::Result<(Device, String, bool)> {
     }
 }
 
+/// Checks if the virtual microphone (VB-Cable) is installed and available.
+pub fn check_virtual_device_status() -> (bool, &'static str) {
+    let host = cpal::default_host();
+    if let Ok(devices) = host.output_devices() {
+        for dev in devices {
+            if let Ok(name) = dev.name() {
+                if name.contains("CABLE Input")
+                    || name.contains("VB-Audio")
+                    || name.contains("CABLE")
+                {
+                    return (true, "Microphone: Ready ✓");
+                }
+            }
+        }
+    }
+    (false, "Microphone: Install VB-Cable…")
+}
+
 /// Starts the cpal audio output playback stream bound to the JitterBuffer.
 pub fn start_audio_stream(device: &Device, jitter_buffer: Arc<JitterBuffer>) -> io::Result<Stream> {
     let supported_config = device

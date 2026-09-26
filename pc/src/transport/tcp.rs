@@ -1,8 +1,10 @@
+use crate::audio::opus::OpusDecoderWrapper;
 use crate::audio::pipeline::JitterBuffer;
 use crate::protocol::{
-    read_frame, write_frame, Frame, FrameType, HelloPayload, MediaHeader, WelcomePayload,
-    CODEC_PCM, MEDIA_HEADER_LEN, PORT_TCP, PROTO_VERSION,
+    read_frame, write_frame, Frame, FrameType, HelloPayload, MediaHeader, RejectPayload,
+    WelcomePayload, CODEC_OPUS, CODEC_PCM, MEDIA_HEADER_LEN, PORT_TCP, PROTO_VERSION,
 };
+use crate::session::{HandshakeOutcome, SessionManager, PENDING_TIMEOUT};
 use std::io::{self, Error, ErrorKind};
 use std::net::{TcpListener, TcpStream};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -29,14 +31,13 @@ pub fn configure_stream(stream: &TcpStream) -> io::Result<()> {
     Ok(())
 }
 
-/// Performs Phase 1 handshake on an accepted connection:
+/// Performs handshake on an accepted connection with SessionManager:
 /// 1. Reads HELLO frame from phone.
-/// 2. Verifies proto version.
-/// 3. Responds with WELCOME frame.
+/// 2. Evaluates against trust rules (sessions-trust.md).
+/// 3. Responds with WELCOME or PENDING then WELCOME/REJECT.
 pub fn perform_handshake(
     stream: &mut TcpStream,
-    pc_id: &str,
-    pc_name: &str,
+    session_manager: &SessionManager,
 ) -> io::Result<HelloPayload> {
     let frame = read_frame(stream)?;
     if frame.frame_type != FrameType::Hello {
@@ -53,6 +54,12 @@ pub fn perform_handshake(
         .map_err(|e| Error::new(ErrorKind::InvalidData, format!("invalid HELLO JSON: {}", e)))?;
 
     if hello.proto != PROTO_VERSION {
+        let reject = RejectPayload {
+            reason: "version".to_string(),
+        };
+        let reject_bytes = serde_json::to_vec(&reject)
+            .map_err(|e| Error::other(format!("failed to serialize REJECT: {}", e)))?;
+        let _ = write_frame(stream, &Frame::new(FrameType::Reject, reject_bytes));
         return Err(Error::new(
             ErrorKind::InvalidData,
             format!(
@@ -62,48 +69,80 @@ pub fn perform_handshake(
         ));
     }
 
-    let welcome = WelcomePayload {
-        pc_id: pc_id.to_string(),
-        pc_name: pc_name.to_string(),
-        token: "phase1-trust-token".to_string(),
-        resumed: false,
-        pc_caps: vec!["pcm".to_string()],
+    let outcome = session_manager.handle_hello(&hello);
+    let final_outcome = match outcome {
+        HandshakeOutcome::Pending { request_id } => {
+            // Inform client that request is pending user approval
+            let pending_frame = Frame::empty(FrameType::Pending);
+            write_frame(stream, &pending_frame)?;
+            session_manager.wait_for_decision(request_id, PENDING_TIMEOUT)
+        }
+        other => other,
     };
 
-    let welcome_bytes = serde_json::to_vec(&welcome)
-        .map_err(|e| Error::other(format!("failed to serialize WELCOME: {}", e)))?;
-
-    let welcome_frame = Frame::new(FrameType::Welcome, welcome_bytes);
-    write_frame(stream, &welcome_frame)?;
-
-    Ok(hello)
+    match final_outcome {
+        HandshakeOutcome::Accept {
+            token,
+            resumed,
+            pc_id,
+            pc_name,
+            ..
+        } => {
+            let welcome = WelcomePayload {
+                pc_id,
+                pc_name,
+                token,
+                resumed,
+                pc_caps: vec!["pcm".to_string(), "opus".to_string()],
+            };
+            let welcome_bytes = serde_json::to_vec(&welcome)
+                .map_err(|e| Error::other(format!("failed to serialize WELCOME: {}", e)))?;
+            write_frame(stream, &Frame::new(FrameType::Welcome, welcome_bytes))?;
+            Ok(hello)
+        }
+        HandshakeOutcome::Reject { reason } => {
+            let reject = RejectPayload {
+                reason: reason.clone(),
+            };
+            let reject_bytes = serde_json::to_vec(&reject)
+                .map_err(|e| Error::other(format!("failed to serialize REJECT: {}", e)))?;
+            let _ = write_frame(stream, &Frame::new(FrameType::Reject, reject_bytes));
+            Err(Error::new(ErrorKind::PermissionDenied, reason))
+        }
+        HandshakeOutcome::Pending { .. } => {
+            Err(Error::new(ErrorKind::TimedOut, "pending timed out"))
+        }
+    }
 }
 
 /// Handles a single connected phone session until disconnection.
 pub fn handle_client(
     mut stream: TcpStream,
     jitter_buffer: Arc<JitterBuffer>,
-    pc_id: &str,
-    pc_name: &str,
+    session_manager: SessionManager,
 ) {
     if let Err(e) = configure_stream(&stream) {
         eprintln!("[tcp] Failed to configure socket: {}", e);
         return;
     }
 
-    let hello = match perform_handshake(&mut stream, pc_id, pc_name) {
+    let hello = match perform_handshake(&mut stream, &session_manager) {
         Ok(h) => h,
         Err(e) => {
-            eprintln!("[handshake] Handshake failed: {}", e);
+            eprintln!("[handshake] Handshake rejected or failed: {}", e);
             return;
         }
     };
 
     println!("[connected] {} via L{}", hello.device_name, hello.level);
+    jitter_buffer.set_level(hello.level);
 
+    let mut opus_decoder = OpusDecoderWrapper::new().ok();
     let mut sample_buf = Vec::with_capacity(960);
 
     while let Ok(frame) = read_frame(&mut stream) {
+        session_manager.record_frame_received();
+
         match frame.frame_type {
             FrameType::Audio => {
                 if frame.payload.len() >= MEDIA_HEADER_LEN {
@@ -115,6 +154,8 @@ pub fn handle_client(
                         }
                     };
 
+                    jitter_buffer.record_arrival(header.capture_ts);
+
                     if header.codec == CODEC_PCM {
                         let pcm_bytes = &frame.payload[MEDIA_HEADER_LEN..];
                         sample_buf.clear();
@@ -124,6 +165,15 @@ pub fn handle_client(
                         }
                         if !sample_buf.is_empty() {
                             jitter_buffer.push_samples(&sample_buf);
+                        }
+                    } else if header.codec == CODEC_OPUS {
+                        if let Some(ref mut dec) = opus_decoder {
+                            let opus_bytes = &frame.payload[MEDIA_HEADER_LEN..];
+                            if dec.decode(opus_bytes, &mut sample_buf).is_ok()
+                                && !sample_buf.is_empty()
+                            {
+                                jitter_buffer.push_samples(&sample_buf);
+                            }
                         }
                     }
                 }
@@ -136,13 +186,14 @@ pub fn handle_client(
                 // Reserved for stream settings
             }
             FrameType::Bye => {
+                session_manager.close_session("bye");
                 break;
             }
             _ => {}
         }
     }
 
-    jitter_buffer.reset();
+    session_manager.notify_transport_dropped();
     println!("[disconnected] {}", hello.device_name);
 }
 
@@ -150,8 +201,7 @@ pub fn handle_client(
 pub fn start_tcp_listener(
     listener: TcpListener,
     jitter_buffer: Arc<JitterBuffer>,
-    pc_id: String,
-    pc_name: String,
+    session_manager: SessionManager,
     running: Arc<AtomicBool>,
 ) -> thread::JoinHandle<()> {
     thread::spawn(move || {
@@ -159,12 +209,11 @@ pub fn start_tcp_listener(
             match listener.accept() {
                 Ok((stream, _addr)) => {
                     let jb = Arc::clone(&jitter_buffer);
-                    let id = pc_id.clone();
-                    let name = pc_name.clone();
+                    let sm = session_manager.clone();
 
                     // Spawn session reader thread for incoming client
                     thread::spawn(move || {
-                        handle_client(stream, jb, &id, &name);
+                        handle_client(stream, jb, sm);
                     });
                 }
                 Err(ref e) if e.kind() == ErrorKind::WouldBlock => {

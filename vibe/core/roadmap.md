@@ -16,10 +16,10 @@ Android
 - [ ] Swipe-away from Recents stops everything
 
 PC
-- [ ] Console binary (no tray yet): TCP listener, framing, handshake
-- [ ] `adb.rs`: track devices, `adb reverse`
-- [ ] Jitter buffer (fixed 20 ms) → virtual mic (VB-Cable on Windows, null-sink + remap-source on Linux)
-- [ ] Logs `[connected] Pixel 7 via L1` / `[disconnected]`
+- [x] Console binary (no tray yet): TCP listener, framing, handshake
+- [x] `adb.rs`: track devices, `adb reverse`
+- [x] Jitter buffer (fixed 20 ms) → virtual mic (VB-Cable on Windows, null-sink + remap-source on Linux)
+- [x] Logs `[connected] Pixel 7 via L1` / `[disconnected]`
 
 ## Phase 2 — The four levels, trust, and the real phone UI
 
@@ -38,13 +38,13 @@ Android
 - [ ] USB-connected-but-no-link tethering hint
 
 PC
-- [ ] Tray icon + menu per [pc-ux.md](pc-ux.md); autostart at login
-- [ ] `beacon.rs`, `bt.rs` (Windows + Linux)
-- [ ] `session.rs`: tokens, trust rules ([sessions-trust.md](../architecture/sessions-trust.md)), ask-before-join prompts, one-active rule, handover with 30 s session hold
-- [ ] Opus decode; adaptive jitter buffer; drift resampler; 200 ms latency cap
-- [ ] Virtual-device detection with "Install…" guidance
-- [ ] Installer (Windows) and .deb/AppImage (Linux) with firewall rule
-- [ ] Refactor pass: modules as in [repo-structure.md](../architecture/repo-structure.md) (Phase 1 was allowed to be rough)
+- [x] Tray icon + menu per [pc-ux.md](pc-ux.md); autostart at login
+- [x] `beacon.rs`, `bt.rs` (Windows + Linux)
+- [x] `session.rs`: tokens, trust rules ([sessions-trust.md](../architecture/sessions-trust.md)), ask-before-join prompts, one-active rule, handover with 30 s session hold
+- [x] Opus decode; adaptive jitter buffer; drift resampler; 200 ms latency cap
+- [x] Virtual-device detection with "Install…" guidance
+- [x] Installer (Windows) and .deb/AppImage (Linux) with firewall rule
+- [x] Refactor pass: modules as in [repo-structure.md](../architecture/repo-structure.md) (Phase 1 was allowed to be rough)
 
 ## Phase 3 — Camera
 
