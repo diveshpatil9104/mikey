@@ -21,7 +21,7 @@ minifb = "0.28"
 nnnoiseless = { version = "0.5", default-features = false }
 
 [target.'cfg(windows)'.dependencies]
-tray-icon = "0.19"
+tray-icon = "0.25"
 muda = "0.15"
 
 # Unoptimized, JPEG decoding, noise suppression and Opus run about 20 times slower and the
