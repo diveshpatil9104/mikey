@@ -39,31 +39,6 @@ impl OpusDecoderWrapper {
             )),
         }
     }
-
-    /// Decodes a packet loss concealment (PLC) frame to fill a gap.
-    pub fn decode_plc(&mut self, out_pcm: &mut Vec<i16>, frame_size: usize) -> io::Result<usize> {
-        out_pcm.clear();
-        let target_len = frame_size.min(self.output_buf.len());
-        // In opus-decoder or RFC 8251, decode with empty data or generate concealment
-        match self
-            .decoder
-            .decode_float(&[], &mut self.output_buf[..target_len], true)
-        {
-            Ok(samples_decoded) => {
-                out_pcm.reserve(samples_decoded);
-                for &s in &self.output_buf[..samples_decoded] {
-                    let clamped = s.clamp(-1.0, 1.0);
-                    out_pcm.push((clamped * 32767.0).round() as i16);
-                }
-                Ok(samples_decoded)
-            }
-            Err(_) => {
-                // Fallback: fill with comfortable zero silence if PLC fails
-                out_pcm.resize(frame_size, 0);
-                Ok(frame_size)
-            }
-        }
-    }
 }
 
 #[cfg(test)]
