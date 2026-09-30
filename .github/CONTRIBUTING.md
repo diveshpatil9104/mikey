@@ -121,7 +121,7 @@ cargo run --release
 
 ### Virtual audio/video devices
 
-- **Windows:** Install [VB-Audio Virtual Cable](https://vb-audio.com/Cable/) (free) for virtual mic. The [softcam](https://github.com/niconicolet/softcam) DLL is bundled for virtual webcam.
+- **Windows:** Configure the virtual microphone (run `setup-mic.cmd` or use the installer) for virtual mic. The [softcam](https://github.com/niconicolet/softcam) DLL is bundled for virtual webcam.
 - **Linux:** PipeWire/PulseAudio creates the virtual mic automatically. For virtual webcam, load `v4l2loopback`.
 
 See [INSTALL_PC.md](../docs/INSTALL_PC.md) for detailed platform setup.
@@ -265,7 +265,7 @@ Use the same format as commit messages:
 ```
 feat(android): add bluetooth transport toggle
 fix(pc): prevent crash on malformed audio frame
-docs: add troubleshooting guide for VB-Cable
+docs: add troubleshooting guide for virtual microphone
 ```
 
 ---

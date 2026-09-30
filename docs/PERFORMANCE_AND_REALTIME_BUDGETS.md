@@ -36,7 +36,7 @@ PC JitterBuffer & DSP (pc/src/audio/)
 WASAPI System Playback Buffer (sink/stream.rs)
        │  ~3.0 ms (Windows Shared Mixer Engine)
        ▼
-VB-Audio Virtual Cable / Mic Endpoint
+Virtual Microphone Endpoint (Mikey Mic)
        │
        Total: ~18.5 ms (Well within ≤ 20 ms budget)
 ```

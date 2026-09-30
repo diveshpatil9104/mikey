@@ -28,7 +28,7 @@ The first preview release.
 - Tray app with a native panel: mic level, mute, camera preview and noise suppression
 - TCP listener (`:7653`), UDP discovery beacon (`:7654`), Bluetooth RFCOMM and an adb watcher
 - Sessions with trust on first use, ask-before-join and a 30 s hold when the link drops
-- Audio: Opus or PCM decode, RNNoise noise suppression, an adaptive jitter buffer, smooth drift correction with cubic interpolation, fades at gaps and a soft clip, into VB-CABLE as *Mikey Mic*
+- Audio: Opus or PCM decode, RNNoise noise suppression, an adaptive jitter buffer, smooth drift correction with cubic interpolation, fades at gaps and a soft clip, into the virtual microphone as *Mikey Mic*
 - Video: JPEG decode, smooth scaling to one fixed 1920×1080 size, into the built-in virtual camera *Mikey Cam* (softcam)
 
 ### Project
