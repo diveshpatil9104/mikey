@@ -8,9 +8,9 @@ Mikey for PC runs as a standalone tray application (`mikey`) that acts as the re
 
 ### Windows 10 / 11
 1. Download `Mikey-Setup-x.y.z.exe` from Releases.
-2. Run the installer (requires administrator privilege to register the local private firewall rule for TCP port 7653 and UDP port 7654).
-3. Install **[VB-Audio Virtual Cable](https://vb-audio.com/Cable/)** (free). Mikey outputs audio to **"CABLE Input"**, and your meeting apps (Zoom, Teams, Google Meet, Discord) select **"CABLE Output"** as their microphone.
-4. Launch Mikey. A small dot appears in your system tray (Notification Area).
+2. Run the installer. It automatically sets up Mikey, configures firewall rules, and creates the **"Mikey Mic"** microphone and **"Mikey Cam"** camera.
+3. Launch Mikey. A small icon appears in your system tray.
+4. In your meeting apps (Zoom, Teams, Google Meet, Discord), select **"Mikey Mic"** as your microphone and **"Mikey Cam"** as your camera.
 
 ### Linux (Ubuntu / Debian / Arch / Fedora)
 - **Debian / Ubuntu:** `sudo dpkg -i mikey_x.y.z_amd64.deb`
@@ -25,6 +25,7 @@ Mikey for PC runs as a standalone tray application (`mikey`) that acts as the re
 - **Rust Toolchain:** Stable Rust (1.80+) with `cargo`.
 - **Windows:** Microsoft Visual C++ Build Tools or MinGW GNU toolchain.
 - **Linux:** `build-essential`, `libasound2-dev`, `libdbus-1-dev`.
+- **Virtual Mic (Windows):** Run `setup-mic.cmd` as Administrator once to configure **"Mikey Mic"** (or click the setup banner in the tray flyout).
 
 ### Build & Run
 ```bash

@@ -25,7 +25,7 @@
 │                   → drift resample → virtual mic                │
 │  Video pipeline   JPEG decode → scale/letterbox → virtual cam   │
 │  Tray / UI        icon + flyout, notifications, preview window  │
-└──────── Virtual mic (VB-Cable / PipeWire) ───────────────────────┘
+└──────── Virtual mic (Mikey Mic / PipeWire) ──────────────────────┘
           Virtual cam (softcam / v4l2loopback)
 ```
 

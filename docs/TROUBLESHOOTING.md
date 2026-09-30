@@ -49,7 +49,7 @@ Common issues and solutions for Mikey. If your problem isn't listed here, [open 
 
 **Solutions:**
 1. **Check virtual mic setup:**
-   - **Windows:** Ensure [VB-Audio Virtual Cable](https://vb-audio.com/Cable/) is installed. In your meeting app, select **"CABLE Output"** as the microphone.
+   - **Windows:** Ensure the virtual microphone is ready (click **Setup Mic** in the Mikey tray panel if prompted, or re-run the installer). In your meeting app, select **"Mikey Mic"** as the microphone.
    - **Linux:** Mikey creates "Mikey Microphone" automatically via PipeWire/PulseAudio. Select it in your app's audio settings.
 2. **Check Mikey is receiving:** Look at the VU meter in the PC tray flyout. If it's showing activity, the audio is reaching the PC - the issue is in your meeting app's mic selection.
 3. **Check mic permission on Android:** Settings → Apps → Mikey → Permissions → Microphone must be "Allowed".

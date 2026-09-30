@@ -40,11 +40,7 @@ The camera and microphone in your phone are far better than the ones built into 
 
 ## Get started
 
-### 1. Install VB-CABLE on your PC
-
-[VB-CABLE](https://vb-audio.com/Cable/) (free, by VB-Audio) is the virtual mic Mikey sends your voice to. Install it once and restart when it asks; Mikey finds it by itself.
-
-### 2. Download Mikey
+### 1. Download Mikey
 
 From the [latest release](https://github.com/diveshpatil9104/mikey/releases):
 
@@ -55,23 +51,23 @@ From the [latest release](https://github.com/diveshpatil9104/mikey/releases):
 
 Mikey isn't code-signed yet, so Windows SmartScreen may warn you: click **More info**, then **Run anyway**.
 
-### 3. Connect
+### 2. Connect
 
 - **USB:** turn on USB debugging on the phone, plug it in, and tap *Allow* on the phone. The PC needs [Android platform-tools](https://developer.android.com/tools/releases/platform-tools) (`adb`) on its `PATH`.
 - **Wi-Fi:** put the phone and PC on the same network, and let Mikey through the firewall ([how](docs/INSTALL_PC.md#3-firewall-configuration)).
 
 Open Mikey on the phone and tap the mic or the camera. The first time, click **Allow** on the PC to trust your phone.
 
-### 4. Pick Mikey in your app
+### 3. Pick Mikey in your app
 
-In Meet, Zoom or Teams, choose **CABLE Output (VB-Audio Virtual Cable)** as the microphone and **Mikey Cam** as the camera.
+In Meet, Zoom or Teams, choose **Mikey Mic** as the microphone and **Mikey Cam** as the camera.
 
 Something not working? See [Troubleshooting](docs/TROUBLESHOOTING.md).
 
 <details>
 <summary><b>Build from source instead</b></summary>
 
-You need [Rust](https://rustup.rs), [Android Studio](https://developer.android.com/studio) (Quail 4 or newer) and VB-CABLE.
+You need [Rust](https://rustup.rs) and [Android Studio](https://developer.android.com/studio) (Quail 4 or newer).
 
 ```powershell
 git clone --recursive https://github.com/diveshpatil9104/mikey.git
@@ -81,7 +77,7 @@ cargo run --release
 
 Then open the `android` folder in Android Studio and press **Run** to install the phone app ([more ways](docs/INSTALL_ANDROID.md)).
 
-Running from the source folder also enables the panel's **Setup Mic** button: click it once and approve the administrator prompt, and VB-CABLE's mic is renamed *Mikey Mic*.
+Running from the source folder also enables the panel's **Setup Mic** button: click it once and approve the administrator prompt to automatically configure *Mikey Mic*.
 
 </details>
 
@@ -127,7 +123,7 @@ The phone is always the client and the PC is always the server: TCP port `7653` 
 | **2** | Four connection levels, trust, phone UI | Done |
 | **3** | Phone camera as a virtual webcam | Done |
 | **4** | Audio quality: noise suppression, jitter buffer, drift correction | Done |
-| **5** | Release: v0.1.0 preview is out; next are the Windows installer (with VB-CABLE built in), Linux packages and v1.0 | In progress |
+| **5** | Release: v0.1.0 preview is out; next are the Windows installer, Linux packages and v1.0 | In progress |
 
 Details and the device test matrix are in the [Roadmap & Test Matrix](docs/ROADMAP_AND_TEST_MATRIX.md). Every release is listed in the [Changelog](docs/CHANGELOG.md).
 

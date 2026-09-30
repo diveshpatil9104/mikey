@@ -56,7 +56,7 @@ The Mikey audio subsystem is architected for **broadcast-grade speech fidelity, 
                        [WASAPI Virtual Sink] (pc/src/audio/sink/)
                           - High-priority real-time audio thread callback
                           - Non-blocking try-lock fetch
-                          - Feeds virtual microphone endpoint (VB-Audio Cable)
+                          - Feeds virtual microphone endpoint (Mikey Mic)
 ```
 
 ---
@@ -138,4 +138,4 @@ Mikey corrects drift by resampling continuously with **4-point cubic (Catmull-Ro
 In `pc/src/audio/sink/`:
 - **WASAPI Integration**: Operates in Windows Audio Session API shared event-driven mode (`AUDCLNT_STREAMFLAGS_EVENTCALLBACK`).
 - **Real-Time Guarantee**: The WASAPI render callback executes at high real-time priority. It retrieves audio from `JitterBuffer` via non-blocking try-locks. If the buffer runs dry, playback fades out into silence and fades back in after refilling (see 3.2), so gaps don't click.
-- **Virtual Audio Cable Compatibility**: Seamlessly links to VB-Audio Cable or dedicated virtual driver endpoints, exposing the stream as a standard microphone in Windows Sound Settings.
+- **Virtual Audio Endpoint Compatibility**: Seamlessly links to dedicated virtual driver endpoints (such as Mikey Mic), exposing the stream as a standard microphone in Windows Sound Settings.

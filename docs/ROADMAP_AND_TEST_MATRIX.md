@@ -21,7 +21,7 @@ This document tracks Mikey’s five implementation phases, current development s
 - [x] **Android**: Protocol handshake: `HELLO`, `WELCOME`, `HEARTBEAT`, `BYE`.
 - [x] **Android**: Swipe-away from Recents stops capture and terminates the service cleanly.
 - [x] **PC**: Console binary with TCP listener on port 7653.
-- [x] **PC**: Media demuxing and basic audio routing to virtual microphone (VB-Audio Cable).
+- [x] **PC**: Media demuxing and basic audio routing to virtual microphone (Mikey Mic).
 - [x] **PC**: Connection logging (`[connected] Pixel via L1`).
 
 ### 2.2 Phase 2 - Multi-Transport Engine & Trust (Complete)
