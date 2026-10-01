@@ -32,7 +32,7 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
         exit $proc.ExitCode
     } catch {
         Say "Windows didn't allow it, so Mikey Mic wasn't set up." "Yellow"
-        exit 1
+        Finish 1
     }
 }
 
@@ -124,6 +124,20 @@ if (Test-Driver) {
     if (-not $proc.WaitForExit(180000)) {
         Restore-Defaults
         Say "Installing Mikey Mic took too long." "Yellow"
+        Finish 1
+    }
+    # The setup's exit code isn't documented, so check that the driver's device actually appeared.
+    # Present devices only: a leftover entry from an old, removed install doesn't count.
+    $deadline = (Get-Date).AddSeconds(15)
+    do {
+        $installed = Get-PnpDevice -Class Media -PresentOnly -ErrorAction SilentlyContinue |
+            Where-Object { $_.FriendlyName -eq $DriverDevice }
+        if ($installed) { break }
+        Start-Sleep -Seconds 1
+    } while ((Get-Date) -lt $deadline)
+    if (-not $installed) {
+        Restore-Defaults
+        Say "Windows didn't install Mikey Mic's driver." "Yellow"
         Finish 1
     }
     $restartNeeded = $true

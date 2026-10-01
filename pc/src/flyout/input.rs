@@ -130,7 +130,9 @@ impl FlyoutWindow {
                     if let Some(path) = beside_exe.into_iter().chain(in_source).find(|p| p.exists())
                     {
                         let script = path.to_string_lossy();
-                        let args = ["-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass"];
+                        // Not hidden: if Mikey already runs as administrator the script runs in this
+                        // window, and it waits for Enter before closing.
+                        let args = ["-ExecutionPolicy", "Bypass"];
                         let _ = crate::launch::start(
                             "powershell.exe",
                             &[&args[..], &["-File", &script]].concat(),
