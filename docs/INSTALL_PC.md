@@ -4,18 +4,18 @@ Mikey for PC runs as a standalone tray application (`mikey`) that acts as the re
 
 ---
 
-## 1. Quick Start (Pre-Built Binaries)
+## 1. Quick Start
 
 ### Windows 10 / 11
-1. Download `Mikey-Setup-x.y.z.exe` from Releases.
-2. Run the installer. It automatically sets up Mikey, configures firewall rules, and creates the **"Mikey Mic"** microphone and **"Mikey Cam"** camera.
-3. Launch Mikey. A small icon appears in your system tray.
-4. In your meeting apps (Zoom, Teams, Google Meet, Discord), select **"Mikey Mic"** as your microphone and **"Mikey Cam"** as your camera.
+1. Download `Mikey-Setup-x.y.z.exe` from [Releases](https://github.com/diveshpatil9104/mikey/releases).
+2. Run it and approve the administrator prompt. It installs Mikey and **Mikey Mic**, the virtual microphone, and lets your phone reach Mikey on private networks (TCP port 7653, UDP port 7654). Your own default speakers and microphone stay as they were.
+3. Restart Windows if the installer asks: Mikey Mic's driver needs it the first time.
+4. Open Mikey; it can also start when you sign in. In Meet, Zoom, Teams or Discord, pick **Mikey Mic** as the microphone and **Mikey Cam** as the camera.
 
-### Linux (Ubuntu / Debian / Arch / Fedora)
-- **Debian / Ubuntu:** `sudo dpkg -i mikey_x.y.z_amd64.deb`
-- **AppImage:** `chmod +x Mikey-x.y.z.AppImage && ./Mikey-x.y.z.AppImage`
-- **Virtual Microphone on Linux:** Mikey automatically creates a virtual null-sink remap source using PipeWire/PulseAudio (`mikey_sink`), appearing as **"Mikey Microphone"** in your audio settings.
+If Mikey Mic goes missing later, open Mikey's panel and click **Setup Mic**. Uninstalling Mikey leaves Mikey Mic's driver in place, since other apps may use it. Third-party parts are listed in `THIRD-PARTY-NOTICES.txt` in Mikey's install folder.
+
+### Linux
+Not ready yet: the PC app builds on Linux, but has no virtual mic, camera, tray or Bluetooth there.
 
 ---
 
@@ -23,9 +23,8 @@ Mikey for PC runs as a standalone tray application (`mikey`) that acts as the re
 
 ### Prerequisites
 - **Rust Toolchain:** Stable Rust (1.80+) with `cargo`.
-- **Windows:** Microsoft Visual C++ Build Tools or MinGW GNU toolchain.
+- **Windows:** Microsoft Visual C++ Build Tools or MinGW GNU toolchain, and [VB-CABLE](https://vb-audio.com/Cable/) for the virtual mic. Then run `pc\setup-mic.cmd` as Administrator once, or click **Setup Mic** in the panel, to name it *Mikey Mic*.
 - **Linux:** `build-essential`, `libasound2-dev`, `libdbus-1-dev`.
-- **Virtual Mic (Windows):** Run `setup-mic.cmd` as Administrator once to configure **"Mikey Mic"** (or click the setup banner in the tray flyout).
 
 ### Build & Run
 ```bash
@@ -42,6 +41,9 @@ cargo run --release
 # Run self-test mode (plays a 3-second test tone into virtual mic)
 cargo run -- --test-tone
 ```
+
+### Build the Windows installer
+The [Windows installer workflow](../.github/workflows/windows-installer.yml) builds `mikey.exe` and `Mikey-Setup-x.y.z.exe` on every version tag, and on demand. To build it by hand on Windows, put the Mikey Mic driver files (VB-CABLE's `VBCABLE_Driver_Pack45.zip`, unzipped) in `pc/installer/driver/`, build `mikey.exe`, then run Inno Setup 6: `ISCC /DMyAppVersion=x.y.z pc\installer\mikey.iss`.
 
 ---
 
