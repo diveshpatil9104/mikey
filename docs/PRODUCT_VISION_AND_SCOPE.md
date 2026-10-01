@@ -68,7 +68,7 @@ Mikey feels less like software you operate and more like a physical hardware cab
 ### 4.1 First-Time PC Setup
 1. User downloads the single-file installer from GitHub Releases and executes it.
 2. The installer copies the `mikey` binary, registers the DirectShow virtual camera (`softcam.dll`), sets an autostart registry entry, adds a private network firewall rule, and starts the tray icon.
-3. If the virtual microphone driver is not detected, the tray icon displays an amber dot and the flyout presents an actionable banner: *"One more step: install the virtual microphone"*. Clicking the prompt runs setup to configure it. Mikey detects installation automatically without requiring an application restart.
+3. The installer also sets up **Mikey Mic**, the virtual microphone (it runs on the bundled VB-Audio Cable driver), and keeps the user's default speakers and microphone as they were. If Mikey Mic is missing later, the flyout shows a *Mic setup needed* banner whose **Setup Mic** button sets it up again. Mikey detects it automatically without an application restart.
 
 ### 4.2 First-Time Phone Setup
 1. User installs the APK from GitHub or F-Droid and opens Mikey.
@@ -108,7 +108,7 @@ If a user begins a meeting over Wi-Fi and connects a USB cable mid-call:
 | **R7** | USB tethering routes PC traffic through phone mobile data | Medium | Present a one-time informative tip explaining upstream tethering behavior; prefer Level 1 (ADB) when available. |
 | **R8** | Linux desktop environments hide standard tray icons | Medium | Support StatusNotifier/AppIndicator protocols; provide fallback command-line options (`mikey --settings`). |
 | **R9** | Linux Secure Boot blocks unsigned `v4l2loopback` kernel module | Medium | Recommend distro DKMS packages (auto-signed with MOK on Ubuntu/Fedora); provide comprehensive troubleshooting documentation. |
-| **R10**| Virtual microphone driver configuration | Low | Implement automated status detection and setup scripts in the installer and companion flyout. |
+| **R10**| The virtual mic depends on the third-party VB-Audio Cable driver | Low | The installer bundles it (VB-Audio's licensing page allows embedding it in an installer) as *Mikey Mic*, credited in `THIRD-PARTY-NOTICES.txt`; a Mikey-owned signed driver is the long-term option. |
 | **R11**| Client-isolated enterprise Wi-Fi blocks broadcast discovery | Low | Provide `manualPcAddress` in Advanced settings and retain `lastPcAddress` cache for direct IP connection. |
 | **R12**| Scope creep degrading core performance | High | Adhere strictly to Product Principle 2: non-essential features belong in Advanced or are rejected. |
 

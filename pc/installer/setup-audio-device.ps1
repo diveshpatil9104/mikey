@@ -1,262 +1,183 @@
-# Mikey - Audio Endpoint Auto-Setup & Rebranding
-# Installs / repairs the virtual audio driver and renames endpoints to "Mikey Mic" and "Mikey Audio Bridge".
-# Auto-elevates to Administrator if needed.
+# Mikey Mic setup: installs the virtual microphone driver if it's missing, names it "Mikey Mic",
+# and leaves the user's own default speakers and microphone exactly as they were.
+#
+# Run by the installer (-Silent) and by the panel's Setup Mic button. Needs administrator rights.
+# The driver files come from -DriverDir, by default the "driver" folder next to this script.
+# Exit codes: 0 ready, 3010 ready after Windows restarts, 1 failed.
 
 param (
-    [switch]$Silent = $false
+    [switch]$Silent = $false,
+    [string]$DriverDir = ""
 )
 
-$IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+$ErrorActionPreference = "Stop"
+if (-not $DriverDir) { $DriverDir = Join-Path $PSScriptRoot "driver" }
 
-$scriptPath = if ($PSCommandPath) { $PSCommandPath } else { $MyInvocation.MyCommand.Path }
-if (-not $scriptPath -or -not (Test-Path $scriptPath)) {
-    $scriptPath = Join-Path $PSScriptRoot "setup-audio-device.ps1"
+function Say([string]$text, [string]$color = "Cyan") {
+    if (-not $Silent) { Write-Host "[mikey] $text" -ForegroundColor $color }
 }
 
-if (-not $IsAdmin) {
-    if (-not $Silent) {
-        Write-Host "[mikey] Administrator privileges required to configure Mikey Mic." -ForegroundColor Yellow
-        Write-Host "[mikey] Requesting UAC elevation..." -ForegroundColor Cyan
-        try {
-            $psi = New-Object System.Diagnostics.ProcessStartInfo
-            $psi.FileName = "powershell.exe"
-            $psi.Arguments = "-ExecutionPolicy Bypass -NoProfile -File `"$scriptPath`""
-            $psi.Verb = "runas"
-            $psi.UseShellExecute = $true
-            $proc = [System.Diagnostics.Process]::Start($psi)
-            if ($proc) {
-                $proc.WaitForExit()
-                exit $proc.ExitCode
-            }
-            exit 0
-        } catch {
-            Write-Host ""
-            Write-Host "[mikey] Auto-elevation could not open prompt: $_" -ForegroundColor Yellow
-            Write-Host "[mikey] To complete audio device setup:" -ForegroundColor Cyan
-            Write-Host "       1. In File Explorer, go to: e:\Programs\mikey\pc" -ForegroundColor Cyan
-            Write-Host "       2. Right-click 'setup-mic.cmd' and select 'Run as administrator'" -ForegroundColor Cyan
-            Write-Host ""
-            exit 1
-        }
-    } else {
-        Write-Error "[mikey] Administrator privileges required to setup audio device."
+function Finish([int]$code) {
+    if (-not $Silent) { Read-Host "Press Enter to close" | Out-Null }
+    exit $code
+}
+
+$principal = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    if ($Silent) { exit 1 }
+    Say "Setting up Mikey Mic needs administrator rights. Asking Windows..." "Yellow"
+    $elevated = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -DriverDir `"$DriverDir`""
+    try {
+        $proc = Start-Process powershell.exe -ArgumentList $elevated -Verb RunAs -PassThru -Wait
+        exit $proc.ExitCode
+    } catch {
+        Say "Windows didn't allow it, so Mikey Mic wasn't set up." "Yellow"
         exit 1
     }
 }
 
-Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "  Mikey Audio Setup: Configuring Mikey Mic...  " -ForegroundColor Cyan
-Write-Host "===============================================" -ForegroundColor Cyan
+# Mikey Mic runs on this virtual cable driver. Its device and endpoint names as Windows reports them.
+$DriverDevice = "VB-Audio Virtual Cable"
+$MikeyAudio = "Mikey Audio"
+$EndpointName = "{a45c254e-df1c-4efd-8020-67d146a850e0},2"   # PKEY_Device_DeviceDesc: "CABLE Output"
+$AdapterName  = "{b3f8fa53-0004-438e-9003-51a46e139bfc},6"   # PKEY_DeviceInterface_FriendlyName: the part in brackets
 
-# 1. Check if driver is already running healthy
-$pnp = Get-PnpDevice -Class Media -ErrorAction SilentlyContinue | Where-Object { 
-    $_.InstanceId -like "*MEDIA\0003*" -or $_.FriendlyName -like "*CABLE*" -or $_.FriendlyName -like "*VB-Audio*" -or $_.FriendlyName -like "*Mikey*"
-} | Select-Object -First 1
-
-$needsInstall = $true
-if ($pnp -and $pnp.Status -eq "OK") {
-    Write-Host "[mikey] Found running audio driver device: $($pnp.FriendlyName)" -ForegroundColor Green
-    $needsInstall = $false
-}
-
-if ($needsInstall) {
-    Write-Host "[mikey] Installing / repairing driver..." -ForegroundColor Cyan
-
-    # A. Check DriverStore INF
-    $dsInf = Get-ChildItem -Path "C:\Windows\System32\DriverStore\FileRepository" -Filter "vbmmecable64_win10.inf" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($dsInf) {
-        Write-Host "[mikey] Adding driver from DriverStore: $($dsInf.FullName)" -ForegroundColor Cyan
-        & pnputil.exe /add-driver "$($dsInf.FullName)" /install | Out-Null
-    }
-
-    # B. Run bundled setup executable
-    $setupExe = "C:\Program Files\VB\CABLE\VBCABLE_Setup_x64.exe"
-    if (Test-Path $setupExe) {
-        Write-Host "[mikey] Running driver installer: $setupExe" -ForegroundColor Cyan
-        $proc = Start-Process -FilePath $setupExe -ArgumentList "-i", "-h" -PassThru
-        $proc.WaitForExit(10000)
-    }
-
-    # C. Restart device if error persists
-    Start-Sleep -Seconds 1
-    $dev = Get-PnpDevice -Class Media -ErrorAction SilentlyContinue | Where-Object { 
-        $_.InstanceId -like "*MEDIA\0003*" -or $_.FriendlyName -like "*CABLE*" -or $_.FriendlyName -like "*VB-Audio*"
-    } | Select-Object -First 1
-    if ($dev) {
-        & pnputil.exe /restart-device "$($dev.InstanceId)" | Out-Null
-    }
-
-    Start-Sleep -Seconds 1
-}
-
-# 2. Rebrand Audio Endpoints in Registry to "Mikey Mic" and "Mikey Audio Bridge"
-$FriendlyNameProp = "{a45c254e-df1c-4efd-8020-67d146a850e0},2"
-$DeviceDescProp   = "{b3f8fa53-0004-438e-9003-51a46e139bfc},6"
-$InterfaceProp    = "{b3f8fa53-0004-438e-9003-51a46e139bfc},2"
-
-# 2A. Capture Endpoints (Microphones) -> "Mikey Mic"
-$capturePath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Capture"
-if (Test-Path $capturePath) {
-    Get-ChildItem -Path $capturePath -Recurse -ErrorAction SilentlyContinue | Where-Object {
-        $_.Property -contains $FriendlyNameProp
-    } | ForEach-Object {
-        $keyPath = $_.PSPath
-        $props = Get-ItemProperty -Path $keyPath -ErrorAction SilentlyContinue
-        $currentName = $props.$FriendlyNameProp
-        $deviceDesc = $props.$DeviceDescProp
-        $interface = $props.$InterfaceProp
-
-        if ($currentName -like "*CABLE*" -or $currentName -like "*VB-Audio*" -or $deviceDesc -like "*VB-Audio*" -or $interface -like "*0003*") {
-            Write-Host "[mikey] Rebranding Capture Endpoint '$currentName' -> 'Mikey Mic'..." -ForegroundColor Green
-            Set-ItemProperty -Path $keyPath -Name $FriendlyNameProp -Value "Mikey Mic" -Force
-        }
-    }
-}
-
-# 2B. Clean up Render Endpoints (Speakers)
-# The user wants ONLY their own physical speakers visible for audio output.
-$renderPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render"
-if (Test-Path $renderPath) {
-    Get-ChildItem -Path $renderPath -Recurse -ErrorAction SilentlyContinue | Where-Object {
-        $_.Property -contains $FriendlyNameProp
-    } | ForEach-Object {
-        $keyPath = $_.PSPath
-        $props = Get-ItemProperty -Path $keyPath -ErrorAction SilentlyContinue
-        $currentName = $props.$FriendlyNameProp
-        $deviceDesc = $props.$DeviceDescProp
-        $interface = $props.$InterfaceProp
-        $parentKey = Split-Path $keyPath
-
-        # 1. Disable orphan AudioRelay virtual speaker so it disappears from output list
-        if ($currentName -like "*Virtual Speaker*" -or $deviceDesc -like "*AudioRelay*") {
-            Write-Host "[mikey] Disabling orphan output '$currentName'..." -ForegroundColor Yellow
-            Set-ItemProperty -Path $parentKey -Name "DeviceState" -Value 268435458 -Force -ErrorAction SilentlyContinue
-        }
-
-        # 2. Disable duplicate "Speakers (VB-Audio Virtual Cable)" so user only sees real speakers
-        if ($currentName -like "*Speakers*" -and ($deviceDesc -like "*VB-Audio*" -or $interface -like "*0003*")) {
-            Write-Host "[mikey] Disabling extra virtual speaker '$currentName'..." -ForegroundColor Yellow
-            Set-ItemProperty -Path $parentKey -Name "DeviceState" -Value 268435458 -Force -ErrorAction SilentlyContinue
-        }
-
-        # 3. Rebrand the internal bridge endpoint to "Mikey Mic Bridge"
-        if (($currentName -like "*CABLE In*" -or $currentName -like "*CABLE*" -or $currentName -like "*Mikey*") -and $currentName -notlike "*Realtek*" -and $currentName -notlike "*Speakers*") {
-            Write-Host "[mikey] Setting Render Bridge '$currentName' -> 'Mikey Mic Bridge'..." -ForegroundColor Green
-            Set-ItemProperty -Path $keyPath -Name $FriendlyNameProp -Value "Mikey Mic Bridge" -Force
-        }
-    }
-}
-
-# 3. Restart Windows Audio Service to apply changes
-Write-Host "[mikey] Refreshing Windows Audio Service..." -ForegroundColor Cyan
-try {
-    Restart-Service -Name "Audiosrv" -Force -ErrorAction Stop
-    Write-Host "[mikey] Windows Audio Service refreshed." -ForegroundColor Green
-    # Gently notify the shell that device associations changed (do NOT kill explorer -
-    # that breaks Windows 11 Quick Settings flyouts for Wi-Fi, Sound, Bluetooth)
-    $shNotify = @'
-using System;
-using System.Runtime.InteropServices;
-public class ShellNotify {
-    [DllImport("shell32.dll")]
-    public static extern void SHChangeNotify(int wEventId, int uFlags, IntPtr dwItem1, IntPtr dwItem2);
-    public static void Refresh() { SHChangeNotify(0x08000000, 0, IntPtr.Zero, IntPtr.Zero); }
-}
-'@
-    if (-not ([System.Management.Automation.PSTypeName]'ShellNotify').Type) {
-        Add-Type -TypeDefinition $shNotify -ErrorAction SilentlyContinue
-    }
-    [ShellNotify]::Refresh()
-} catch {
-    Write-Warning "[mikey] Could not restart Audiosrv automatically: $_"
-}
-
-# 3B. Preserve User's Physical Speaker Output & Set Mikey Mic as Default Input
-try {
-    $cSharp = @'
+Add-Type -TypeDefinition @'
 using System;
 using System.Runtime.InteropServices;
 
-[Guid("F8679F50-850A-41CF-9C72-430F290290C8"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+[ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
+class MMDeviceEnumerator {}
+
+[ComImport, Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+interface IMMDeviceEnumerator {
+    int EnumAudioEndpoints();
+    [PreserveSig] int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice device);
+}
+
+[ComImport, Guid("D666063F-1587-4E43-81F1-B948E807363F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+interface IMMDevice {
+    int Activate();
+    int OpenPropertyStore();
+    [PreserveSig] int GetId([MarshalAs(UnmanagedType.LPWStr)] out string id);
+}
+
+[ComImport, Guid("F8679F50-850A-41CF-9C72-430F290290C8"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 interface IPolicyConfig {
-    void GetMixFormat();
-    void GetDeviceFormat();
-    void ResetDeviceFormat();
-    void SetDeviceFormat();
-    void GetProcessingPeriod();
-    void SetProcessingPeriod();
-    void GetShareMode();
-    void SetShareMode();
-    void GetPropertyValue();
-    void SetPropertyValue();
-    void SetDefaultEndpoint(string wszDeviceId, int eRole);
-    void SetEndpointVisibility();
+    int GetMixFormat(); int GetDeviceFormat(); int ResetDeviceFormat(); int SetDeviceFormat();
+    int GetProcessingPeriod(); int SetProcessingPeriod(); int GetShareMode(); int SetShareMode();
+    int GetPropertyValue(); int SetPropertyValue();
+    [PreserveSig] int SetDefaultEndpoint([MarshalAs(UnmanagedType.LPWStr)] string id, int role);
 }
 
-[Guid("870AF99C-171D-4F9E-AF0D-E63DF40C2BC9")]
-public class CPolicyConfigClient {}
+[ComImport, Guid("870AF99C-171D-4F9E-AF0D-E63DF40C2BC9")]
+class PolicyConfigClient {}
 
-public class AudioDeviceHelper {
-    public static int SetDefault(string deviceId) {
-        try {
-            IPolicyConfig policy = (IPolicyConfig)new CPolicyConfigClient();
-            policy.SetDefaultEndpoint(deviceId, 0); // eConsole
-            policy.SetDefaultEndpoint(deviceId, 1); // eMultimedia
-            policy.SetDefaultEndpoint(deviceId, 2); // eCommunications
-            return 0;
-        } catch {
-            return -1;
-        }
+public static class MikeyDefaults {
+    // flow 0 = speakers, 1 = microphones; role 0 = console, 1 = multimedia, 2 = communications
+    public static string Get(int flow, int role) {
+        IMMDevice device;
+        var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+        if (enumerator.GetDefaultAudioEndpoint(flow, role, out device) != 0 || device == null) return null;
+        string id;
+        return device.GetId(out id) == 0 ? id : null;
+    }
+    public static void Set(string id, int role) {
+        ((IPolicyConfig)new PolicyConfigClient()).SetDefaultEndpoint(id, role);
     }
 }
 '@
-    if (-not ([System.Management.Automation.PSTypeName]'AudioDeviceHelper').Type) {
-        Add-Type -TypeDefinition $cSharp -ErrorAction SilentlyContinue
+
+# 1. Remember the user's default speakers and microphone, for every role.
+$saved = @()
+foreach ($flow in 0, 1) {
+    foreach ($role in 0, 1, 2) {
+        $id = [MikeyDefaults]::Get($flow, $role)
+        if ($id) { $saved += [pscustomobject]@{ Id = $id; Role = $role } }
     }
-
-    # Ensure Physical Speaker is the Default Output (Render)
-    $physicalSpeaker = Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render" -ErrorAction SilentlyContinue | Where-Object {
-        (Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).DeviceState -eq 1
-    } | Where-Object {
-        $props = Get-ItemProperty ($_.PSPath + "\Properties") -ErrorAction SilentlyContinue
-        $name = $props.$FriendlyNameProp
-        $desc = $props.$DeviceDescProp
-        $name -notlike "*Mikey*" -and $name -notlike "*CABLE*" -and $name -notlike "*VB-Audio*" -and $desc -notlike "*VB-Audio*"
-    } | Select-Object -First 1
-
-    if ($physicalSpeaker) {
-        $spkName = (Get-ItemProperty ($physicalSpeaker.PSPath + "\Properties") -ErrorAction SilentlyContinue).$FriendlyNameProp
-        [AudioDeviceHelper]::SetDefault($physicalSpeaker.PSChildName) | Out-Null
-        Write-Host "[mikey] Speaker Output: '$spkName' remains your default output (Unchanged)" -ForegroundColor Green
-    }
-
-    # Set Mikey Mic as Default Recording Device (Capture)
-    $mikeyMic = Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Capture" -ErrorAction SilentlyContinue | Where-Object {
-        (Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).DeviceState -eq 1
-    } | Where-Object {
-        $props = Get-ItemProperty ($_.PSPath + "\Properties") -ErrorAction SilentlyContinue
-        $name = $props.$FriendlyNameProp
-        $name -like "*Mikey*" -or $name -like "*CABLE Output*"
-    } | Select-Object -First 1
-
-    if ($mikeyMic) {
-        [AudioDeviceHelper]::SetDefault($mikeyMic.PSChildName) | Out-Null
-        Write-Host "[mikey] Microphone Input: 'Mikey Mic' set as default recording input" -ForegroundColor Green
-    }
-} catch {
-    Write-Warning "[mikey] Default endpoint assignment skipped: $_"
 }
 
-# 4. Final verification
-Start-Sleep -Seconds 1
-$pnpFinal = Get-PnpDevice -Class Media -ErrorAction SilentlyContinue | Where-Object { 
-    $_.InstanceId -like "*MEDIA\0003*" -or $_.FriendlyName -like "*CABLE*" -or $_.FriendlyName -like "*VB-Audio*" -or $_.FriendlyName -like "*Mikey*"
-} | Select-Object -First 1
+# Installing the driver can make it the default device; put the user's own ones back.
+function Restore-Defaults {
+    foreach ($d in $saved) {
+        try { [void][MikeyDefaults]::Set($d.Id, $d.Role) } catch {}
+    }
+}
 
-if ($pnpFinal -and $pnpFinal.Status -eq "OK") {
-    Write-Host ""
-    Write-Host "[mikey] SUCCESS! Mikey Mic is installed, healthy, and ready!" -ForegroundColor Green
-    Write-Host "[mikey] Windows applications will now detect 'Mikey Mic' as an input device." -ForegroundColor Green
+# 2. Install the driver if it isn't there.
+function Test-Driver {
+    $dev = Get-PnpDevice -Class Media -ErrorAction SilentlyContinue | Where-Object { $_.FriendlyName -eq $DriverDevice }
+    return [bool]($dev | Where-Object { $_.Status -eq "OK" })
+}
+
+$restartNeeded = $false
+if (Test-Driver) {
+    Say "Mikey Mic's driver is already installed." "Green"
 } else {
-    Write-Host "[mikey] Setup finished. Status: $($pnpFinal.Status)" -ForegroundColor Yellow
+    $setup = Join-Path $DriverDir "VBCABLE_Setup_x64.exe"
+    if (-not (Test-Path $setup)) {
+        Say "Mikey Mic's driver files are missing. Reinstall Mikey to set it up." "Yellow"
+        Finish 1
+    }
+    Say "Installing Mikey Mic. This can take a minute..."
+    $proc = Start-Process -FilePath $setup -ArgumentList "-i", "-h" -WorkingDirectory $DriverDir -PassThru
+    if (-not $proc.WaitForExit(180000)) {
+        Restore-Defaults
+        Say "Installing Mikey Mic took too long." "Yellow"
+        Finish 1
+    }
+    $restartNeeded = $true
 }
+
+# 3. Name it Mikey Mic. Its endpoints appear shortly after the driver installs.
+function Rename-Endpoints([string]$flow, [string]$name) {
+    $root = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\$flow"
+    $found = 0
+    Get-ChildItem -Path $root -ErrorAction SilentlyContinue | ForEach-Object {
+        $props = Join-Path $_.PSPath "Properties"
+        $values = Get-ItemProperty -Path $props -ErrorAction SilentlyContinue
+        if ($values -and ($values.$AdapterName -eq $DriverDevice -or $values.$AdapterName -eq $MikeyAudio)) {
+            Set-ItemProperty -Path $props -Name $EndpointName -Value $name
+            Set-ItemProperty -Path $props -Name $AdapterName -Value $MikeyAudio
+            $found++
+        }
+    }
+    return $found
+}
+
+try {
+    $deadline = (Get-Date).AddSeconds(30)
+    do {
+        $mics = Rename-Endpoints "Capture" "Mikey Mic"
+        if ($mics -gt 0) { break }
+        Start-Sleep -Seconds 2
+    } while ((Get-Date) -lt $deadline)
+    [void](Rename-Endpoints "Render" "Mikey Mic Bridge")
+} catch {
+    Restore-Defaults
+    Say "Couldn't name the microphone Mikey Mic: $($_.Exception.Message)" "Yellow"
+    Finish 1
+}
+
+if ($mics -eq 0) {
+    Restore-Defaults
+    if ($restartNeeded) {
+        Say "Mikey Mic is installed. Restart Windows, then click Setup Mic in Mikey's panel to finish." "Yellow"
+        Finish 3010
+    }
+    Say "Mikey Mic's driver is installed, but Windows hasn't created the microphone yet. Restart Windows and try again." "Yellow"
+    Finish 1
+}
+
+# 4. Apply the names, then put the user's defaults back.
+try {
+    Restart-Service -Name "Audiosrv" -Force
+    Start-Sleep -Seconds 2
+} catch {
+    Say "The new name shows after Windows restarts." "Yellow"
+}
+Restore-Defaults
+
+Say "Mikey Mic is ready. Pick it as the microphone in Meet, Zoom or Teams." "Green"
+if ($restartNeeded) { Finish 3010 }
+Finish 0

@@ -121,7 +121,7 @@ cargo run --release
 
 ### Virtual audio/video devices
 
-- **Windows:** Configure the virtual microphone (run `setup-mic.cmd` or use the installer) for virtual mic. The [softcam](https://github.com/niconicolet/softcam) DLL is bundled for virtual webcam.
+- **Windows:** Install [VB-CABLE](https://vb-audio.com/Cable/) for the virtual mic, then run `pc\setup-mic.cmd` as Administrator once (or click **Setup Mic** in the panel) to name it *Mikey Mic*. The [softcam](https://github.com/tshino/softcam) DLL is bundled for the virtual webcam, *Mikey Cam*.
 - **Linux:** PipeWire/PulseAudio creates the virtual mic automatically. For virtual webcam, load `v4l2loopback`.
 
 See [INSTALL_PC.md](../docs/INSTALL_PC.md) for detailed platform setup.

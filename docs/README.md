@@ -14,7 +14,7 @@ The project is built on strict **lean engineering principles**: zero accounts, z
 ### 1.1 Getting Started & Deployment
 | Guide | Purpose |
 | :--- | :--- |
-| **[INSTALL_PC.md](./INSTALL_PC.md)** | Step-by-step setup for Windows 10/11 and Linux hosts (virtual microphone, softcam, permissions). |
+| **[INSTALL_PC.md](./INSTALL_PC.md)** | Setup for Windows 10/11 (installer with Mikey Mic, firewall), building from source, and building the installer. |
 | **[INSTALL_ANDROID.md](./INSTALL_ANDROID.md)** | Android APK installation, USB debugging authorization, and first-launch steps. |
 | **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** | Diagnosing firewall isolation, ADB port conflicts, OEM battery killers, and Bluetooth RFCOMM. |
 | **[CHANGELOG.md](./CHANGELOG.md)** | Version evolution history and release notes. |

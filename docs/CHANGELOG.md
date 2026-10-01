@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+- Windows installer (`Mikey-Setup-x.y.z.exe`) that installs Mikey and sets up **Mikey Mic**, the virtual microphone, built by a new Windows installer workflow
+
+### Changed
+- Mic setup keeps the user's own default speakers and microphone, and no longer turns off other apps' audio devices
+- The mic shows up in apps as *Mikey Mic (Mikey Audio)*
+
+### Fixed
+- The panel's **Setup Mic** button finds its script next to `mikey.exe`
 
 ---
 

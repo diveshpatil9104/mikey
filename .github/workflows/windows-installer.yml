@@ -1,0 +1,69 @@
+name: Windows installer
+
+# Builds mikey.exe and Mikey-Setup-x.y.z.exe on Windows. The installer bundles the Mikey Mic
+# driver files, downloaded here and checked against a known checksum.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+  pull_request:
+    paths:
+      - 'pc/installer/**'
+      - 'pc/Cargo.toml'
+      - '.github/workflows/windows-installer.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  installer:
+    name: Build the Windows installer
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      # Static C runtime: mikey.exe runs without the Visual C++ Redistributable.
+      - name: Build mikey.exe
+        env:
+          RUSTFLAGS: -C target-feature=+crt-static
+        run: cargo build --release --manifest-path pc/Cargo.toml
+
+      - name: Check the Mikey Mic setup script
+        shell: pwsh
+        run: |
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile("$PWD\pc\installer\setup-audio-device.ps1", [ref]$null, [ref]$errors) | Out-Null
+          if ($errors) { $errors | ForEach-Object { Write-Error $_.ToString() }; exit 1 }
+
+      - name: Download the Mikey Mic driver files
+        shell: pwsh
+        run: |
+          $zip = "$env:RUNNER_TEMP\mikey-mic-driver.zip"
+          Invoke-WebRequest https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip -OutFile $zip
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
+          if ($hash -ne 'B950E39F01AF1D04EA623C8F6D8EB9B6EA5C477C637295FABF20631C85116BFB') { throw "Unexpected driver files: $hash" }
+          Expand-Archive $zip -DestinationPath pc\installer\driver -Force
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build the installer
+        shell: pwsh
+        run: |
+          $version = (Select-String -Path pc\Cargo.toml -Pattern '^version = "(.+)"').Matches[0].Groups[1].Value
+          $iscc = Get-ChildItem "${env:ProgramFiles(x86)}\Inno Setup *\ISCC.exe", "$env:ProgramFiles\Inno Setup *\ISCC.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $iscc) { throw "Inno Setup's compiler wasn't found" }
+          & $iscc.FullName "/DMyAppVersion=$version" pc\installer\mikey.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item pc\target\release\mikey.exe "pc\installer\Output\Mikey-v$version-windows-x64.exe"
+
+      - name: Upload the installer and mikey.exe
+        uses: actions/upload-artifact@v7
+        with:
+          name: mikey-windows
+          path: pc/installer/Output/*.exe
+          if-no-files-found: error

@@ -118,15 +118,16 @@ impl FlyoutWindow {
                     self.update_window_region(new_h);
                 }
                 FlyoutButton::SetupVirtualMic => {
-                    let candidates = [
+                    // Next to mikey.exe once installed; under pc/ when run from the source tree.
+                    let beside_exe = std::env::current_exe()
+                        .ok()
+                        .and_then(|exe| Some(exe.parent()?.join("setup-audio-device.ps1")));
+                    let in_source = [
                         "pc/installer/setup-audio-device.ps1",
                         "installer/setup-audio-device.ps1",
-                        "setup-audio-device.ps1",
-                    ];
-                    if let Some(path) = candidates
-                        .iter()
-                        .map(std::path::PathBuf::from)
-                        .find(|p| p.exists())
+                    ]
+                    .map(std::path::PathBuf::from);
+                    if let Some(path) = beside_exe.into_iter().chain(in_source).find(|p| p.exists())
                     {
                         let script = path.to_string_lossy();
                         let args = ["-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass"];
