@@ -7,7 +7,7 @@
 ```
 ┌──────────────────────── Android: Owlmic ──────────────────────────┐
 │  MainActivity (Compose) - observes StateFlow, no logic           │
-│  MikeyService (foreground)                                       │
+│  OwlmicService (foreground)                                      │
 │    ├─ SessionController    idle → connecting → live → ...        │
 │    ├─ TransportManager     probes & ranks L1..L4                 │
 │    │    ├─ AdbTransport       TCP → 127.0.0.1:7653              │

@@ -101,7 +101,7 @@ If a user begins a meeting over Wi-Fi and connects a USB cable mid-call:
 | :---: | :--- | :---: | :--- |
 | **R1** | Audio delay and glitches over Wi-Fi packet jitter | Medium | Adaptive `JitterBuffer` with smooth drift correction; echo cancellation is left to the meeting app (Meet, Zoom, Teams). |
 | **R2** | Aggressive OEM battery managers terminate background capture | High | Bind capture to a dedicated Foreground Service with dynamic media types; provide clear instructions for aggressive OEMs (dontkillmyapp.com). |
-| **R3** | Android OS permission and Foreground Service rule churn | Medium | Isolate all FGS logic inside `MikeyService` and `Notifier` behind clean abstraction boundaries. |
+| **R3** | Android OS permission and Foreground Service rule churn | Medium | Isolate all FGS logic inside `OwlmicService` and `Notifier` behind clean abstraction boundaries. |
 | **R4** | DirectShow softcam not visible in some UWP / Windows Store apps | Medium | Softcam covers major meeting apps (Zoom, Teams, Meet, OBS); support Media Foundation virtual camera on Windows 11 as a phase upgrade. |
 | **R5** | ADB binary conflicts with developer Android SDKs | Low | Prefer `adb` on system `PATH` if present; fall back to local bundled platform-tools binary only when missing. |
 | **R6** | Bluetooth RFCOMM throughput instability | Low | Designate Bluetooth as Level 4 fallback; compress audio via Opus at 48 kbps CBR; strictly disable video streaming over Bluetooth. |

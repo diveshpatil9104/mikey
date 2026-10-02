@@ -16,7 +16,7 @@ This document tracks Owlmic’s five implementation phases, current development 
 ### 2.1 Phase 1 - Microphone over the Simplest Wire (Complete)
 *Goal: Prove the audio path end-to-end over Level 1 USB debugging.*
 - [x] **Android**: Single activity, basic tap halves, status dot.
-- [x] **Android**: `MikeyService` foreground service with microphone type.
+- [x] **Android**: `OwlmicService` foreground service with microphone type.
 - [x] **Android**: `AudioRecord` 48 kHz mono capture → 10 ms PCM frames → TCP to `127.0.0.1:7653`.
 - [x] **Android**: Protocol handshake: `HELLO`, `WELCOME`, `HEARTBEAT`, `BYE`.
 - [x] **Android**: Swipe-away from Recents stops capture and terminates the service cleanly.

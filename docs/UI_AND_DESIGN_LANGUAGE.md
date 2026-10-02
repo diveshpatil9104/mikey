@@ -34,7 +34,7 @@ The color system is unified across Kotlin Compose on Android (`Palette.kt`) and 
 
 ---
 
-## 3. Android UI Implementation (`android/app/src/main/java/com/mikey/ui/`)
+## 3. Android UI Implementation (`android/app/src/main/java/com/owlmic/ui/`)
 
 ### 3.1 Split Screen Layout (`MainScreen.kt`)
 The primary screen is split into two massive, thumb-friendly touch targets:
