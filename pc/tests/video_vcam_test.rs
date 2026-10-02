@@ -144,3 +144,9 @@ fn test_directshow_device_enumeration() {
         CoUninitialize();
     }
 }
+
+#[test]
+fn test_camera_off_frame_readiness() {
+    let vcam = mikey::video::vcam::VirtualCamera::new();
+    vcam.show_off_frame();
+}

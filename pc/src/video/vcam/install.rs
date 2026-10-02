@@ -1,4 +1,4 @@
-//! Automatic per-user DirectShow virtual camera installation and registry management.
+//! Automatic per-user and system-wide DirectShow virtual camera installation and registry management.
 
 #![cfg(windows)]
 
@@ -9,6 +9,10 @@ static EMBEDDED_SOFTCAM_DLL: &[u8] = include_bytes!("../../../softcam.dll");
 
 const HKEY_CLASSES_ROOT: usize = 0xFFFF_FFFF_8000_0000;
 const HKEY_CURRENT_USER: usize = 0xFFFF_FFFF_8000_0001;
+const HKEY_LOCAL_MACHINE: usize = 0xFFFF_FFFF_8000_0002;
+
+const SOFTCAM_CLSID: &str = "{AEF3B972-5FA5-4647-9571-358EB472BC9E}";
+const DSHOW_CATEGORY_CLSID: &str = "{860BB310-5D01-11D0-BD3B-00A0C911CE86}";
 
 #[link(name = "advapi32")]
 extern "system" {
@@ -30,6 +34,14 @@ extern "system" {
         samDesired: u32,
         phkResult: *mut usize,
     ) -> i32;
+    fn RegQueryValueExW(
+        hKey: usize,
+        lpValueName: *const u16,
+        lpReserved: *const u32,
+        lpType: *mut u32,
+        lpData: *mut u8,
+        lpcbData: *mut u32,
+    ) -> i32;
     fn RegSetValueExW(
         hKey: usize,
         lpValueName: *const u16,
@@ -47,6 +59,31 @@ extern "system" {
     fn LoadLibraryW(lpLibFileName: *const u16) -> usize;
     fn GetProcAddress(hModule: usize, lpProcName: *const std::ffi::c_char) -> *const c_void;
     fn FreeLibrary(hModule: usize) -> i32;
+}
+
+pub fn format_hresult(hr: i32) -> String {
+    format!("0x{:08X}", hr as u32)
+}
+
+/// Checks whether the current process has write access to HKLM\Software\Classes.
+pub fn is_admin() -> bool {
+    let subkey: Vec<u16> = "Software\\Classes\0".encode_utf16().collect();
+    let mut h = 0usize;
+    let res = unsafe {
+        RegOpenKeyExW(
+            HKEY_LOCAL_MACHINE,
+            subkey.as_ptr(),
+            0,
+            0x20006, // KEY_WRITE
+            &mut h,
+        )
+    };
+    if res == 0 {
+        unsafe { RegCloseKey(h) };
+        true
+    } else {
+        false
+    }
 }
 
 pub fn ensure_softcam_installed() -> Option<PathBuf> {
@@ -82,60 +119,159 @@ pub fn ensure_softcam_installed() -> Option<PathBuf> {
     Some(target_dll)
 }
 
-pub fn ensure_directshow_registered(dll_path: &Path) {
-    let instance_path =
-        "Software\\Classes\\CLSID\\{860BB310-5D01-11D0-BD3B-00A0C911CE86}\\Instance\\DirectShow Softcam\0";
-    let subkey_instance: Vec<u16> = instance_path.encode_utf16().collect();
+/// Queries the InprocServer32 default value for the softcam CLSID under the specified root key.
+pub fn get_registered_inproc_server(root: usize) -> Option<PathBuf> {
+    let inproc_path = format!(
+        "Software\\Classes\\CLSID\\{}\\InprocServer32\0",
+        SOFTCAM_CLSID
+    );
+    let subkey: Vec<u16> = inproc_path.encode_utf16().collect();
+    let mut h_key = 0usize;
+
+    let open_res = unsafe {
+        RegOpenKeyExW(
+            root,
+            subkey.as_ptr(),
+            0,
+            0x20019, // KEY_READ
+            &mut h_key,
+        )
+    };
+    if open_res != 0 {
+        return None;
+    }
+
+    let mut buf = [0u16; 512];
+    let mut size = (buf.len() * 2) as u32;
+    let mut val_type = 0u32;
+    let query_res = unsafe {
+        RegQueryValueExW(
+            h_key,
+            std::ptr::null(), // default value
+            std::ptr::null_mut(),
+            &mut val_type,
+            buf.as_mut_ptr() as *mut u8,
+            &mut size,
+        )
+    };
+    unsafe { RegCloseKey(h_key) };
+
+    if query_res == 0 && (val_type == 1 || val_type == 2) {
+        let len = (size as usize / 2).saturating_sub(1);
+        let path_str = String::from_utf16_lossy(&buf[..len]);
+        let clean = path_str.trim_matches('\0').trim();
+        if !clean.is_empty() {
+            return Some(PathBuf::from(clean));
+        }
+    }
+    None
+}
+
+/// Checks whether DirectShow has registered the instance subkey under the given root key.
+pub fn is_instance_registered(root: usize) -> bool {
+    let instance_path = format!(
+        "Software\\Classes\\CLSID\\{}\\Instance\\DirectShow Softcam\0",
+        DSHOW_CATEGORY_CLSID
+    );
+    let subkey: Vec<u16> = instance_path.encode_utf16().collect();
     let mut h_check = 0usize;
 
-    let already_registered = unsafe {
+    let open_res = unsafe {
         RegOpenKeyExW(
-            HKEY_CURRENT_USER,
-            subkey_instance.as_ptr(),
+            root,
+            subkey.as_ptr(),
             0,
-            0x20006,
+            0x20019, // KEY_READ
             &mut h_check,
-        ) == 0
+        )
     };
+    if open_res == 0 {
+        unsafe { RegCloseKey(h_check) };
+        true
+    } else {
+        false
+    }
+}
 
-    if already_registered {
+/// Sets the DirectShow FriendlyName to "Mikey Cam" for the virtual camera.
+fn set_friendly_name(root: usize) {
+    let instance_path = format!(
+        "Software\\Classes\\CLSID\\{}\\Instance\\DirectShow Softcam\0",
+        DSHOW_CATEGORY_CLSID
+    );
+    let subkey: Vec<u16> = instance_path.encode_utf16().collect();
+    let mut h_instance = 0usize;
+    let open_res = unsafe {
+        RegOpenKeyExW(
+            root,
+            subkey.as_ptr(),
+            0,
+            0x20006, // KEY_WRITE
+            &mut h_instance,
+        )
+    };
+    if open_res == 0 {
         let friendly_name: Vec<u16> = "Mikey Cam\0".encode_utf16().collect();
         let friendly_val_name: Vec<u16> = "FriendlyName\0".encode_utf16().collect();
         unsafe {
             RegSetValueExW(
-                h_check,
+                h_instance,
                 friendly_val_name.as_ptr(),
                 0,
-                1,
+                1, // REG_SZ
                 friendly_name.as_ptr() as *const u8,
                 (friendly_name.len() * 2) as u32,
             );
-            RegCloseKey(h_check);
+            RegCloseKey(h_instance);
         }
-        return;
     }
+}
 
-    let classes_subkey: Vec<u16> = "Software\\Classes\0".encode_utf16().collect();
-    let mut hkcu_classes = 0usize;
-    let create_res = unsafe {
-        RegCreateKeyExW(
-            HKEY_CURRENT_USER,
-            classes_subkey.as_ptr(),
-            0,
-            std::ptr::null_mut(),
-            0,
-            0x2001F,
-            std::ptr::null_mut(),
-            &mut hkcu_classes,
-            std::ptr::null_mut(),
-        )
+pub fn ensure_directshow_registered(dll_path: &Path) {
+    let admin = is_admin();
+    let primary_root = if admin {
+        HKEY_LOCAL_MACHINE
+    } else {
+        HKEY_CURRENT_USER
     };
-    if create_res != 0 {
+
+    // Fast path: verify InprocServer32 points to valid active DLL and Instance key exists
+    let mut already_valid = false;
+    if let Some(registered_path) = get_registered_inproc_server(primary_root) {
+        if registered_path == dll_path
+            && registered_path.exists()
+            && is_instance_registered(primary_root)
+        {
+            already_valid = true;
+        }
+    }
+
+    if already_valid {
+        set_friendly_name(primary_root);
         return;
     }
 
-    unsafe {
-        RegOverridePredefKey(HKEY_CLASSES_ROOT, hkcu_classes);
+    let mut hkcu_classes = 0usize;
+    if !admin {
+        let classes_subkey: Vec<u16> = "Software\\Classes\0".encode_utf16().collect();
+        let create_res = unsafe {
+            RegCreateKeyExW(
+                HKEY_CURRENT_USER,
+                classes_subkey.as_ptr(),
+                0,
+                std::ptr::null_mut(),
+                0,
+                0x2001F,
+                std::ptr::null_mut(),
+                &mut hkcu_classes,
+                std::ptr::null_mut(),
+            )
+        };
+        if create_res == 0 {
+            unsafe {
+                RegOverridePredefKey(HKEY_CLASSES_ROOT, hkcu_classes);
+            }
+        }
     }
 
     let wide_dll_path: Vec<u16> = dll_path
@@ -151,40 +287,44 @@ pub fn ensure_directshow_registered(dll_path: &Path) {
             if !p_reg.is_null() {
                 type FnDllRegisterServer = unsafe extern "system" fn() -> i32;
                 let reg_fn: FnDllRegisterServer = std::mem::transmute(p_reg);
-                let _ = reg_fn();
+                let hr = reg_fn();
+                if hr != 0 {
+                    eprintln!("[vcam] DllRegisterServer failed: {}", format_hresult(hr));
+                }
             }
             FreeLibrary(h_mod);
         }
+    } else {
+        eprintln!("[vcam] Failed to load softcam.dll from {:?}", dll_path);
     }
 
-    unsafe {
-        RegOverridePredefKey(HKEY_CLASSES_ROOT, 0);
-        RegCloseKey(hkcu_classes);
-    }
-
-    let mut h_instance = 0usize;
-    let open_res = unsafe {
-        RegOpenKeyExW(
-            HKEY_CURRENT_USER,
-            subkey_instance.as_ptr(),
-            0,
-            0x20006,
-            &mut h_instance,
-        )
-    };
-    if open_res == 0 {
-        let friendly_name: Vec<u16> = "Mikey Cam\0".encode_utf16().collect();
-        let friendly_val_name: Vec<u16> = "FriendlyName\0".encode_utf16().collect();
+    if !admin && hkcu_classes != 0 {
         unsafe {
-            RegSetValueExW(
-                h_instance,
-                friendly_val_name.as_ptr(),
-                0,
-                1,
-                friendly_name.as_ptr() as *const u8,
-                (friendly_name.len() * 2) as u32,
-            );
-            RegCloseKey(h_instance);
+            RegOverridePredefKey(HKEY_CLASSES_ROOT, 0);
+            RegCloseKey(hkcu_classes);
         }
+    }
+
+    // Set FriendlyName on registered roots
+    if admin {
+        set_friendly_name(HKEY_LOCAL_MACHINE);
+    }
+    set_friendly_name(HKEY_CURRENT_USER);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hresult_error_formatting() {
+        assert_eq!(format_hresult(0), "0x00000000");
+        assert_eq!(format_hresult(0x8007007E_u32 as i32), "0x8007007E");
+        assert_eq!(format_hresult(0x80004005_u32 as i32), "0x80004005");
+    }
+
+    #[test]
+    fn test_is_admin_check_does_not_panic() {
+        let _ = is_admin();
     }
 }

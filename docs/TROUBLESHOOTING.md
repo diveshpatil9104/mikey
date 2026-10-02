@@ -77,6 +77,15 @@ Common issues and solutions for Mikey. If your problem isn't listed here, [open 
 
 ## Video Issues
 
+### Meeting app says "Maybe another app is using the camera" (Google Meet / Chrome)
+
+**Symptoms:** Google Meet shows an error icon stating *"Maybe another app is using the camera"* when selecting **Mikey Cam**, or the camera fails to start in sandboxed browsers.
+
+**Solutions:**
+1. **Stale DLL path auto-repaired:** If Mikey was moved to a new directory or rebuilt, earlier versions left a stale path in the Windows Registry (`InprocServer32`). Mikey now automatically detects stale paths and repairs the DirectShow registration on startup. Simply restart Mikey.
+2. **Restart browser:** Chrome's sandboxed `VideoCaptureService` caches DirectShow COM device handles. If Mikey started after Chrome was already open, restart Chrome completely.
+3. **System-wide registration:** Running the installer or running Mikey as Administrator once registers the DirectShow filter system-wide in `HKLM\Software\Classes`, ensuring full access across Chromium's sandboxed GPU and utility processes.
+
 ### Meeting app doesn't show Mikey Cam, or shows it black
 
 **Solutions:**
