@@ -100,12 +100,16 @@ fn main() {
         !args.iter().any(|a| a == "--autostart"),
     );
 
-    // 3. Everything slow runs on one thread, in order: listing audio devices can take seconds on
-    // some PCs, and the first softcam registration remaps HKCR for the whole process, which
-    // audio setup must not see. The audio streams live as long as this thread.
+    // 3. Audio output streams and virtual camera initialize concurrently
+    {
+        let video_pipeline = Arc::clone(&video_pipeline);
+        thread::spawn(move || {
+            video_pipeline.load_vcam();
+        });
+    }
+
     {
         let jitter_buffer = Arc::clone(&jitter_buffer);
-        let video_pipeline = Arc::clone(&video_pipeline);
         let running = Arc::clone(&running);
         thread::spawn(move || {
             let _streams = sink::start_output(&jitter_buffer);
@@ -115,7 +119,6 @@ fn main() {
                     "[mikey] Note: Virtual microphone not yet configured as 'Mikey Mic'. Setup available via flyout companion."
                 );
             }
-            video_pipeline.load_vcam();
             while running.load(Ordering::Relaxed) {
                 thread::park_timeout(Duration::from_secs(1));
             }

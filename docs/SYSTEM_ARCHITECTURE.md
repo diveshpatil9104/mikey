@@ -107,7 +107,7 @@ Mikey is a distributed, real-time media streaming system consisting of an Androi
 | **`AudioNormalizer`**| [`audio/pipeline/normalizer.rs`](file:///e:/Programs/mikey/pc/src/audio/pipeline/normalizer.rs) | Speech leveling and boost up to +12 dB with anti-pumping noise hold and soft clipping. |
 | **`AudioDsp`** | [`audio/dsp/denoise.rs`](file:///e:/Programs/mikey/pc/src/audio/dsp/denoise.rs) | Neural network speech noise suppression (RNNoise) and adjustable strength mixing. |
 | **`VideoPipeline`** | [`video/pipeline.rs`](file:///e:/Programs/mikey/pc/src/video/pipeline.rs) | Dedicated worker thread decompressing JPEG to BGRA, pushing frames to softcam driver, and updating preview. |
-| **`VirtualCamera`** | [`video/vcam/mod.rs`](file:///e:/Programs/mikey/pc/src/video/vcam/mod.rs) | DirectShow filter registration and shared memory frame delivery for video conferencing apps. |
+| **`VirtualCamera`** | [`video/vcam/mod.rs`](file:///e:/Programs/mikey/pc/src/video/vcam/mod.rs) | DirectShow filter registration with InprocServer32 path repair, HKLM/HKCU dual strategy, and shared memory frame delivery. |
 | **`FlyoutWindow`** | [`flyout/window.rs`](file:///e:/Programs/mikey/pc/src/flyout/window.rs) | Native Win32 GDI/GDI+ double-buffered companion card with interactive volume meter and controls. |
 
 ---

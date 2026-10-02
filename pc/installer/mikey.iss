@@ -53,6 +53,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "{#MikeyExe}"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Flags: ignoreversion
+Source: "..\softcam.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "setup-audio-device.ps1"; DestDir: "{app}"; Flags: ignoreversion
 Source: "THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "driver\*"; DestDir: "{app}\driver"; Flags: ignoreversion recursesubdirs
@@ -65,11 +66,13 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDi
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Mikey"; ValueData: """{app}\{#MyAppExeName}"" --autostart"; Tasks: autostart; Flags: uninsdeletevalue
 
 [Run]
-Filename: "netsh"; Parameters: "advfirewall firewall add rule name=""Mikey TCP"" dir=in action=allow protocol=TCP localport=7653 profile=private"; StatusMsg: "Letting your phone reach Mikey..."; Flags: runhidden
-Filename: "netsh"; Parameters: "advfirewall firewall add rule name=""Mikey UDP Beacon"" dir=in action=allow protocol=UDP localport=7654 profile=private"; StatusMsg: "Letting your phone find Mikey..."; Flags: runhidden
+Filename: "regsvr32.exe"; Parameters: "/s ""{app}\softcam.dll"""; StatusMsg: "Registering virtual camera..."; Flags: runhidden
+Filename: "netsh"; Parameters: "advfirewall firewall add rule name=""Mikey TCP"" dir=in action=allow protocol=TCP localport=7653 profile=any"; StatusMsg: "Letting your phone reach Mikey..."; Flags: runhidden
+Filename: "netsh"; Parameters: "advfirewall firewall add rule name=""Mikey UDP Beacon"" dir=in action=allow protocol=UDP localport=7654 profile=any"; StatusMsg: "Letting your phone find Mikey..."; Flags: runhidden
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
+Filename: "regsvr32.exe"; Parameters: "/u /s ""{app}\softcam.dll"""; Flags: runhidden; RunOnceId: "MikeySoftcam"
 Filename: "netsh"; Parameters: "advfirewall firewall delete rule name=""Mikey TCP"""; Flags: runhidden; RunOnceId: "MikeyFirewallTcp"
 Filename: "netsh"; Parameters: "advfirewall firewall delete rule name=""Mikey UDP Beacon"""; Flags: runhidden; RunOnceId: "MikeyFirewallUdp"
 
