@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Common issues and solutions for Mikey. If your problem isn't listed here, [open a Discussion](https://github.com/diveshpatil9104/mikey/discussions) or [file a bug report](https://github.com/diveshpatil9104/mikey/issues/new?template=bug_report.yml).
+Common issues and solutions for Owlmic. If your problem isn't listed here, [open a Discussion](https://github.com/diveshpatil9104/mikey/discussions) or [file a bug report](https://github.com/diveshpatil9104/mikey/issues/new?template=bug_report.yml).
 
 ---
 
@@ -15,13 +15,13 @@ Common issues and solutions for Mikey. If your problem isn't listed here, [open 
 2. Check the PC firewall allows incoming connections on:
    - **TCP 7653** (streaming protocol)
    - **UDP 7654** (discovery beacon)
-   *Tip:* If rules are missing on Windows, the Mikey flyout displays a **"Wi-Fi Blocked"** banner. Click **"Allow Access"** to approve the UAC prompt and automatically create the required firewall rules without opening an administrative terminal.
+   *Tip:* If rules are missing on Windows, the Owlmic flyout displays a **"Wi-Fi Blocked"** banner. Click **"Allow Access"** to approve the UAC prompt and automatically create the required firewall rules without opening an administrative terminal.
 3. Some routers enable "AP isolation" or "client isolation" which blocks device-to-device traffic. Check your router settings.
 4. If on a corporate/university network, local device discovery may be blocked. Try USB or phone hotspot instead.
 
 ### USB debugging connection not working
 
-**Symptoms:** Phone is plugged in via USB but Mikey doesn't connect via Level 1.
+**Symptoms:** Phone is plugged in via USB but Owlmic doesn't connect via Level 1.
 
 **Solutions:**
 1. Ensure **USB Debugging** is enabled: Settings → Developer Options → USB Debugging.
@@ -35,7 +35,7 @@ Common issues and solutions for Mikey. If your problem isn't listed here, [open 
 **Symptoms:** Phone won't connect via Bluetooth RFCOMM.
 
 **Solutions:**
-1. **Pair first:** Mikey does not handle Bluetooth pairing. Pair your phone and PC through OS Bluetooth settings.
+1. **Pair first:** Owlmic does not handle Bluetooth pairing. Pair your phone and PC through OS Bluetooth settings.
 2. Bluetooth provides audio only (Level 4) - video is not available over Bluetooth.
 3. On Linux, ensure BlueZ is running: `systemctl status bluetooth`.
 4. Some PCs have unreliable Bluetooth adapters. Try a USB Bluetooth 5.0 dongle.
@@ -50,10 +50,10 @@ Common issues and solutions for Mikey. If your problem isn't listed here, [open 
 
 **Solutions:**
 1. **Check virtual mic setup:**
-   - **Windows:** In your meeting app, select **Mikey Mic** as the microphone (**CABLE Output** if you use `mikey.exe` without the installer). If Mikey Mic is missing, open Mikey's panel and click **Setup Mic**, or run the installer again.
+   - **Windows:** In your meeting app, select **Owlmic** as the microphone (**CABLE Output** if you use `mikey.exe` without the installer). If Owlmic is missing, open Owlmic's panel and click **Setup Mic**, or run the installer again.
    - **Linux:** There's no virtual mic on Linux yet.
-2. **Check Mikey is receiving:** Look at the VU meter in the PC tray flyout. If it's showing activity, the audio is reaching the PC - the issue is in your meeting app's mic selection.
-3. **Check mic permission on Android:** Settings → Apps → Mikey → Permissions → Microphone must be "Allowed".
+2. **Check Owlmic is receiving:** Look at the VU meter in the PC tray flyout. If it's showing activity, the audio is reaching the PC - the issue is in your meeting app's mic selection.
+3. **Check mic permission on Android:** Settings → Apps → Owlmic → Permissions → Microphone must be "Allowed".
 
 ### Echo or feedback
 
@@ -62,7 +62,7 @@ Common issues and solutions for Mikey. If your problem isn't listed here, [open 
 **Solutions:**
 1. **Use headphones:** The simplest fix: the phone can't pick up the call's sound then.
 2. **Move the phone away from the speakers,** or turn them down.
-3. **Keep the meeting app's own echo cancellation on:** Zoom, Meet and Teams all have one. Mikey doesn't cancel echo itself.
+3. **Keep the meeting app's own echo cancellation on:** Zoom, Meet and Teams all have one. Owlmic doesn't cancel echo itself.
 
 ### Audio sounds robotic or choppy
 
@@ -79,25 +79,25 @@ Common issues and solutions for Mikey. If your problem isn't listed here, [open 
 
 ### Meeting app says "Maybe another app is using the camera" (Google Meet / Chrome)
 
-**Symptoms:** Google Meet shows an error icon stating *"Maybe another app is using the camera"* when selecting **Mikey Cam**, or the camera fails to start in sandboxed browsers.
+**Symptoms:** Google Meet shows an error icon stating *"Maybe another app is using the camera"* when selecting **Owlmic Cam**, or the camera fails to start in sandboxed browsers.
 
 **Solutions:**
-1. **Stale DLL path auto-repaired:** If Mikey was moved to a new directory or rebuilt, earlier versions left a stale path in the Windows Registry (`InprocServer32`). Mikey now automatically detects stale paths and repairs the DirectShow registration on startup. Simply restart Mikey.
-2. **Restart browser:** Chrome's sandboxed `VideoCaptureService` caches DirectShow COM device handles. If Mikey started after Chrome was already open, restart Chrome completely.
-3. **System-wide registration:** Running the installer or running Mikey as Administrator once registers the DirectShow filter system-wide in `HKLM\Software\Classes`, ensuring full access across Chromium's sandboxed GPU and utility processes.
+1. **Stale DLL path auto-repaired:** If Owlmic was moved to a new directory or rebuilt, earlier versions left a stale path in the Windows Registry (`InprocServer32`). Owlmic now automatically detects stale paths and repairs the DirectShow registration on startup. Simply restart Owlmic.
+2. **Restart browser:** Chrome's sandboxed `VideoCaptureService` caches DirectShow COM device handles. If Owlmic started after Chrome was already open, restart Chrome completely.
+3. **System-wide registration:** Running the installer or running Owlmic as Administrator once registers the DirectShow filter system-wide in `HKLM\Software\Classes`, ensuring full access across Chromium's sandboxed GPU and utility processes.
 
-### Meeting app doesn't show Mikey Cam, or shows it black
+### Meeting app doesn't show Owlmic Cam, or shows it black
 
 **Solutions:**
-1. **Windows:** Mikey registers *Mikey Cam* for your user the first time it runs; no admin step is needed.
+1. **Windows:** Owlmic registers *Owlmic Cam* for your user the first time it runs; no admin step is needed.
 2. **Linux:** Ensure `v4l2loopback` is loaded: `sudo modprobe v4l2loopback`.
-3. Browsers (Chrome, Edge) and some apps list cameras once and keep that list until a real camera is plugged in or removed. If Mikey started after the browser was already open, or you just updated from a Mikey whose camera was 1280×720, restart the browser once. Starting Mikey before the browser avoids this.
+3. Browsers (Chrome, Edge) and some apps list cameras once and keep that list until a real camera is plugged in or removed. If Owlmic started after the browser was already open, or you just updated from a Owlmic whose camera was 1280×720, restart the browser once. Starting Owlmic before the browser avoids this.
 4. Video is not available on Bluetooth (Level 4).
 
 ### Camera preview is sideways or upside down
 
 **Solutions:**
-1. Mikey handles rotation automatically. If the image is wrong, check that your phone's auto-rotate is not locked.
+1. Owlmic handles rotation automatically. If the image is wrong, check that your phone's auto-rotate is not locked.
 2. File a bug report with your phone model - some devices report incorrect sensor orientation.
 
 ---

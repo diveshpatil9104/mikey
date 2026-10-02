@@ -55,8 +55,8 @@ The WASAPI audio playback thread is driven by the Windows kernel audio engine at
 ```
 
 ### 3.1 Instant Startup
-1. **Busy Pointer Dismissal (`launch.rs`)**: Windows shows an hourglass/spinning cursor when launching an executable. Mikey immediately calls `end_busy_pointer()` to ensure seamless background entry.
-2. **Console Detachment**: In release builds (`windows_subsystem = "windows"`), and in debug builds without `--console`, Mikey calls `FreeConsole()` and hides any lingering console handle.
+1. **Busy Pointer Dismissal (`launch.rs`)**: Windows shows an hourglass/spinning cursor when launching an executable. Owlmic immediately calls `end_busy_pointer()` to ensure seamless background entry.
+2. **Console Detachment**: In release builds (`windows_subsystem = "windows"`), and in debug builds without `--console`, Owlmic calls `FreeConsole()` and hides any lingering console handle.
 3. **Single-Instance Mutex (`instance.rs`)**: Uses a named Win32 Mutex (`Global\MikeySingleInstanceMutex`). If another instance is running, it brings the existing instance's flyout to the front and terminates cleanly.
 
 ---

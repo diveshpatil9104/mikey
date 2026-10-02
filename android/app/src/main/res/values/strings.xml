@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mikey</string>
+    <string name="app_name">Owlmic</string>
 
     <string name="notification_channel">Mic and camera</string>
     <string name="notification_looking">Looking for your PC</string>
@@ -10,9 +10,9 @@
     <string name="notification_connected">Connected to %1$s</string>
     <string name="notification_muted">Muted</string>
     <string name="notification_denied">Your PC said no</string>
-    <string name="notification_update">Update Mikey</string>
-    <string name="notification_refused">Your PC turned Mikey away</string>
-    <string name="notification_try_again">Open Mikey to try again</string>
+    <string name="notification_update">Update Owlmic</string>
+    <string name="notification_refused">Your PC turned Owlmic away</string>
+    <string name="notification_try_again">Open Owlmic to try again</string>
     <string name="notification_versions">Phone and PC versions don\'t match</string>
     <string name="notification_mic">Mic</string>
     <string name="notification_mic_on">Mic on</string>
@@ -51,9 +51,9 @@
     <string name="line_mic_denied">Microphone access is off. Tap to allow.</string>
     <string name="line_dropped">Audio isn\'t reaching the PC. Trying again.</string>
     <string name="line_waiting">Approve this phone on the PC.</string>
-    <string name="line_no_pc">Open Mikey on your PC, or connect with USB.</string>
+    <string name="line_no_pc">Open Owlmic on your PC, or connect with USB.</string>
     <string name="line_refused_denied">The PC said no to this phone.</string>
-    <string name="line_refused_version">Mikey on the PC and on this phone don\'t match. Update the older one.</string>
+    <string name="line_refused_version">Owlmic on the PC and on this phone don\'t match. Update the older one.</string>
     <string name="line_refused">The PC turned this phone away.</string>
 
     <string name="cd_settings">Settings</string>
@@ -109,5 +109,5 @@
     <string name="no_paired">No paired computers</string>
     <string name="forget">Forget</string>
     <string name="open_tethering">Open USB tethering settings</string>
-    <string name="version">Mikey v%1$s</string>
+    <string name="version">Owlmic v%1$s</string>
 </resources>

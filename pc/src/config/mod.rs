@@ -39,7 +39,7 @@ impl Default for Config {
         let pc_id = generate_random_hex(16);
         let pc_name = env::var("COMPUTERNAME")
             .or_else(|_| env::var("HOSTNAME"))
-            .unwrap_or_else(|_| "Mikey-Host".to_string());
+            .unwrap_or_else(|_| "Owlmic-PC".to_string());
 
         Self {
             pc_id,

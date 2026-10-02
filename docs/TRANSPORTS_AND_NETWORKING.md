@@ -1,6 +1,6 @@
 # Transports & Multi-Level Networking Architecture
 
-Mikey automatically negotiates the optimal physical transport between the Android client and the PC companion across **four prioritized connection levels**. It dynamically upgrades connections using a **make-before-break** strategy and fails over within 2 seconds when an active medium is interrupted.
+Owlmic automatically negotiates the optimal physical transport between the Android client and the PC companion across **four prioritized connection levels**. It dynamically upgrades connections using a **make-before-break** strategy and fails over within 2 seconds when an active medium is interrupted.
 
 ---
 
@@ -46,9 +46,9 @@ Mikey automatically negotiates the optimal physical transport between the Androi
     ```json
     { "mikey_pc": true, "version": 2, "pc_id": "...", "pc_name": "...", "port": 7653 }
     ```
-- **Manual Address Fallback**: In restricted corporate or university networks where UDP broadcast packets are filtered by managed switches, Mikey provides `manualPcAddress` in Android settings to bypass discovery.
+- **Manual Address Fallback**: In restricted corporate or university networks where UDP broadcast packets are filtered by managed switches, Owlmic provides `manualPcAddress` in Android settings to bypass discovery.
 - **Wi-Fi Latency Lock (`WifiLatencyLock.kt`)**: Acquires an Android `WifiManager.WifiLock` with `WIFI_MODE_FULL_LOW_LATENCY` to instruct the wireless chipset to stay in high-power, low-latency mode.
-- **Windows Firewall Detection & One-Click Elevation (`pc/src/firewall.rs`)**: On startup, when Wi-Fi or USB tethering is enabled, Mikey queries Windows Firewall for `Mikey TCP` (port 7653) and `Mikey UDP Beacon` (port 7654). If either rule is missing, a non-intrusive alert banner ("Wi-Fi Blocked — Allow Access") appears in the flyout. Clicking "Allow Access" triggers a single elevated UAC execution adding both rules without requiring manual terminal commands.
+- **Windows Firewall Detection & One-Click Elevation (`pc/src/firewall.rs`)**: On startup, when Wi-Fi or USB tethering is enabled, Owlmic queries Windows Firewall for `Mikey TCP` (port 7653) and `Mikey UDP Beacon` (port 7654). If either rule is missing, a non-intrusive alert banner ("Wi-Fi Blocked — Allow Access") appears in the flyout. Clicking "Allow Access" triggers a single elevated UAC execution adding both rules without requiring manual terminal commands.
 
 ### 2.4 Level 4: Bluetooth RFCOMM
 - **Mechanism**: Uses standard Bluetooth Serial Port Profile (SPP).
@@ -66,7 +66,7 @@ Mikey automatically negotiates the optimal physical transport between the Androi
 
 ## 3. Make-Before-Break Upgrade Protocol
 
-When Mikey is streaming on a lower-priority connection (e.g. Wi-Fi) and a higher-priority link becomes viable (e.g. the user plugs in a USB cable), Mikey executes a **make-before-break upgrade**:
+When Owlmic is streaming on a lower-priority connection (e.g. Wi-Fi) and a higher-priority link becomes viable (e.g. the user plugs in a USB cable), Owlmic executes a **make-before-break upgrade**:
 
 ```mermaid
 sequenceDiagram

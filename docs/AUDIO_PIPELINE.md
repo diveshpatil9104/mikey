@@ -1,6 +1,6 @@
 # Audio Pipeline & Digital Signal Processing (DSP) Architecture
 
-The Mikey audio subsystem is architected for **broadcast-grade speech fidelity, minimal end-to-end latency, and robust jitter resilience**. The architecture strictly separates raw, unadulterated capture on Android from intensive mathematical signal processing on the PC.
+The Owlmic audio subsystem is architected for **broadcast-grade speech fidelity, minimal end-to-end latency, and robust jitter resilience**. The architecture strictly separates raw, unadulterated capture on Android from intensive mathematical signal processing on the PC.
 
 ---
 
@@ -56,7 +56,7 @@ The Mikey audio subsystem is architected for **broadcast-grade speech fidelity, 
                        [WASAPI Virtual Sink] (pc/src/audio/sink/)
                           - High-priority real-time audio thread callback
                           - Non-blocking try-lock fetch
-                          - Feeds virtual microphone endpoint (Mikey Mic)
+                          - Feeds virtual microphone endpoint (Owlmic)
 ```
 
 ---
@@ -72,7 +72,7 @@ The Mikey audio subsystem is architected for **broadcast-grade speech fidelity, 
   - Automatically activates if AAudio fails or is preempted by an incoming phone call.
   - Queries `AudioManager.PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED`. If true, sets `MediaRecorder.AudioSource.UNPROCESSED`. Otherwise, falls back to `MediaRecorder.AudioSource.VOICE_RECOGNITION` (which Android CDD mandates disables OEM AGC and compression, unlike `AudioSource.MIC`).
   - **System AGC Disable**: If `AutomaticGainControl.isAvailable()`, the capture loop explicitly creates and disables system AGC on the recorder's audio session ID to eliminate hardware voice ducking.
-  - **The Voice Communication Rule**: Under no circumstances does Mikey use `AudioSource.VOICE_COMMUNICATION`. Android’s native voice processing injects aggressive, non-linear hardware AGC and echo cancellation that fundamentally breaks PC-side neural noise filters.
+  - **The Voice Communication Rule**: Under no circumstances does Owlmic use `AudioSource.VOICE_COMMUNICATION`. Android’s native voice processing injects aggressive, non-linear hardware AGC and echo cancellation that fundamentally breaks PC-side neural noise filters.
 - **Thread Priority**: The capture loop runs inside a dedicated OS thread (`mikey-capture`) pinned to `Process.THREAD_PRIORITY_URGENT_AUDIO`.
 
 ### 2.2 Frame Joining & Opus Encoding
@@ -113,7 +113,7 @@ The PC `JitterBuffer` absorbs packet arrival variance across unpredictable wirel
 ### 3.2 Clock Drift Compensation (`pc/src/audio/pipeline/resample.rs`)
 Because the phone’s hardware audio clock and the PC’s DAC audio clock are driven by separate physical quartz oscillators, their rates inevitably drift apart by up to ±50 ppm.
 
-Mikey corrects drift by resampling continuously with **4-point cubic (Catmull-Rom) interpolation**:
+Owlmic corrects drift by resampling continuously with **4-point cubic (Catmull-Rom) interpolation**:
 - **Phase Accumulator**: Maintains a fractional sample offset $\text{phase} \in [0.0, 1.0)$, interpolating between the sample before `buf[0]` and `buf[2]`. Straight-line interpolation dulls the highs by up to 3 dB at 12 kHz depending on the phase, so a moving phase is heard as a flutter on "s" and "t" sounds; the cubic curve holds it to about 1 dB.
 - **Averaged Depth**: The queue depth jumps by a whole packet as each one lands, so drift correction steers by its average over about half a second (`DEPTH_AVG_FRAMES = 24000`), not the depth at the moment of the callback. Steering by the raw depth slammed the speed between its limits in most callbacks.
 - **Drift Ratio Clamp** (`DRIFT_GAIN = 0.004`):
@@ -139,4 +139,4 @@ Mikey corrects drift by resampling continuously with **4-point cubic (Catmull-Ro
 In `pc/src/audio/sink/`:
 - **WASAPI Integration**: Operates in Windows Audio Session API shared event-driven mode (`AUDCLNT_STREAMFLAGS_EVENTCALLBACK`).
 - **Real-Time Guarantee**: The WASAPI render callback executes at high real-time priority. It retrieves audio from `JitterBuffer` via non-blocking try-locks. If the buffer runs dry, playback fades out into silence and fades back in after refilling (see 3.2), so gaps don't click.
-- **Virtual Audio Endpoint Compatibility**: Seamlessly links to dedicated virtual driver endpoints (such as Mikey Mic), exposing the stream as a standard microphone in Windows Sound Settings.
+- **Virtual Audio Endpoint Compatibility**: Seamlessly links to dedicated virtual driver endpoints (such as Owlmic), exposing the stream as a standard microphone in Windows Sound Settings.

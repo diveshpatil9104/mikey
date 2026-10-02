@@ -137,17 +137,9 @@ fn test_directshow_device_enumeration() {
         fn RegCloseKey(hKey: usize) -> i32;
     }
 
-    let mut open_res = unsafe { RegOpenKeyExW(root_key, subkey.as_ptr(), 0, 0x20019, &mut h_key) };
-    if open_res != 0 {
-        // Fallback to the other root key if already registered system-wide/per-user
-        let alt_root = if root_key == 0x8000_0002 {
-            0x8000_0001usize
-        } else {
-            0x8000_0002usize
-        };
-        open_res = unsafe { RegOpenKeyExW(alt_root, subkey.as_ptr(), 0, 0x20019, &mut h_key) };
-    }
-    assert_eq!(open_res, 0, "Mikey Cam DirectShow key must be openable");
+    let open_res =
+        unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, subkey.as_ptr(), 0, 0x20019, &mut h_key) };
+    assert_eq!(open_res, 0, "Owlmic Cam DirectShow key must be openable");
 
     let friendly_name_key: Vec<u16> = "FriendlyName\0".encode_utf16().collect();
     let mut val_type = 0u32;
@@ -171,7 +163,7 @@ fn test_directshow_device_enumeration() {
         "Enumerated DirectShow capture device FriendlyName: {}",
         name.trim_matches('\0')
     );
-    assert_eq!(name.trim_matches('\0'), "Mikey Cam");
+    assert_eq!(name.trim_matches('\0'), "Owlmic Cam");
 
     unsafe {
         RegCloseKey(h_key);

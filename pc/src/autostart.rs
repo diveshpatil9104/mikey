@@ -323,7 +323,9 @@ pub fn is_autostart_enabled() -> bool {
     get_autostart_value().is_some()
 }
 
-#[cfg(test)]
+// Every test here is about the Windows Run key; other systems format and store autostart
+// differently.
+#[cfg(all(test, windows))]
 mod tests {
     use super::*;
     use crate::config::Config;

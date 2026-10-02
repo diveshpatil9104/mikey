@@ -21,7 +21,7 @@ pub fn render_header(
     let active_session = flyout.session_manager.active_session();
     let pending_devices = flyout.session_manager.list_pending();
 
-    // ── Header: "Mikey" title with app icon ──
+    // ── Header: "Owlmic" title with app icon ──
     let icon_color = if is_active {
         ARGB_MIC_ON
     } else if !pending_devices.is_empty() {
@@ -42,7 +42,7 @@ pub fn render_header(
         14,
         120,
         34,
-        "Mikey",
+        "Owlmic",
         0,
     );
 

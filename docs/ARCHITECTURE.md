@@ -5,7 +5,7 @@
 ## System Topology
 
 ```
-┌──────────────────────── Android: Mikey ──────────────────────────┐
+┌──────────────────────── Android: Owlmic ──────────────────────────┐
 │  MainActivity (Compose) - observes StateFlow, no logic           │
 │  MikeyService (foreground)                                       │
 │    ├─ SessionController    idle → connecting → live → ...        │
@@ -18,14 +18,14 @@
 │    └─ VideoCapture         CameraX → JPEG → frames             │
 └─────────── L1 USB │ L2 Tether │ L3 Wi-Fi │ L4 Bluetooth ───────┘
                     ▼                           ▼
-┌──────────────────── PC: Mikey for PC (mikey) ────────────────────┐
+┌──────────────────── PC: Owlmic for PC (mikey) ────────────────────┐
 │  Listeners: TCP :7653 · UDP beacon :7654 · RFCOMM · AdbWatcher  │
 │  SessionManager   tokens, trust, ask-before-join, session hold   │
 │  Audio pipeline   Opus decode → RNNoise → jitter buf            │
 │                   → drift resample → virtual mic                │
 │  Video pipeline   JPEG decode → scale/letterbox → virtual cam   │
 │  Tray / UI        icon + flyout, notifications, preview window  │
-└──────── Virtual mic (Mikey Mic / PipeWire) ──────────────────────┘
+└──────── Virtual mic (Owlmic / PipeWire) ──────────────────────┘
           Virtual cam (softcam / v4l2loopback)
 ```
 
@@ -33,7 +33,7 @@
 
 ### Connection Levels
 
-Mikey automatically selects the best available transport:
+Owlmic automatically selects the best available transport:
 
 | Priority | Level | Medium | Audio | Video |
 |----------|-------|--------|-------|-------|

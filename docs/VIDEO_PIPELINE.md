@@ -1,6 +1,6 @@
 # Video Pipeline & Virtual Camera Architecture
 
-Mikey transforms an Android smartphone's camera sensors into an upright, plug-and-play webcam for PC videoconferencing. The video pipeline is engineered for **zero battery runaway, automatic gravity orientation, and sub-frame delivery latency** using a strict `KEEP_ONLY_LATEST` queue discipline.
+Owlmic transforms an Android smartphone's camera sensors into an upright, plug-and-play webcam for PC videoconferencing. The video pipeline is engineered for **zero battery runaway, automatic gravity orientation, and sub-frame delivery latency** using a strict `KEEP_ONLY_LATEST` queue discipline.
 
 ---
 
@@ -49,12 +49,12 @@ Mikey transforms an Android smartphone's camera sensors into an upright, plug-an
 ## 2. Android Video Capture Engine
 
 ### 2.1 CameraX Configuration (`VideoCapture.kt`)
-- **No Local GPU Preview**: Mikey deliberately does not display the camera feed on the phone screen. Bypassing the local preview surface cuts device power consumption by ~40% and prevents rapid thermal throttling.
+- **No Local GPU Preview**: Owlmic deliberately does not display the camera feed on the phone screen. Bypassing the local preview surface cuts device power consumption by ~40% and prevents rapid thermal throttling.
 - **`STRATEGY_KEEP_ONLY_LATEST`**: CameraX automatically drops intermediate frames if the analyzer thread is busy. A frame is never queued behind another; the pipeline only operates on the freshest optical data.
 - **Service Lifecycle**: Binds directly to a custom `ServiceLifecycle.kt` rather than an `Activity`, keeping the camera stream alive when the user switches to other phone apps.
 
 ### 2.2 Gravity & Orientation Tracking (`surfaceRotationFor`)
-Smartphones are often placed on desktop stands or clamped in horizontal mounts. Mikey guarantees the image arrives upright on the PC using accelerometer hysteresis:
+Smartphones are often placed on desktop stands or clamped in horizontal mounts. Owlmic guarantees the image arrives upright on the PC using accelerometer hysteresis:
 
 ```kotlin
 internal fun surfaceRotationFor(degrees: Int, current: Int): Int {
@@ -79,7 +79,7 @@ internal fun surfaceRotationFor(degrees: Int, current: Int): Int {
 This **20° hysteresis threshold** prevents the video feed from violently flickering between portrait and landscape when the phone is tilted near a 45° diagonal angle.
 
 ### 2.3 Color Plane Mapping & Cropping (`Nv21.kt`)
-- **YUV to NV21 Conversion (`yuv420ToNv21`)**: CameraX yields `ImageProxy` instances with three independent planar buffers (`Y`, `U`, `V`) featuring variable row strides and pixel strides. Mikey linearizes these planes into a single contiguous semi-planar NV21 buffer (`Y` plane followed by interleaved `VU` bytes).
+- **YUV to NV21 Conversion (`yuv420ToNv21`)**: CameraX yields `ImageProxy` instances with three independent planar buffers (`Y`, `U`, `V`) featuring variable row strides and pixel strides. Owlmic linearizes these planes into a single contiguous semi-planar NV21 buffer (`Y` plane followed by interleaved `VU` bytes).
 - **Square Crop (`cropNv21Square`)**: For modern 1:1 portrait video feeds, `cropNv21Square` crops the central square region directly in native byte buffers before compression.
 
 ### 2.4 Thermal & Backlog Adaptive JPEG Compression
@@ -103,13 +103,13 @@ JPEG compression quality dynamically adapts to runtime conditions:
 - **DirectShow Registration & Path Verification (`install.rs`)**: Registers a lightweight DirectShow source filter (`softcam.dll`) in the Windows Registry without requiring system reboots. To prevent stale ghost DLL paths after directory moves or updates, `ensure_directshow_registered` queries the `InprocServer32` default value and verifies that the registered path matches the current DLL and actually exists on disk.
 - **Dual Registration Strategy (HKLM / HKCU)**: When running with administrative privileges (e.g. during installer setup), the filter is registered system-wide in `HKLM\Software\Classes` (matching OBS Virtual Camera), making it accessible to Chromium's sandboxed `VideoCaptureService` in Google Meet. When running unprivileged, it falls back to per-user `HKCU\Software\Classes` registration.
 - **Parallel Startup (<50ms)**: Virtual camera initialization runs concurrently with audio sink initialization on its own thread, ensuring DirectShow filters and shared memory pins are ready in under 50ms without waiting for slow audio device enumeration.
-- **Universal Application Support**: Exposes the stream as a standard hardware webcam named *"Mikey Cam"*, compatible with Zoom, Microsoft Teams, Google Meet, Discord, and OBS Studio.
-- **One Fixed Size (`vcam/mod.rs`)**: Mikey Cam is always 1920×1080 at 30 fps and is created once, when the PC app starts. Chrome, Edge and similar apps remember a camera's sizes from when they last listed cameras, and list a DirectShow camera again only after a real camera is added or removed; softcam only serves the size it was created at. Mikey Cam used to be recreated at the phone's size when the phone connected, so on PCs whose meeting app had opened a built-in camera first, switching to Mikey Cam showed nothing until a camera was toggled in Device Manager.
+- **Universal Application Support**: Exposes the stream as a standard hardware webcam named *"Owlmic Cam"*, compatible with Zoom, Microsoft Teams, Google Meet, Discord, and OBS Studio.
+- **One Fixed Size (`vcam/mod.rs`)**: Owlmic Cam is always 1920×1080 at 30 fps and is created once, when the PC app starts. Chrome, Edge and similar apps remember a camera's sizes from when they last listed cameras, and list a DirectShow camera again only after a real camera is added or removed; softcam only serves the size it was created at. Owlmic Cam used to be recreated at the phone's size when the phone connected, so on PCs whose meeting app had opened a built-in camera first, switching to Owlmic Cam showed nothing until a camera was toggled in Device Manager.
 - **Scaling & Letterboxing (`DecodedFrame::letterbox_into`)**: Pictures of any other size or shape (720p, 4:3, square, portrait) are scaled to fit with bilinear scaling, with black bars where the shape differs. Each source row is scaled across once and reused, so 720p to 1080p costs about 3 ms a frame.
 
 ### 3.3 Privacy & Offline Placeholder Frame
 - **Immediate Startup Frame**: `show_off_frame()` pushes a clean 1920×1080 offline card immediately upon virtual camera backend initialization so DirectShow media graph negotiation succeeds even before the phone connects.
-- **Camera OFF Handling**: When the user toggles the camera OFF from either the phone or the PC tray, Mikey **never closes the virtual camera driver**. Closing the driver causes videoconferencing apps to display "Camera Disconnected" errors or freeze video graphs. Instead, `DecodedFrame::placeholder(1920, 1080)` pushes a clean, dark neutral placeholder card featuring a calm privacy glyph, preserving the virtual device handle while guaranteeing complete user privacy.
+- **Camera OFF Handling**: When the user toggles the camera OFF from either the phone or the PC tray, Owlmic **never closes the virtual camera driver**. Closing the driver causes videoconferencing apps to display "Camera Disconnected" errors or freeze video graphs. Instead, `DecodedFrame::placeholder(1920, 1080)` pushes a clean, dark neutral placeholder card featuring a calm privacy glyph, preserving the virtual device handle while guaranteeing complete user privacy.
 
 ### 3.4 Floating Native Preview Window (`pc/src/video/preview.rs`)
 - Zero-dependency, lightweight Win32 floating window displaying the live camera stream.

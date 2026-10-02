@@ -1,11 +1,11 @@
-Mikey includes the following third-party software.
+Owlmic includes the following third-party software.
 
-Mikey Mic
-  Mikey Mic runs on VB-CABLE, the virtual audio cable driver by Vincent Burel (VB-Audio Software).
+Owlmic microphone
+  The Owlmic microphone runs on VB-CABLE, the virtual audio cable driver by Vincent Burel (VB-Audio Software).
   Origin: https://www.vb-cable.com
   VB-CABLE is donationware; all participations are welcome.
   License: https://vb-audio.com/Services/licensing.htm
 
-Mikey Cam
-  Mikey Cam runs on softcam by tshino, under the MIT License.
+Owlmic Cam
+  Owlmic Cam runs on softcam by tshino, under the MIT License.
   https://github.com/tshino/softcam

@@ -67,7 +67,7 @@ pub fn create_flyout_hwnd() -> win32::HWND {
         win32::CreateWindowExW(
             win32::WS_EX_TOOLWINDOW | win32::WS_EX_TOPMOST,
             class_name.as_ptr(),
-            to_wide("Mikey").as_ptr(),
+            to_wide("Owlmic").as_ptr(),
             win32::WS_POPUP,
             -2000,
             -2000,

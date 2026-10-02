@@ -1,6 +1,6 @@
 # Development Roadmap & Test Matrix
 
-This document tracks Mikey’s five implementation phases, current development status, release criteria, and the real-device test matrix required to validate production builds.
+This document tracks Owlmic’s five implementation phases, current development status, release criteria, and the real-device test matrix required to validate production builds.
 
 ---
 
@@ -21,7 +21,7 @@ This document tracks Mikey’s five implementation phases, current development s
 - [x] **Android**: Protocol handshake: `HELLO`, `WELCOME`, `HEARTBEAT`, `BYE`.
 - [x] **Android**: Swipe-away from Recents stops capture and terminates the service cleanly.
 - [x] **PC**: Console binary with TCP listener on port 7653.
-- [x] **PC**: Media demuxing and basic audio routing to virtual microphone (Mikey Mic).
+- [x] **PC**: Media demuxing and basic audio routing to virtual microphone (Owlmic).
 - [x] **PC**: Connection logging (`[connected] Pixel via L1`).
 
 ### 2.2 Phase 2 - Multi-Transport Engine & Trust (Complete)
@@ -50,7 +50,7 @@ This document tracks Mikey’s five implementation phases, current development s
 - [x] **Android**: Camera disabled with informative message over Bluetooth or when PC lacks virtual camera.
 - [x] **Android**: Gravity orientation hysteresis (20° threshold) ensuring upright video output.
 - [x] **PC**: TurboJPEG SIMD background decoding thread.
-- [x] **PC**: DirectShow virtual camera filter registration (`softcam.dll`) exposed as "Mikey Cam".
+- [x] **PC**: DirectShow virtual camera filter registration (`softcam.dll`) exposed as "Owlmic Cam".
 - [x] **PC**: Aspect ratio preservation with automatic letterboxing/pillarboxing.
 - [x] **PC**: Privacy placeholder frame (1920×1080) displayed when camera is toggled off.
 - [x] **PC**: Detached native Win32 floating preview window.
@@ -65,7 +65,7 @@ This document tracks Mikey’s five implementation phases, current development s
 - [x] **PC**: Full bidirectional synchronization of audio and video settings across devices.
 
 ### 2.5 Phase 5 - Packaging, Hardening & Release (In Progress)
-*Goal: A stranger installs and uses Mikey in under 5 minutes.*
+*Goal: A stranger installs and uses Owlmic in under 5 minutes.*
 - [ ] Signed Android APK build automation with ABI splits (`arm64-v8a`, `armeabi-v7a`).
 - [x] Windows Inno Setup installer bundling `mikey.exe`, DirectShow `softcam.dll`, and firewall rules.
 - [ ] Linux `.deb` and AppImage packages with desktop autostart entries.

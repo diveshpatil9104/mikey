@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="docs/images/banner.png" alt="Mikey: your Android phone as a webcam and mic for your PC, over USB, Wi-Fi or Bluetooth" width="100%">
+  <img src="docs/images/banner.png" alt="Owlmic: your Android phone as a webcam and mic for your PC, over USB, Wi-Fi or Bluetooth" width="100%">
 </p>
 <p align="center">
   <a href="https://github.com/diveshpatil9104/mikey/releases"><img src="https://img.shields.io/github/v/release/diveshpatil9104/mikey?include_prereleases&style=for-the-badge&color=D71921&label=Download" alt="Download"></a>
@@ -15,7 +15,7 @@
 
 <p align="center"><strong>Plug in. Tap once. Forget it exists.</strong></p>
 
-The camera and microphone in your phone are far better than the ones built into most laptops. Mikey turns them into a webcam and mic that every app on your PC can use: Google Meet, Zoom, Teams, Discord and OBS. No accounts, no cloud, no setup ritual.
+The camera and microphone in your phone are far better than the ones built into most laptops. Owlmic turns them into a webcam and mic that every app on your PC can use: Google Meet, Zoom, Teams, Discord and OBS. No accounts, no cloud, no setup ritual.
 
 > [!NOTE]
 > **v0.1.0 is an early preview** for Windows 10 / 11 and Android 8.0+. If something doesn't work, please [open an issue](https://github.com/diveshpatil9104/mikey/issues).
@@ -24,8 +24,8 @@ The camera and microphone in your phone are far better than the ones built into 
 
 ## Features
 
-- **Mic and webcam in one app.** Your phone shows up on the PC as a microphone and as *Mikey Cam*, in any app.
-- **Connects by itself.** Mikey picks the best link (USB, Wi-Fi or Bluetooth) and moves to a better one when it appears, without dropping your call.
+- **Mic and webcam in one app.** Your phone shows up on the PC as a microphone and as *Owlmic Cam*, in any app.
+- **Connects by itself.** Owlmic picks the best link (USB, Wi-Fi or Bluetooth) and moves to a better one when it appears, without dropping your call.
 - **Clear voice.** Raw 48 kHz audio from the phone, lossless over USB, with noise suppression on the PC.
 - **Low delay.** A 20 ms audio buffer over USB and 40 ms over Wi-Fi, growing only when the link is unsteady.
 - **Private by design.** No accounts and no cloud: everything stays on your own cable or network. Mic and camera start off, and a new phone needs your OK on the PC.
@@ -40,27 +40,27 @@ The camera and microphone in your phone are far better than the ones built into 
 
 ## Get started
 
-### 1. Download Mikey
+### 1. Download Owlmic
 
 From the [latest release](https://github.com/diveshpatil9104/mikey/releases):
 
 | File | Where it goes |
 |---|---|
-| `Mikey-v0.1.0-windows-x64.exe` | Your PC. Run it and Mikey appears in the system tray. |
-| `Mikey-v0.1.0-android.apk` | Your phone. Android asks to allow installs from your browser or files app the first time. |
+| `Owlmic-Setup-x.y.z.exe` | Your PC. It installs Owlmic and its microphone; restart Windows if it asks. |
+| `Owlmic-vx.y.z-android.apk` | Your phone. Android asks to allow installs from your browser or files app the first time. |
 
-Mikey isn't code-signed yet, so Windows SmartScreen may warn you: click **More info**, then **Run anyway**.
+Owlmic isn't code-signed yet, so Windows SmartScreen may warn you: click **More info**, then **Run anyway**.
 
 ### 2. Connect
 
 - **USB:** turn on USB debugging on the phone, plug it in, and tap *Allow* on the phone. The PC needs [Android platform-tools](https://developer.android.com/tools/releases/platform-tools) (`adb`) on its `PATH`.
-- **Wi-Fi:** put the phone and PC on the same network, and let Mikey through the firewall ([how](docs/INSTALL_PC.md#3-firewall-configuration)).
+- **Wi-Fi:** put the phone and PC on the same network, and let Owlmic through the firewall ([how](docs/INSTALL_PC.md#3-firewall-configuration)).
 
-Open Mikey on the phone and tap the mic or the camera. The first time, click **Allow** on the PC to trust your phone.
+Open Owlmic on the phone and tap the mic or the camera. The first time, click **Allow** on the PC to trust your phone.
 
-### 3. Pick Mikey in your app
+### 3. Pick Owlmic in your app
 
-In Meet, Zoom or Teams, choose **Mikey Mic** as the microphone and **Mikey Cam** as the camera.
+In Meet, Zoom or Teams, choose **Owlmic** as the microphone and **Owlmic Cam** as the camera.
 
 Something not working? See [Troubleshooting](docs/TROUBLESHOOTING.md).
 
@@ -77,7 +77,7 @@ cargo run --release
 
 Then open the `android` folder in Android Studio and press **Run** to install the phone app ([more ways](docs/INSTALL_ANDROID.md)).
 
-Running from the source folder also enables the panel's **Setup Mic** button: click it once and approve the administrator prompt to automatically configure *Mikey Mic*.
+Running from the source folder also enables the panel's **Setup Mic** button: click it once and approve the administrator prompt to automatically configure *Owlmic*.
 
 </details>
 
@@ -85,7 +85,7 @@ Running from the source folder also enables the panel's **Setup Mic** button: cl
 
 ## Connection levels
 
-Mikey tries these in order and switches up as soon as a better one is available.
+Owlmic tries these in order and switches up as soon as a better one is available.
 
 | Level | Link | Audio | Video |
 |:-:|---|---|---|
@@ -97,11 +97,11 @@ Mikey tries these in order and switches up as soon as a better one is available.
 ## How it works
 
 ```
- Phone (Android app)                               PC (Mikey tray app)
+ Phone (Android app)                               PC (Owlmic tray app)
 
  Mic: raw 48 kHz, 10 ms frames ──┐           ┌── Opus decode ▸ noise suppression (RNNoise)
                                  ├── link ───┤     ▸ jitter buffer ▸ drift correction ▸ virtual mic
- Camera: CameraX ▸ JPEG ─────────┘           └── JPEG decode ▸ scale to 1920×1080 ▸ Mikey Cam
+ Camera: CameraX ▸ JPEG ─────────┘           └── JPEG decode ▸ scale to 1920×1080 ▸ Owlmic Cam
 
             link = USB debugging · USB tethering · Wi-Fi · Bluetooth
 ```
@@ -136,7 +136,7 @@ Details and the device test matrix are in the [Roadmap & Test Matrix](docs/ROADM
 | [Install on PC](docs/INSTALL_PC.md) | Building, running and the firewall |
 | [Install on Android](docs/INSTALL_ANDROID.md) | Building and installing the phone app |
 | [Troubleshooting](docs/TROUBLESHOOTING.md) | Fixes for connection, audio and camera problems |
-| [Architecture](docs/ARCHITECTURE.md) | A short tour of how Mikey fits together |
+| [Architecture](docs/ARCHITECTURE.md) | A short tour of how Owlmic fits together |
 | [All docs](docs/README.md) | Protocol, audio and video pipelines, design language, budgets |
 
 ---

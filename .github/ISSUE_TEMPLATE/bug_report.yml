@@ -23,7 +23,7 @@ body:
       label: Steps to reproduce
       description: Numbered steps to trigger the bug.
       placeholder: |
-        1. Open Mikey on phone
+        1. Open Owlmic on phone
         2. Connect to PC over Wi-Fi
         3. Tap mic
         4. Observe: no audio on PC side
@@ -42,7 +42,7 @@ body:
     id: component
     attributes:
       label: Component
-      description: Which part of Mikey is affected?
+      description: Which part of Owlmic is affected?
       options:
         - Android app
         - PC app (Windows)
@@ -74,7 +74,7 @@ body:
       placeholder: |
         - Phone: Pixel 7, Android 14
         - PC OS: Windows 11 23H2 / Ubuntu 24.04
-        - Mikey version: v0.x.x or commit hash
+        - Owlmic version: v0.x.x or commit hash
         - Connection: Wi-Fi (same network)
     validations:
       required: true
