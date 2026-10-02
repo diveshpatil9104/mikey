@@ -1,6 +1,6 @@
 # Performance Budgets & Real-Time Constraints
 
-Mikey is a real-time communications system. Every millisecond of latency, every dropped audio packet, and every megabyte of RAM is governed by **strict, non-negotiable performance budgets**.
+Owlmic is a real-time communications system. Every millisecond of latency, every dropped audio packet, and every megabyte of RAM is governed by **strict, non-negotiable performance budgets**.
 
 ---
 
@@ -36,7 +36,7 @@ PC JitterBuffer & DSP (pc/src/audio/)
 WASAPI System Playback Buffer (sink/stream.rs)
        │  ~3.0 ms (Windows Shared Mixer Engine)
        ▼
-Virtual Microphone Endpoint (Mikey Mic)
+Virtual Microphone Endpoint (Owlmic)
        │
        Total: ~18.5 ms (Well within ≤ 20 ms budget)
 ```

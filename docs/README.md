@@ -1,8 +1,8 @@
-# Mikey Documentation Index
+# Owlmic Documentation Index
 
-Welcome to the comprehensive technical documentation for **Mikey**.
+Welcome to the comprehensive technical documentation for **Owlmic**.
 
-Mikey turns an Android phone into a high-performance, ultra-low-latency microphone and webcam for a PC over four automatic connection levels:
+Owlmic turns an Android phone into a high-performance, ultra-low-latency microphone and webcam for a PC over four automatic connection levels:
 `Level 1 (USB Debugging / adb reverse)` > `Level 2 (USB Tethering)` > `Level 3 (Wi-Fi LAN)` > `Level 4 (Bluetooth RFCOMM)`.
 
 The project is built on strict **lean engineering principles**: zero accounts, zero cloud dependencies, zero electron/webviews, zero async runtime bloat, and pure functional OLED-black styling.
@@ -14,7 +14,7 @@ The project is built on strict **lean engineering principles**: zero accounts, z
 ### 1.1 Getting Started & Deployment
 | Guide | Purpose |
 | :--- | :--- |
-| **[INSTALL_PC.md](./INSTALL_PC.md)** | Setup for Windows 10/11 (installer with Mikey Mic, firewall), building from source, and building the installer. |
+| **[INSTALL_PC.md](./INSTALL_PC.md)** | Setup for Windows 10/11 (installer with Owlmic, firewall), building from source, and building the installer. |
 | **[INSTALL_ANDROID.md](./INSTALL_ANDROID.md)** | Android APK installation, USB debugging authorization, and first-launch steps. |
 | **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** | Diagnosing firewall isolation, ADB port conflicts, OEM battery killers, and Bluetooth RFCOMM. |
 | **[CHANGELOG.md](./CHANGELOG.md)** | Version evolution history and release notes. |

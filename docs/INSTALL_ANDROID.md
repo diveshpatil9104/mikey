@@ -1,4 +1,4 @@
-# Installing Mikey on Android
+# Installing Owlmic on Android
 
 ## Option 1: Download the APK (Recommended)
 
@@ -7,7 +7,7 @@
 3. On your phone:
    - Open Settings → Security → enable "Install from unknown sources" for your browser (or Files app)
    - Open the downloaded APK and tap Install
-4. Launch Mikey
+4. Launch Owlmic
 
 > **Note:** A signed APK and Google Play release are planned for v1.0.0.
 
@@ -59,8 +59,8 @@ Or drag the APK onto the Android Studio device manager.
    - Camera - required for video streaming
    - Notification - required for the foreground service indicator
 2. **Connect to your PC:**
-   - **USB:** Plug in with USB debugging enabled. Mikey connects automatically.
-   - **Wi-Fi:** Join the same network as your PC. Mikey discovers the PC automatically.
+   - **USB:** Plug in with USB debugging enabled. Owlmic connects automatically.
+   - **Wi-Fi:** Join the same network as your PC. Owlmic discovers the PC automatically.
    - **Bluetooth:** Pair phone and PC in OS Bluetooth settings first.
 3. **Tap mic or camera** to start streaming.
 

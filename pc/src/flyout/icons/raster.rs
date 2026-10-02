@@ -161,5 +161,5 @@ pub fn generate_mikey_tray_rgba(mode: TrayIconMode) -> Vec<u8> {
 #[cfg(windows)]
 pub fn create_mikey_tray_icon(mode: TrayIconMode) -> tray_icon::Icon {
     let rgba = generate_mikey_tray_rgba(mode);
-    tray_icon::Icon::from_rgba(rgba, 32, 32).expect("create Mikey tray icon")
+    tray_icon::Icon::from_rgba(rgba, 32, 32).expect("create Owlmic tray icon")
 }

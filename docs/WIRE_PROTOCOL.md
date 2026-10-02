@@ -1,6 +1,6 @@
 # Wire Protocol & Framing Specification
 
-Mikey uses a lean, deterministic binary wire protocol over reliable streams (TCP and Bluetooth RFCOMM). It provides low-overhead framing for high-frequency media delivery while multiplexing structured UTF-8 JSON payloads for control, synchronization, and authentication.
+Owlmic uses a lean, deterministic binary wire protocol over reliable streams (TCP and Bluetooth RFCOMM). It provides low-overhead framing for high-frequency media delivery while multiplexing structured UTF-8 JSON payloads for control, synchronization, and authentication.
 
 ---
 

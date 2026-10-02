@@ -193,7 +193,7 @@ pub fn is_instance_registered(root: usize) -> bool {
     }
 }
 
-/// Sets the DirectShow FriendlyName to "Mikey Cam" for the virtual camera.
+/// Sets the DirectShow FriendlyName to "Owlmic Cam" for the virtual camera.
 fn set_friendly_name(root: usize) {
     let instance_path = format!(
         "Software\\Classes\\CLSID\\{}\\Instance\\DirectShow Softcam\0",
@@ -211,7 +211,7 @@ fn set_friendly_name(root: usize) {
         )
     };
     if open_res == 0 {
-        let friendly_name: Vec<u16> = "Mikey Cam\0".encode_utf16().collect();
+        let friendly_name: Vec<u16> = "Owlmic Cam\0".encode_utf16().collect();
         let friendly_val_name: Vec<u16> = "FriendlyName\0".encode_utf16().collect();
         unsafe {
             RegSetValueExW(

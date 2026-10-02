@@ -1,6 +1,6 @@
 name: Windows installer
 
-# Builds mikey.exe and Mikey-Setup-x.y.z.exe on Windows. The installer bundles the Mikey Mic
+# Builds mikey.exe and Owlmic-Setup-x.y.z.exe on Windows. The installer bundles the Owlmic microphone
 # driver files, downloaded here and checked against a known checksum.
 on:
   workflow_dispatch:
@@ -32,14 +32,14 @@ jobs:
           RUSTFLAGS: -C target-feature=+crt-static
         run: cargo build --release --manifest-path pc/Cargo.toml
 
-      - name: Check the Mikey Mic setup script
+      - name: Check the microphone setup script
         shell: pwsh
         run: |
           $errors = $null
           [System.Management.Automation.Language.Parser]::ParseFile("$PWD\pc\installer\setup-audio-device.ps1", [ref]$null, [ref]$errors) | Out-Null
           if ($errors) { $errors | ForEach-Object { Write-Error $_.ToString() }; exit 1 }
 
-      - name: Download the Mikey Mic driver files
+      - name: Download the microphone driver files
         shell: pwsh
         run: |
           $zip = "$env:RUNNER_TEMP\mikey-mic-driver.zip"
@@ -59,11 +59,11 @@ jobs:
           if (-not $iscc) { throw "Inno Setup's compiler wasn't found" }
           & $iscc.FullName "/DMyAppVersion=$version" pc\installer\mikey.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          Copy-Item pc\target\release\mikey.exe "pc\installer\Output\Mikey-v$version-windows-x64.exe"
+          Copy-Item pc\target\release\mikey.exe "pc\installer\Output\Owlmic-v$version-windows-x64.exe"
 
       - name: Upload the installer and mikey.exe
         uses: actions/upload-artifact@v7
         with:
-          name: mikey-windows
+          name: owlmic-windows
           path: pc/installer/Output/*.exe
           if-no-files-found: error
