@@ -173,9 +173,9 @@ impl Config {
 
 /// The settings folder's name from before the rename to Owlmic.
 #[cfg(windows)]
-const OLD_DIR_NAME: &str = "Mikey";
+const OLD_DIR_NAME: &str = "Owlmic";
 #[cfg(not(windows))]
-const OLD_DIR_NAME: &str = "mikey";
+const OLD_DIR_NAME: &str = "owlmic";
 
 fn move_old_dir(dir: &Path) {
     let old = dir.with_file_name(OLD_DIR_NAME);

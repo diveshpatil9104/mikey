@@ -3,13 +3,13 @@ use std::io;
 
 #[cfg(windows)]
 const RUN_VALUE: &str = "Owlmic";
-/// Written before the rename to Owlmic. It starts the old mikey.exe, so syncing removes it.
+/// Written before the rename to Owlmic. It starts the old owlmic.exe, so syncing removes it.
 #[cfg(windows)]
-const OLD_RUN_VALUE: &str = "Mikey";
+const OLD_RUN_VALUE: &str = "Owlmic";
 #[cfg(not(windows))]
 const DESKTOP_FILE: &str = "owlmic.desktop";
 #[cfg(not(windows))]
-const OLD_DESKTOP_FILE: &str = "mikey.desktop";
+const OLD_DESKTOP_FILE: &str = "owlmic.desktop";
 
 #[cfg(windows)]
 pub fn format_autostart_cmd(exe_path: &std::path::Path) -> String {
