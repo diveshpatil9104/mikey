@@ -1,4 +1,5 @@
-#[cfg(windows)]
+#![cfg(windows)]
+
 #[test]
 fn test_export_icons_preview() {
     use mikey::flyout::heroicons::*;
@@ -129,6 +130,25 @@ fn test_export_icons_preview() {
     bmp_data.extend_from_slice(raw_bytes);
 
     std::fs::write(artifact_path, bmp_data).expect("write bmp");
+
+    // Programmatic pixel validation: verify icon strokes were rendered into the buffer
+    let non_bg_count = slice.iter().filter(|&&pixel| pixel != 0xFF111111).count();
+    assert!(
+        non_bg_count > 500,
+        "Expected at least 500 rendered icon pixels, found {}",
+        non_bg_count
+    );
+
+    let has_green = slice.iter().any(|&p| (p & 0x00FF00) > 0x00C000);
+    let has_blue = slice.iter().any(|&p| (p & 0x0000FF) > 0x00E0);
+    assert!(
+        has_green,
+        "Rendered surface should contain green mic pixels"
+    );
+    assert!(
+        has_blue,
+        "Rendered surface should contain blue camera pixels"
+    );
 
     unsafe {
         (g.fn_delete_graphics)(graphics);

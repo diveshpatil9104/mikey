@@ -13,6 +13,10 @@ local.properties
 
 # PC / Rust
 pc/target/
+*.dll
+*.exe
+*.so
+pc/softcam.dll
 
 # Windows installer: driver files downloaded by CI, and the build output
 pc/installer/driver/

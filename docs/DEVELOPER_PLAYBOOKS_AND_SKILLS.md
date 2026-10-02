@@ -119,3 +119,17 @@ if ! grep -q "@AGENTS.md" CLAUDE.md 2>/dev/null; then
   exit 1
 fi
 ```
+
+---
+
+## 7. Playbook: Build PC from Source with Virtual Camera (`softcam.dll`)
+
+In accordance with repository binary hygiene rules, compiled binary files (`*.dll`, `*.exe`, `*.so`) are not tracked in git history.
+
+1. **Automated CI Fetch**: `.github/workflows/ci.yml` and `windows-installer.yml` automatically download and verify `softcam.dll` before compilation.
+2. **Local Development Setup**: If building the PC crate from a clean clone:
+   ```powershell
+   # In pc/ directory, download pinned softcam.dll
+   Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/diveshpatil9104/mikey/3f78b5767f64f4542b4307c586da4b609d54d38e/pc/softcam.dll' -OutFile pc\softcam.dll -UseBasicParsing
+   ```
+   Verify the SHA-256 checksum: `9D635E0AF682A883C3C7D407513D47E59B0883771701B101216820DFCF997F0B`.
