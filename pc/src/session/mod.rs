@@ -34,6 +34,7 @@ impl SessionManager {
                 pending_requests: std::collections::HashMap::new(),
                 pending_controls: Vec::new(),
                 phone_muted: false,
+                firewall_blocked: false,
             })),
             condvar: Arc::new(Condvar::new()),
             next_request_id: Arc::new(AtomicU64::new(1)),
@@ -160,5 +161,15 @@ impl SessionManager {
         let mut inner = self.inner.lock().unwrap();
         inner.config.start_with_computer = enabled;
         let _ = inner.config.save_to(&inner.config_path);
+    }
+
+    pub fn is_firewall_blocked(&self) -> bool {
+        let inner = self.inner.lock().unwrap();
+        inner.firewall_blocked
+    }
+
+    pub fn set_firewall_blocked(&self, blocked: bool) {
+        let mut inner = self.inner.lock().unwrap();
+        inner.firewall_blocked = blocked;
     }
 }

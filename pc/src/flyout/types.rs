@@ -39,6 +39,7 @@ pub enum FlyoutButton {
     MicToggle,
     MuteToggle,
     SetupVirtualMic,
+    FixFirewall,
     TogglePreview,
     FlipCamera,
     NsSlider,

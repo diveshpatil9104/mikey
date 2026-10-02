@@ -161,5 +161,58 @@ pub fn render_banners(
         y += 28;
     }
 
+    // ── Firewall warning banner ──
+    if flyout.session_manager.is_firewall_blocked() {
+        y += 2;
+        if let Some(g) = g_opt {
+            draw_hero_alert(g, graphics, 24.0, (y + 13) as f32, ARGB_STATUS_WAIT);
+        }
+        draw_text(
+            dc,
+            fonts.body,
+            COLOR_TEXT_PRIMARY,
+            36,
+            y + 2,
+            180,
+            y + 24,
+            "Wi-Fi Blocked",
+            0,
+        );
+
+        let btn_w = 84;
+        let btn = rect(FLYOUT_WIDTH - 14 - btn_w, y + 2, FLYOUT_WIDTH - 14, y + 24);
+        flyout.button_rects.push((FlyoutButton::FixFirewall, btn));
+        let f_hover = flyout.hover_btn == Some(FlyoutButton::FixFirewall);
+        draw_pill_bg(
+            dc,
+            btn.left,
+            btn.top,
+            btn.right,
+            btn.bottom,
+            if f_hover {
+                COLOR_BTN_HOVER
+            } else {
+                COLOR_BTN_BG
+            },
+            if f_hover {
+                COLOR_BTN_BORDER_HI
+            } else {
+                COLOR_BTN_BORDER
+            },
+        );
+        draw_text(
+            dc,
+            fonts.body_bold,
+            COLOR_TEXT_PRIMARY,
+            btn.left,
+            btn.top,
+            btn.right,
+            btn.bottom,
+            "Allow Access",
+            DT_CENTER_V,
+        );
+        y += 28;
+    }
+
     y
 }

@@ -123,8 +123,9 @@ Mikey corrects drift by resampling continuously with **4-point cubic (Catmull-Ro
 - **Soft Clip**: Output above 0.95 full scale (`SOFT_CLIP_KNEE`) bends smoothly toward full scale instead of being cut flat, which crackles.
 
 ### 3.3 Auto Loudness Normalization (`pc/src/audio/pipeline/normalizer.rs`)
-- **Unity Gain Delivery**: Maintains constant unity gain (`MIN_AUTO_GAIN = 1.0`, `MAX_AUTO_GAIN = 1.0`, multiplier `1.0×`) across all vocal inputs. This completely eliminates dynamic voice ducking, compressor pumping, and background ambient noise surges during speech pauses.
-- **Vocal Headroom & Monitoring**: Tracks continuous vocal RMS against broadcast speech standards (`TARGET_RMS_I16 = 4126.0`, -18 dBFS) for flyout UI level metering while preserving linear input dynamics for meeting applications.
+- **Speech Leveling & Boost**: Automatically amplifies quiet microphone input from mobile devices up to +12 dB (`MAX_AUTO_GAIN = 4.0`, `MIN_AUTO_GAIN = 1.0`) towards broadcast speech standards (`TARGET_RMS_I16 = 4126.0`, -18 dBFS), ensuring voices are clearly audible in meetings without distortion.
+- **Anti-Pumping Noise Hold**: Below speech threshold (`NOISE_FLOOR_I16 = 350.0`, ~ -39 dBFS), the normalizer freezes its current gain instead of tracking lower. Ambient room noise and keyboard clatter during pauses are never pumped upward.
+- **Asymmetric Level Dynamics**: Uses a very slow gain ramp (`GAIN_UP_ALPHA = 0.003`, ~3 seconds) for quiet passages to prevent inter-word breathing artifacts, paired with a faster reduction (`GAIN_DOWN_ALPHA = 0.02`, ~500 ms) and soft clipping (`SOFT_CLIP_KNEE = 0.95`) to prevent loud vocal transients from clipping.
 
 ### 3.4 Neural Speech Denoising (`pc/src/audio/dsp/denoise.rs`)
 - **Model**: Embedded **RNNoise** recurrent neural network model trained on voice and background noise spectra.

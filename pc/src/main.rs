@@ -69,6 +69,18 @@ fn main() {
         eprintln!("[mikey] autostart sync failed: {e}");
     }
 
+    // Inspect firewall rules for Wi-Fi / Tethering (TCP :7653, UDP :7654)
+    #[cfg(windows)]
+    if cfg.levels.wifi || cfg.levels.usb_tethering {
+        let (tcp_ok, udp_ok) = mikey::firewall::check_rules();
+        if !tcp_ok || !udp_ok {
+            eprintln!(
+                "[firewall] Inbound traffic blocked (TCP: {tcp_ok}, UDP: {udp_ok}). Showing banner."
+            );
+            session_manager.set_firewall_blocked(true);
+        }
+    }
+
     // --test-tone mode: play a 3-second tone to verify audio pipeline, then exit
     if test_mode {
         let _streams = sink::start_output(&jitter_buffer);
