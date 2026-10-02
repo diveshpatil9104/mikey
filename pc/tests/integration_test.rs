@@ -185,3 +185,64 @@ fn test_end_to_end_handover_with_session_hold() {
     );
     server_thread.join().expect("server joins cleanly");
 }
+
+#[test]
+fn test_control_settings_sync() {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind ephemeral port");
+    let addr = listener.local_addr().expect("local addr");
+
+    let jb = Arc::new(JitterBuffer::new());
+    let jb_clone = Arc::clone(&jb);
+    let vp = Arc::new(VideoPipeline::new());
+    let vp_clone = Arc::clone(&vp);
+
+    let mut temp_cfg = std::env::temp_dir();
+    temp_cfg.push(format!("mikey_it_ctrl_{}.toml", generate_random_hex(8)));
+    let sm = SessionManager::new(temp_cfg);
+    let sm_clone = sm.clone();
+
+    let server_thread = thread::spawn(move || {
+        let (stream, _) = listener.accept().expect("accept connection");
+        handle_client(stream, jb_clone, vp_clone, sm_clone);
+    });
+
+    let mut client = TcpStream::connect(addr).expect("connect client");
+    configure_stream(&client).expect("configure stream");
+
+    let hello = HelloPayload {
+        proto: PROTO_VERSION,
+        device_id: "ctrl-phone-id".to_string(),
+        device_name: "Pixel 8".to_string(),
+        level: 1,
+        token: None,
+        resume: None,
+        caps: vec!["pcm".to_string()],
+    };
+    write_frame(
+        &mut client,
+        &Frame::new(FrameType::Hello, serde_json::to_vec(&hello).unwrap()),
+    )
+    .expect("send hello");
+
+    let welcome = read_frame(&mut client).expect("read welcome");
+    assert_eq!(welcome.frame_type, FrameType::Welcome);
+
+    // Send control frame updating noise suppression strength to 80%, mute to true, and camera to true
+    let ctrl_json = r#"{"audio":{"ns":true,"ns_strength":0.80,"muted":true},"video":{"on":true}}"#;
+    let ctrl_frame = Frame::new(FrameType::Control, ctrl_json.as_bytes().to_vec());
+    write_frame(&mut client, &ctrl_frame).expect("send control");
+
+    // Allow time for server thread to process control packet
+    thread::sleep(std::time::Duration::from_millis(50));
+
+    assert!(sm.is_phone_muted());
+    assert_eq!(jb.get_ns_strength(), 80);
+    assert!(vp.is_camera_on());
+
+    // Clean shutdown
+    let _ = write_frame(
+        &mut client,
+        &Frame::new(FrameType::Bye, b"{\"reason\":\"user_stop\"}".to_vec()),
+    );
+    server_thread.join().expect("server joins cleanly");
+}

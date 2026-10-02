@@ -26,6 +26,19 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Ensure softcam.dll
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "pc\softcam.dll")) {
+            $expectedHash = '9D635E0AF682A883C3C7D407513D47E59B0883771701B101216820DFCF997F0B'
+            $url = 'https://raw.githubusercontent.com/diveshpatil9104/mikey/3f78b5767f64f4542b4307c586da4b609d54d38e/pc/softcam.dll'
+            Invoke-WebRequest -Uri $url -OutFile pc\softcam.dll -UseBasicParsing
+            $hash = (Get-FileHash pc\softcam.dll -Algorithm SHA256).Hash
+            if ($hash -ne $expectedHash) {
+              throw "Downloaded softcam.dll checksum mismatch: $hash"
+            }
+          }
+
       # Static C runtime: mikey.exe runs without the Visual C++ Redistributable.
       - name: Build mikey.exe
         env:
@@ -43,9 +56,45 @@ jobs:
         shell: pwsh
         run: |
           $zip = "$env:RUNNER_TEMP\mikey-mic-driver.zip"
-          Invoke-WebRequest https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip -OutFile $zip
-          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
-          if ($hash -ne 'B950E39F01AF1D04EA623C8F6D8EB9B6EA5C477C637295FABF20631C85116BFB') { throw "Unexpected driver files: $hash" }
+          $expectedHash = 'B950E39F01AF1D04EA623C8F6D8EB9B6EA5C477C637295FABF20631C85116BFB'
+          $sources = @(
+            'https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip',
+            'https://web.archive.org/web/20240901000000id_/https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip'
+          )
+          $downloaded = $false
+          $ProgressPreference = 'SilentlyContinue'
+          foreach ($url in $sources) {
+            try {
+              Write-Host "Downloading Mikey Mic driver from $url..."
+              if (Test-Path $zip) { Remove-Item $zip -Force }
+              Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing -UserAgent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' -TimeoutSec 60
+              $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
+              if ($hash -eq $expectedHash) {
+                $downloaded = $true
+                Write-Host "Driver checksum verified: $hash"
+                break
+              }
+              Write-Warning "Checksum mismatch for ${url}: got $hash, expected $expectedHash"
+            } catch {
+              Write-Warning "Invoke-WebRequest failed for ${url}: $($_.Exception.Message)"
+              try {
+                if (Test-Path $zip) { Remove-Item $zip -Force }
+                & curl.exe -sS -f -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -o $zip $url --max-time 60
+                $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
+                if ($hash -eq $expectedHash) {
+                  $downloaded = $true
+                  Write-Host "Driver checksum verified via curl: $hash"
+                  break
+                }
+                Write-Warning "Checksum mismatch via curl for ${url}: got $hash, expected $expectedHash"
+              } catch {
+                Write-Warning "curl failed for ${url}: $($_.Exception.Message)"
+              }
+            }
+          }
+          if (-not $downloaded) {
+            throw "Failed to download verified driver pack from any source."
+          }
           Expand-Archive $zip -DestinationPath pc\installer\driver -Force
 
       - name: Install Inno Setup

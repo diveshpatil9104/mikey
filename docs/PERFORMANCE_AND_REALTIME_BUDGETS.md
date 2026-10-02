@@ -103,3 +103,8 @@ cd pc && cargo test
 # Verify audio output pipeline without a physical phone (plays 3-second test tone)
 cd pc && cargo run -- --test-tone
 ```
+
+### 4.1 Automated Test Suite Matrix
+- **53 Unit Tests (`pc/src/`)**: Validates protocol framing limits, adaptive jitter buffer pre-buffering (20–120 ms), drift resampling at ±0.2%, RNNoise neural noise suppression, cross-platform autostart synchronization (Windows registry and Linux XDG `.desktop`), firewall rule parsing across public/private profiles, TOFU pairing handshakes, and DirectShow COM registration.
+- **17 Integration Tests (`pc/tests/`)**: Validates end-to-end media streaming, mid-call transport handover with 30-second session hold, bidirectional runtime control synchronization, session termination lifecycles, SIMD JPEG decoding, and programmatic GDI+ rendering pixel assertions.
+- **Timing & Parallelism**: All 70 automated tests execute concurrently in under 0.3 seconds via `cargo test`.

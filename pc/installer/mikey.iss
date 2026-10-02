@@ -64,6 +64,7 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDi
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Mikey"; ValueData: """{app}\{#MyAppExeName}"" --autostart"; Tasks: autostart; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueName: "Mikey"; Flags: dontcreatekey uninsdeletevalue
 
 [Run]
 Filename: "regsvr32.exe"; Parameters: "/s ""{app}\softcam.dll"""; StatusMsg: "Registering virtual camera..."; Flags: runhidden
@@ -72,6 +73,7 @@ Filename: "netsh"; Parameters: "advfirewall firewall add rule name=""Mikey UDP B
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
+Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden; RunOnceId: "MikeyKill"
 Filename: "regsvr32.exe"; Parameters: "/u /s ""{app}\softcam.dll"""; Flags: runhidden; RunOnceId: "MikeySoftcam"
 Filename: "netsh"; Parameters: "advfirewall firewall delete rule name=""Mikey TCP"""; Flags: runhidden; RunOnceId: "MikeyFirewallTcp"
 Filename: "netsh"; Parameters: "advfirewall firewall delete rule name=""Mikey UDP Beacon"""; Flags: runhidden; RunOnceId: "MikeyFirewallUdp"
@@ -88,14 +90,21 @@ var
 begin
   if CurStep <> ssPostInstall then
     Exit;
-  WizardForm.StatusLabel.Caption := 'Setting up the Owlmic microphone. This can take a minute...';
-  if Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'),
-      '-NoProfile -ExecutionPolicy Bypass -File "' + ExpandConstant('{app}\setup-audio-device.ps1') + '" -Silent',
-      '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and ((ResultCode = 0) or (ResultCode = 3010)) then
-    MicNeedsRestart := ResultCode = 3010
-  else
-    SuppressibleMsgBox('Owlmic is installed, but its microphone couldn''t be set up yet. Restart Windows, open Owlmic, and click Setup Mic in its panel.',
-      mbInformation, MB_OK, IDOK);
+  WizardForm.StatusLabel.Caption := 'Setting up the Owlmic microphone...';
+  WizardForm.FilenameLabel.Caption := 'Configuring virtual audio driver and endpoints (this can take up to a minute)...';
+  WizardForm.ProgressGauge.Style := npbstMarquee;
+  try
+    if Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'),
+        '-NoProfile -ExecutionPolicy Bypass -File "' + ExpandConstant('{app}\setup-audio-device.ps1') + '" -Silent',
+        '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and ((ResultCode = 0) or (ResultCode = 3010)) then
+      MicNeedsRestart := ResultCode = 3010
+    else
+      SuppressibleMsgBox('Owlmic is installed, but its microphone couldn''t be set up yet. Restart Windows, open Owlmic, and click Setup Mic in its panel.',
+        mbInformation, MB_OK, IDOK);
+  finally
+    WizardForm.ProgressGauge.Style := npbstNormal;
+    WizardForm.FilenameLabel.Caption := '';
+  end;
 end;
 
 function NeedRestart(): Boolean;

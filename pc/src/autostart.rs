@@ -334,12 +334,23 @@ mod tests {
 
     static TEST_LOCK: Mutex<()> = Mutex::new(());
 
+    #[cfg(windows)]
     #[test]
     fn test_autostart_command_line_formatting() {
         let p = Path::new(r"C:\Program Files\Mikey\mikey.exe");
         assert_eq!(
             format_autostart_cmd(p),
             r#""C:\Program Files\Mikey\mikey.exe" --autostart"#
+        );
+    }
+
+    #[cfg(not(windows))]
+    #[test]
+    fn test_autostart_command_line_formatting_linux() {
+        let p = Path::new("/usr/bin/mikey");
+        assert_eq!(
+            format_autostart_cmd(p),
+            "[Desktop Entry]\nType=Application\nName=Mikey\nExec=/usr/bin/mikey --autostart\nTerminal=false\n"
         );
     }
 

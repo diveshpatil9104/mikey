@@ -67,7 +67,7 @@ This document tracks Owlmic’s five implementation phases, current development 
 ### 2.5 Phase 5 - Packaging, Hardening & Release (In Progress)
 *Goal: A stranger installs and uses Owlmic in under 5 minutes.*
 - [ ] Signed Android APK build automation with ABI splits (`arm64-v8a`, `armeabi-v7a`).
-- [ ] Windows Inno Setup installer bundling `mikey.exe`, DirectShow `softcam.dll`, and firewall rules.
+- [x] Windows Inno Setup installer bundling `mikey.exe`, DirectShow `softcam.dll`, and firewall rules.
 - [ ] Linux `.deb` and AppImage packages with desktop autostart entries.
 - [ ] Optional: AES-GCM encryption on Level 3 (Wi-Fi) using pairing-established keys.
 - [ ] Real-device test matrix validation across phones, host OSes, and video conferencing apps.

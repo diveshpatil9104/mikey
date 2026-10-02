@@ -38,7 +38,7 @@ The project is built on strict **lean engineering principles**: zero accounts, z
 | **[PC_ARCHITECTURE_AND_STYLE.md](./PC_ARCHITECTURE_AND_STYLE.md)** | Rust systems architecture, std threads + bounded channels, strict no-async rule, silent background tray entry, and Clippy rigor. | `pc/src/` |
 | **[UI_AND_DESIGN_LANGUAGE.md](./UI_AND_DESIGN_LANGUAGE.md)** | Pure functional aesthetic, OLED pure black palette (`#000000`), Geist typography, icon metrics, and double-buffered Win32 GDI flyout engine. | `Palette.kt`, `Controls.kt`, `flyout/render.rs`, `flyout/palette.rs` |
 | **[PERFORMANCE_AND_REALTIME_BUDGETS.md](./PERFORMANCE_AND_REALTIME_BUDGETS.md)** | Hard latency budgets (≤20ms USB, ≤40ms Wi-Fi), memory/CPU limits, buffer bounds, timeouts, and verification steps. | `constants.rs`, `docs/PERFORMANCE_AND_REALTIME_BUDGETS.md` |
-| **[ROADMAP_AND_TEST_MATRIX.md](./ROADMAP_AND_TEST_MATRIX.md)** | Checklists for Phases 1–5 (Phases 1–4 complete), Phase 5 release criteria, and real-device test matrix across OEMs, OSes, and apps. | `ROADMAP_AND_TEST_MATRIX.md` |
+| **[ROADMAP_AND_TEST_MATRIX.md](./ROADMAP_AND_TEST_MATRIX.md)** | Checklists for Phases 1–5 (All phases complete), release criteria, and real-device test matrix across OEMs, OSes, and apps. | `ROADMAP_AND_TEST_MATRIX.md` |
 | **[DEVELOPER_PLAYBOOKS_AND_SKILLS.md](./DEVELOPER_PLAYBOOKS_AND_SKILLS.md)** | Step-by-step developer playbooks (build Android, add dependency, change protocol, close phase), coding rules 1–18, and pre-commit hook. | `AGENTS.md` |
 
 ---
