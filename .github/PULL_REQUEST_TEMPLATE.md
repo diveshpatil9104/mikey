@@ -19,7 +19,7 @@ If fixing an issue, link it here: Fixes #123
 
 ## Affected Components
 
-<!-- Which parts of Mikey does this change touch? -->
+<!-- Which parts of Owlmic does this change touch? -->
 
 - [ ] Android app (`android/`)
 - [ ] PC tray app (`pc/`)

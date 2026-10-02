@@ -1,12 +1,12 @@
 # Sessions & Trust Architecture
 
-Security, privacy, and device pairing in Mikey are anchored in **local cryptographic trust, transparent user authorization, and zero cloud dependency**. There are no accounts, no central servers, and no background telemetry.
+Security, privacy, and device pairing in Owlmic are anchored in **local cryptographic trust, transparent user authorization, and zero cloud dependency**. There are no accounts, no central servers, and no background telemetry.
 
 ---
 
 ## 1. Trust-on-First-Use (TOFU) Architecture
 
-Mikey uses a **Trust-on-First-Use** verification model that adjusts prompts based on the physical transport medium:
+Owlmic uses a **Trust-on-First-Use** verification model that adjusts prompts based on the physical transport medium:
 
 ```mermaid
 sequenceDiagram

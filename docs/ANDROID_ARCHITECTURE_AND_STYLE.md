@@ -7,7 +7,7 @@ The Android client (`android/`) is engineered for **ultra-low latency, maximum b
 ## 1. Architectural Philosophy
 
 ### 1.1 Strict Dependency Austerity
-Mikey intentionally eliminates heavy, complex frameworks:
+Owlmic intentionally eliminates heavy, complex frameworks:
 - **No Dependency Injection**: No Dagger, Hilt, or Koin. Dependencies are instantiated and passed directly via constructors.
 - **No Heavy ORMs**: No Room or SQLite. Settings are persisted via lightweight Android `SharedPreferences` (`Settings.kt`).
 - **No HTTP/REST Frameworks**: No Retrofit, OkHttp, or Ktor. All communication uses native TCP and RFCOMM sockets with custom binary framing.
