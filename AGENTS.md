@@ -1,4 +1,4 @@
-# Mikey - Agent Instructions
+# Owlmic - Agent Instructions
 
 > `CLAUDE.md` imports this file via `@AGENTS.md`. Edit this file directly - see [update-agent-files](docs/DEVELOPER_PLAYBOOKS_AND_SKILLS.md).
 
@@ -25,7 +25,7 @@ Code and documentation must **never** drift apart:
 
 ## Project Overview & Ownership
 
-- **Project in one line**: Android app (Kotlin/Compose) + per-user PC tray app (Rust, binary `mikey`) that turns a phone into a mic and webcam for a PC over four automatic connection levels:
+- **Project in one line**: Android app (Kotlin/Compose) + per-user PC tray app (Rust, binary `owlmic`) that turns a phone into a mic and webcam for a PC over four automatic connection levels:
   `1 USB debugging (adb reverse)` > `2 USB tethering` > `3 Wi-Fi` > `4 Bluetooth RFCOMM (audio only)`.
 - **Ownership boundaries**:
   - `android/` - repo owner's domain.
@@ -36,7 +36,7 @@ Code and documentation must **never** drift apart:
 
 ## Architecture & Invariants
 
-1. **Android App** (`android/`): `MikeyService` foreground service owns capture + transport. `TransportManager` negotiates the best of 4 levels with make-before-break upgrades.
+1. **Android App** (`android/`): `OwlmicService` foreground service owns capture + transport. `TransportManager` negotiates the best of 4 levels with make-before-break upgrades.
 2. **PC Tray App** (`pc/`): TCP `:7653`, UDP discovery beacon `:7654`, RFCOMM server, adb watcher, `SessionManager` (tokens, trust, ask-before-join), audio pipeline (Opus, jitter buffer, drift resampler, noise gate, RNNoise, SpeexDSP AEC), video pipeline (JPEG -> virtual camera).
 3. **Threading & Concurrency**:
    - PC: Blocking std threads + bounded channels.
@@ -46,7 +46,7 @@ Code and documentation must **never** drift apart:
    - Every socket must have a timeout. Every queue/channel must have a strict upper bound. No unbounded buffering.
 5. **State & Permissions**:
    - Mic and camera always initialize in the **OFF** state. Never auto-enable capture from the background or upon connection.
-   - UI never owns logic: Compose observes `StateFlow` from `MikeyService`; PC tray reflects `SessionManager`.
+   - UI never owns logic: Compose observes `StateFlow` from `OwlmicService`; PC tray reflects `SessionManager`.
 
 ---
 
@@ -147,7 +147,7 @@ Do not introduce or propose any of the following:
 - **Runtimes & Frameworks**: Electron, Tauri webviews, Node.js, Python, HTTP/REST/WebSockets for media streaming, GTK, or Qt.
 - **Android Libraries**: Retrofit, Hilt/Dagger, Room, Firebase, analytics/telemetry SDKs.
 - **Async on PC**: Tokio anywhere outside `pc/src/transport/bt.rs`.
-- **System bloat**: Windows services or system-wide systemd units (Mikey PC is strictly a per-user tray app autostarting at user login).
+- **System bloat**: Windows services or system-wide systemd units (Owlmic PC is strictly a per-user tray app autostarting at user login).
 - **Hardcoded networking**: Hardcoded USB tethering subnets (always discover interfaces dynamically).
 - **Visual bloat**: Gradients, shadows, glassmorphism, decorative animations, or emojis in code and technical documentation headers.
 - **Git bloat**: Compiled binaries (`.apk`, `.exe`, `.aab`, `.dll`, `.so`, `.zip`) committed into the Git repository.
