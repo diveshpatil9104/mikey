@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.mikey"
+    namespace = "com.owlmic"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.mikey"
+        applicationId = "com.owlmic"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

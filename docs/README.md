@@ -23,7 +23,7 @@ The project is built on strict **lean engineering principles**: zero accounts, z
 | Document | Primary Focus | Key Source Files |
 | :--- | :--- | :--- |
 | **[PRODUCT_VISION_AND_SCOPE.md](./PRODUCT_VISION_AND_SCOPE.md)** | Motto, core vision, empathy personas, 7 product principles, v1.0 scope boundaries, user journeys, risks R1–R12, and 11 recorded decisions. | `README.md` |
-| **[SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md)** | End-to-end system topology, component responsibilities, threading models, failure matrix, and platform boundaries. | `MainActivity.kt`, `MikeyService.kt`, `main.rs`, `lib.rs` |
+| **[SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md)** | End-to-end system topology, component responsibilities, threading models, failure matrix, and platform boundaries. | `MainActivity.kt`, `OwlmicService.kt`, `main.rs`, `lib.rs` |
 | **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Quick contributor summary of system topology, connection levels, and threading. | `docs/ARCHITECTURE.md` |
 | **[TRANSPORTS_AND_NETWORKING.md](./TRANSPORTS_AND_NETWORKING.md)** | The 4 connection levels, make-before-break upgrades, UDP discovery beacon (`:7654`), subnet pinning, and anti-flap timers. | `TransportManager.kt`, `Discovery.kt`, `adb.rs`, `beacon.rs`, `tcp/` |
 | **[WIRE_PROTOCOL.md](./WIRE_PROTOCOL.md)** | Complete binary wire framing, packet opcodes (`0x00`–`0x12`), 14-byte `MediaHeader`, JSON control schemas, and state machine. | `protocol/Frame.kt`, `protocol/Messages.kt`, `pc/src/protocol/` |
@@ -34,7 +34,7 @@ The project is built on strict **lean engineering principles**: zero accounts, z
 ### 1.3 Platform Engineering & Quality
 | Document | Primary Focus | Key Source Files |
 | :--- | :--- | :--- |
-| **[ANDROID_ARCHITECTURE_AND_STYLE.md](./ANDROID_ARCHITECTURE_AND_STYLE.md)** | Kotlin design patterns, reactive Compose observing `MikeyService`, foreground service lifecycle, real-time priority, JNI, and anti-slop rules. | `android/app/src/main/` |
+| **[ANDROID_ARCHITECTURE_AND_STYLE.md](./ANDROID_ARCHITECTURE_AND_STYLE.md)** | Kotlin design patterns, reactive Compose observing `OwlmicService`, foreground service lifecycle, real-time priority, JNI, and anti-slop rules. | `android/app/src/main/` |
 | **[PC_ARCHITECTURE_AND_STYLE.md](./PC_ARCHITECTURE_AND_STYLE.md)** | Rust systems architecture, std threads + bounded channels, strict no-async rule, silent background tray entry, and Clippy rigor. | `pc/src/` |
 | **[UI_AND_DESIGN_LANGUAGE.md](./UI_AND_DESIGN_LANGUAGE.md)** | Pure functional aesthetic, OLED pure black palette (`#000000`), Geist typography, icon metrics, and double-buffered Win32 GDI flyout engine. | `Palette.kt`, `Controls.kt`, `flyout/render.rs`, `flyout/palette.rs` |
 | **[PERFORMANCE_AND_REALTIME_BUDGETS.md](./PERFORMANCE_AND_REALTIME_BUDGETS.md)** | Hard latency budgets (≤20ms USB, ≤40ms Wi-Fi), memory/CPU limits, buffer bounds, timeouts, and verification steps. | `constants.rs`, `docs/PERFORMANCE_AND_REALTIME_BUDGETS.md` |
@@ -72,10 +72,10 @@ mikey/
 │   ├── app/
 │   │   ├── src/main/
 │   │   │   ├── cpp/          # JNI bindings: aaudio_jni.c, opus_jni.c
-│   │   │   ├── java/com/mikey/
+│   │   │   ├── java/com/owlmic/
 │   │   │   │   ├── media/    # AudioCapture, VideoCapture, LevelMeter, Nv21, OpusEncoder
 │   │   │   │   ├── protocol/ # Frame, FrameType, MediaHeader, Control, Messages
-│   │   │   │   ├── service/  # MikeyService (foreground), SessionController, Notifier
+│   │   │   │   ├── service/  # OwlmicService (foreground), SessionController, Notifier
 │   │   │   │   ├── settings/ # Settings, PairedPc, SharedPreferences
 │   │   │   │   ├── transport/# TransportManager, TcpTransport, BluetoothTransport, Discovery
 │   │   │   │   ├── ui/       # MainScreen, Controls, SettingsSheet, Palette, Type, Glyphs

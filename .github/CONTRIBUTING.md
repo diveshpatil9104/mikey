@@ -135,7 +135,7 @@ mikey/
 ├── android/           # Android app (Kotlin, Jetpack Compose)
 │   └── app/
 │       └── src/main/
-│           ├── java/com/mikey/    # Kotlin sources
+│           ├── java/com/owlmic/    # Kotlin sources
 │           └── cpp/               # Native code (libopus JNI)
 ├── pc/                # PC tray app (Rust)
 │   └── src/
@@ -282,7 +282,7 @@ docs: add troubleshooting guide for virtual microphone
 ### Kotlin (Android)
 
 - Follow the existing code style (Jetpack Compose conventions).
-- UI observes `StateFlow` from `MikeyService` - UI never owns logic.
+- UI observes `StateFlow` from `OwlmicService` - UI never owns logic.
 - Run `./gradlew lintDebug` and fix all warnings.
 
 ### Rust (PC)

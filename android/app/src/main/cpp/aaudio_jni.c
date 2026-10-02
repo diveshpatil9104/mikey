@@ -1,11 +1,11 @@
-// JNI side of com.mikey.media.AAudioInput. The handle is the AAudioStream pointer as a jlong.
+// JNI side of com.owlmic.media.AAudioInput. The handle is the AAudioStream pointer as a jlong.
 #include <jni.h>
 #include <stdint.h>
 #include <aaudio/AAudio.h>
 
 // Opens and starts a low-latency mono 16-bit input stream at sampleRate, or returns 0 when the
 // device won't give exactly that (then AudioRecord takes over on the Kotlin side).
-JNIEXPORT jlong JNICALL Java_com_mikey_media_AAudioInput_nativeOpen(JNIEnv *env, jclass clazz, jint sampleRate) {
+JNIEXPORT jlong JNICALL Java_com_owlmic_media_AAudioInput_nativeOpen(JNIEnv *env, jclass clazz, jint sampleRate) {
     AAudioStreamBuilder *builder = NULL;
     if (AAudio_createStreamBuilder(&builder) != AAUDIO_OK) return 0;
     AAudioStreamBuilder_setDirection(builder, AAUDIO_DIRECTION_INPUT);
@@ -38,7 +38,7 @@ JNIEXPORT jlong JNICALL Java_com_mikey_media_AAudioInput_nativeOpen(JNIEnv *env,
 }
 
 // Blocks until frames samples are read or timeoutNs passes. Returns the samples read, or a negative AAudio error.
-JNIEXPORT jint JNICALL Java_com_mikey_media_AAudioInput_nativeRead(
+JNIEXPORT jint JNICALL Java_com_owlmic_media_AAudioInput_nativeRead(
         JNIEnv *env, jclass clazz, jlong handle, jbyteArray pcm, jint frames, jlong timeoutNs) {
     jbyte *buffer = (*env)->GetByteArrayElements(env, pcm, NULL);
     aaudio_result_t read = AAudioStream_read((AAudioStream *) (intptr_t) handle, buffer, frames, timeoutNs);
@@ -46,7 +46,7 @@ JNIEXPORT jint JNICALL Java_com_mikey_media_AAudioInput_nativeRead(
     return read;
 }
 
-JNIEXPORT void JNICALL Java_com_mikey_media_AAudioInput_nativeClose(JNIEnv *env, jclass clazz, jlong handle) {
+JNIEXPORT void JNICALL Java_com_owlmic_media_AAudioInput_nativeClose(JNIEnv *env, jclass clazz, jlong handle) {
     AAudioStream *stream = (AAudioStream *) (intptr_t) handle;
     AAudioStream_requestStop(stream);
     AAudioStream_close(stream);

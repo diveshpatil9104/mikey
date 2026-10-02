@@ -21,23 +21,23 @@ Owlmic intentionally eliminates heavy, complex frameworks:
                     [MainActivity.kt]
                              │ Dispatches Intents (ACTION_MIC_ON, ACTION_FLIP)
                              ▼
-                    [MikeyService.kt] ── owns capture & network
+                    [OwlmicService.kt] ── owns capture & network
                              │ Emits immutable state
                              ▼
-                 StateFlow<MikeyState>
+                 StateFlow<OwlmicState>
                              │ Observes state
                              ▼
                     [MainScreen.kt] (Pure Jetpack Compose UI)
 ```
 
 - **UI Never Owns Logic**: `MainActivity` and Compose composables are strictly visual renderers. They maintain zero business logic or streaming state.
-- **Service as Single Source of Truth**: `MikeyService` holds the active session and exposes state via `StateFlow<MikeyState>` and audio levels via `StateFlow<Float>`.
+- **Service as Single Source of Truth**: `OwlmicService` holds the active session and exposes state via `StateFlow<OwlmicState>` and audio levels via `StateFlow<Float>`.
 
 ---
 
 ## 2. Service Lifecycle & Permissions
 
-### 2.1 Dynamic Foreground Service Types (`MikeyService.kt`)
+### 2.1 Dynamic Foreground Service Types (`OwlmicService.kt`)
 On Android 11+ (API 30+), background microphone and camera access require explicit foreground declarations:
 ```kotlin
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

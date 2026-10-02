@@ -11,7 +11,7 @@ These rules apply across all modules and must be adhered to without exception:
 1. **Build Strictly What the Current Phase Needs**: Never build speculative abstractions, future-proof interfaces, or unused utility functions for future phases.
 2. **One Responsibility per File**: A module has one clear concern. `tcp.rs` handles TCP streaming; `beacon.rs` handles discovery; `AudioCapture.kt` handles microphone input.
 3. **No Dependency Without Authorization**: Every library, crate, or Gradle plugin must be approved and listed in the architecture documentation. Never introduce unvetted third-party packages.
-4. **UI Never Owns Logic**: User interfaces are strictly dumb observers. Jetpack Compose observes `StateFlow` from `MikeyService`; the PC flyout reflects `SessionManager`.
+4. **UI Never Owns Logic**: User interfaces are strictly dumb observers. Jetpack Compose observes `StateFlow` from `OwlmicService`; the PC flyout reflects `SessionManager`.
 5. **Real-Time Paths Never Block**: The audio capture callback and audio output sink must never wait on network sockets, file I/O, or locks held by slow threads. Drop stale data rather than stalling audio graphs.
 6. **Bounded Queues and Explicit Timeouts Everywhere**: Every socket must configure read/write timeouts. Every queue and channel must enforce strict capacity bounds. Unbounded allocations are forbidden.
 7. **Platform Code Behind Strict Abstractions**: OS-specific code (Win32, Linux BlueZ, PulseAudio) is strictly gated behind `#[cfg(windows)]`, `#[cfg(target_os = "linux")]`, or platform interfaces.
@@ -50,7 +50,7 @@ From the `android/` directory:
 ./gradlew installDebug
 
 # View real-time application logs
-adb logcat --pid=$(adb shell pidof com.mikey)
+adb logcat --pid=$(adb shell pidof com.owlmic)
 ```
 
 ### 2.3 Manual Testing over Level 1 (ADB Reverse)
@@ -81,7 +81,7 @@ The wire protocol is the binary contract between two independent codebases (Andr
 
 1. **Specification First**: Update the markdown documentation in [`WIRE_PROTOCOL.md`](./WIRE_PROTOCOL.md) before altering code.
 2. **Protocol Versioning**: If a change alters byte framing, packet layouts, or opcode semantics, bump the protocol major version (`PROTO_VERSION = 3`). Version mismatches must return `REJECT (reason: "version")`.
-3. **Symmetric Implementation**: Ensure serializers and parsers are updated in lockstep across both `android/app/src/main/java/com/mikey/protocol/` and `pc/src/protocol/`.
+3. **Symmetric Implementation**: Ensure serializers and parsers are updated in lockstep across both `android/app/src/main/java/com/owlmic/protocol/` and `pc/src/protocol/`.
 4. **Regression Testing**: Execute unit tests on both sides to verify packet encoding:
    ```bash
    cd android && ./gradlew testDebugUnitTest

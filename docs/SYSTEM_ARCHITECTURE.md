@@ -10,10 +10,10 @@ Owlmic is a distributed, real-time media streaming system consisting of an Andro
 ┌─────────────────────────────────────── Android Phone (Client) ────────────────────────────────────────┐
 │                                                                                                        │
 │   MainActivity (Jetpack Compose View)                                                                  │
-│    ├── Observes: MikeyService.state (StateFlow<MikeyState>) & MikeyService.micLevel (StateFlow<Float>) │
+│    ├── Observes: OwlmicService.state (StateFlow<OwlmicState>) and .micLevel (StateFlow<Float>)         │
 │    └── Dispatches: Intents (ACTION_MIC_ON, ACTION_MIC_OFF, ACTION_MUTE, ACTION_FLIP, ACTION_STOP)     │
 │                                                                                                        │
-│   MikeyService (Foreground Service with Media Types)                                                  │
+│   OwlmicService (Foreground Service with Media Types)                                                  │
 │    ├── Foreground Types: FOREGROUND_SERVICE_TYPE_MICROPHONE | FOREGROUND_SERVICE_TYPE_CAMERA           │
 │    ├── Notifier (NotificationView): Notification media actions, status glyph, level indicator          │
 │    └── SessionController: State machine, reconnect backoff, heartbeats, bidirectional control        │
@@ -86,14 +86,14 @@ Owlmic is a distributed, real-time media streaming system consisting of an Andro
 
 | Class / Component | Source File | Core Responsibility |
 | :--- | :--- | :--- |
-| **`MainActivity`** | [`MainActivity.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/mikey/MainActivity.kt) | Pure Compose activity. Observes `MikeyService.state` and renders [`MainScreen`](file:///e:/Programs/mikey/android/app/src/main/java/com/mikey/ui/MainScreen.kt). Dispatches user intents. |
-| **`MikeyService`** | [`MikeyService.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/mikey/service/MikeyService.kt) | Foreground service. Manages OS capture permissions, dynamic foreground service types, and notification media actions. |
-| **`SessionController`** | [`SessionController.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/mikey/service/SessionController.kt) | Master state machine. Manages network loops, wire handshake, frame writing, 5s heartbeats, and make-before-break upgrade handoffs. |
-| **`TransportManager`** | [`TransportManager.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/mikey/transport/TransportManager.kt) | Network interface observer. Manages candidate ranking across L1–L4, network socket pinning, and anti-flapping probation (`DEAD_MS = 10_000`). |
-| **`AudioCapture`** | [`AudioCapture.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/mikey/media/AudioCapture.kt) | Ingests 48 kHz mono PCM in 10 ms frames on `mikey-capture` thread with AAudio NDK low latency or AudioRecord fallback. |
-| **`VideoCapture`** | [`VideoCapture.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/mikey/media/VideoCapture.kt) | Manages CameraX `ImageAnalysis`, gravity orientation hysteresis, NV21 conversion, and adaptive JPEG encoding. |
-| **`LevelMeter`** | [`LevelMeter.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/mikey/media/LevelMeter.kt) | Computes instantaneous audio loudness RMS for UI volume bars. |
-| **`Discovery`** | [`Discovery.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/mikey/transport/Discovery.kt) | Scans network interfaces, computes broadcast addresses, and emits UDP discovery probes on port `7654`. |
+| **`MainActivity`** | [`MainActivity.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/MainActivity.kt) | Pure Compose activity. Observes `OwlmicService.state` and renders [`MainScreen`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/ui/MainScreen.kt). Dispatches user intents. |
+| **`OwlmicService`** | [`OwlmicService.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/service/OwlmicService.kt) | Foreground service. Manages OS capture permissions, dynamic foreground service types, and notification media actions. |
+| **`SessionController`** | [`SessionController.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/service/SessionController.kt) | Master state machine. Manages network loops, wire handshake, frame writing, 5s heartbeats, and make-before-break upgrade handoffs. |
+| **`TransportManager`** | [`TransportManager.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/transport/TransportManager.kt) | Network interface observer. Manages candidate ranking across L1–L4, network socket pinning, and anti-flapping probation (`DEAD_MS = 10_000`). |
+| **`AudioCapture`** | [`AudioCapture.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/media/AudioCapture.kt) | Ingests 48 kHz mono PCM in 10 ms frames on `mikey-capture` thread with AAudio NDK low latency or AudioRecord fallback. |
+| **`VideoCapture`** | [`VideoCapture.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/media/VideoCapture.kt) | Manages CameraX `ImageAnalysis`, gravity orientation hysteresis, NV21 conversion, and adaptive JPEG encoding. |
+| **`LevelMeter`** | [`LevelMeter.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/media/LevelMeter.kt) | Computes instantaneous audio loudness RMS for UI volume bars. |
+| **`Discovery`** | [`Discovery.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/transport/Discovery.kt) | Scans network interfaces, computes broadcast addresses, and emits UDP discovery probes on port `7654`. |
 
 ### 2.2 PC Subsystem Breakdown
 
@@ -121,7 +121,7 @@ Owlmic is a distributed, real-time media streaming system consisting of an Andro
        │  MainActivity Compose render, user touch events, SettingsSheet interaction
        │
 [Service Thread] (Looper)
-       │  MikeyService lifecycle, broadcast receiver callbacks (ACTION_USB_STATE)
+       │  OwlmicService lifecycle, broadcast receiver callbacks (ACTION_USB_STATE)
        │
 [mikey-capture] (Native OS Thread)
        │  Process.THREAD_PRIORITY_URGENT_AUDIO
