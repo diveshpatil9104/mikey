@@ -25,6 +25,9 @@ pub fn compute_flyout_height(
     if !crate::audio::sink::virtual_device_ready() {
         h += 30;
     }
+    if session_mgr.is_firewall_blocked() {
+        h += 30;
+    }
     h
 }
 

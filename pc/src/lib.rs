@@ -1,6 +1,7 @@
 pub mod audio;
 pub mod autostart;
 pub mod config;
+pub mod firewall;
 #[cfg(windows)]
 pub mod flyout;
 #[cfg(windows)]

@@ -145,6 +145,16 @@ impl FlyoutWindow {
                         );
                     }
                 }
+                FlyoutButton::FixFirewall => {
+                    let sm = self.session_manager.clone();
+                    let hwnd = self.hwnd;
+                    std::thread::spawn(move || {
+                        if crate::firewall::ensure_rules_elevated().is_ok() {
+                            sm.set_firewall_blocked(false);
+                            unsafe { win32::InvalidateRect(hwnd, std::ptr::null(), 0) };
+                        }
+                    });
+                }
                 FlyoutButton::OpenLogs => {
                     let log_dir = Config::default_log_dir();
                     let _ = std::fs::create_dir_all(&log_dir);

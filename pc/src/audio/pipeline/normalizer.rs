@@ -41,9 +41,9 @@ impl AudioNormalizer {
             if *rms_est > NOISE_FLOOR_I16 {
                 let target_gain = (TARGET_RMS_I16 / *rms_est).clamp(MIN_AUTO_GAIN, MAX_AUTO_GAIN);
                 let alpha = if target_gain > *gain {
-                    GAIN_ATTACK_ALPHA
+                    GAIN_UP_ALPHA
                 } else {
-                    GAIN_RELEASE_ALPHA
+                    GAIN_DOWN_ALPHA
                 };
                 *gain += (target_gain - *gain) * alpha;
                 *gain = gain.clamp(MIN_AUTO_GAIN, MAX_AUTO_GAIN);

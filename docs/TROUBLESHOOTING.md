@@ -15,6 +15,7 @@ Common issues and solutions for Mikey. If your problem isn't listed here, [open 
 2. Check the PC firewall allows incoming connections on:
    - **TCP 7653** (streaming protocol)
    - **UDP 7654** (discovery beacon)
+   *Tip:* If rules are missing on Windows, the Mikey flyout displays a **"Wi-Fi Blocked"** banner. Click **"Allow Access"** to approve the UAC prompt and automatically create the required firewall rules without opening an administrative terminal.
 3. Some routers enable "AP isolation" or "client isolation" which blocks device-to-device traffic. Check your router settings.
 4. If on a corporate/university network, local device discovery may be blocked. Try USB or phone hotspot instead.
 

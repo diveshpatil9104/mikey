@@ -48,6 +48,7 @@ Mikey automatically negotiates the optimal physical transport between the Androi
     ```
 - **Manual Address Fallback**: In restricted corporate or university networks where UDP broadcast packets are filtered by managed switches, Mikey provides `manualPcAddress` in Android settings to bypass discovery.
 - **Wi-Fi Latency Lock (`WifiLatencyLock.kt`)**: Acquires an Android `WifiManager.WifiLock` with `WIFI_MODE_FULL_LOW_LATENCY` to instruct the wireless chipset to stay in high-power, low-latency mode.
+- **Windows Firewall Detection & One-Click Elevation (`pc/src/firewall.rs`)**: On startup, when Wi-Fi or USB tethering is enabled, Mikey queries Windows Firewall for `Mikey TCP` (port 7653) and `Mikey UDP Beacon` (port 7654). If either rule is missing, a non-intrusive alert banner ("Wi-Fi Blocked — Allow Access") appears in the flyout. Clicking "Allow Access" triggers a single elevated UAC execution adding both rules without requiring manual terminal commands.
 
 ### 2.4 Level 4: Bluetooth RFCOMM
 - **Mechanism**: Uses standard Bluetooth Serial Port Profile (SPP).
