@@ -10,7 +10,7 @@ Mikey for PC runs as a standalone tray application (`mikey`) that acts as the re
 1. Download `Mikey-Setup-x.y.z.exe` from [Releases](https://github.com/diveshpatil9104/mikey/releases).
 2. Run it and approve the administrator prompt. It installs Mikey and **Mikey Mic**, the virtual microphone, and lets your phone reach Mikey on private networks (TCP port 7653, UDP port 7654). Your own default speakers and microphone stay as they were.
 3. Restart Windows if the installer asks: Mikey Mic's driver needs it the first time.
-4. Open Mikey; it can also start when you sign in. In Meet, Zoom, Teams or Discord, pick **Mikey Mic** as the microphone and **Mikey Cam** as the camera.
+4. Open Mikey; by default, it automatically launches minimized to the system tray upon Windows login via the `--autostart` flag (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`). You can toggle this behavior anytime in the flyout Settings drawer ("Start with Windows") or via `config.toml` (`start_with_computer = false`). In Meet, Zoom, Teams or Discord, pick **Mikey Mic** as the microphone and **Mikey Cam** as the camera.
 
 If Mikey Mic goes missing later, open Mikey's panel and click **Setup Mic**. Uninstalling Mikey leaves Mikey Mic's driver in place, since other apps may use it. Third-party parts are listed in `THIRD-PARTY-NOTICES.txt` in Mikey's install folder.
 
@@ -37,6 +37,9 @@ cargo build --release
 
 # Run Mikey tray app
 cargo run --release
+
+# Run Mikey in silent autostart mode (minimized to tray, flyout closed)
+cargo run --release -- --autostart
 
 # Run self-test mode (plays a 3-second test tone into virtual mic)
 cargo run -- --test-tone

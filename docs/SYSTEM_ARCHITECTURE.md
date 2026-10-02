@@ -100,6 +100,7 @@ Mikey is a distributed, real-time media streaming system consisting of an Androi
 | Module / Struct | Source File | Core Responsibility |
 | :--- | :--- | :--- |
 | **`main`** | [`main.rs`](file:///e:/Programs/mikey/pc/src/main.rs) | Detaches console, enforces single-instance mutex, coordinates pipeline threads, and starts network listeners. |
+| **`autostart`** | [`autostart.rs`](file:///e:/Programs/mikey/pc/src/autostart.rs) | Queries and synchronizes Windows `Run` registry key with `config.toml` (`start_with_computer`), ensuring silent `--autostart` launch at login. |
 | **`SessionManager`** | [`session/mod.rs`](file:///e:/Programs/mikey/pc/src/session/mod.rs) | Manages authentication, TOFU pairing prompts, session hold grace periods, and control message routing. |
 | **`JitterBuffer`** | [`audio/pipeline/mod.rs`](file:///e:/Programs/mikey/pc/src/audio/pipeline/mod.rs) | Thread-safe sample ring buffer with arrival timestamp tracking, adaptive depth calculation, and latency caps. |
 | **`AudioNormalizer`**| [`audio/pipeline/normalizer.rs`](file:///e:/Programs/mikey/pc/src/audio/pipeline/normalizer.rs) | Unity gain speech level monitoring (1.0×) preventing voice ducking and background pumping. |
@@ -147,6 +148,7 @@ Mikey is a distributed, real-time media streaming system consisting of an Androi
 ```text
 [Main Thread]
        │  CLI parsing, single-instance verification, launches worker threads
+       │  Synchronizes autostart registry state with config.toml (autostart::sync_autostart)
        │  Maintains 1-second park loop monitoring running atomic flag
        │
 [Tray Message Pump Thread]

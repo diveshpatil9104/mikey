@@ -65,6 +65,10 @@ fn main() {
     let cfg = session_manager.config();
     println!("[pc] ID: {}, Name: {}", cfg.pc_id, cfg.pc_name);
 
+    if let Err(e) = mikey::autostart::sync_autostart(&cfg) {
+        eprintln!("[mikey] autostart sync failed: {e}");
+    }
+
     // --test-tone mode: play a 3-second tone to verify audio pipeline, then exit
     if test_mode {
         let _streams = sink::start_output(&jitter_buffer);

@@ -7,7 +7,7 @@ use super::gdi::*;
 use super::palette::*;
 use super::render_audio::render_mic_section;
 use super::render_banners::render_banners;
-use super::render_dsp::render_dsp_section;
+use super::render_drawer::render_drawer_section;
 use super::render_footer::render_footer_section;
 use super::render_header::render_header;
 use super::render_video::render_video_section;
@@ -62,7 +62,7 @@ impl FlyoutWindow {
         y = render_banners(mem_dc, self, g, graphics, &fonts, y);
         y = render_video_section(mem_dc, self, g, graphics, &fonts, y);
         y = render_mic_section(mem_dc, self, g, graphics, &fonts, y);
-        let _ = render_dsp_section(mem_dc, self, g, graphics, &fonts, y);
+        let _ = render_drawer_section(mem_dc, self, g, graphics, &fonts, y);
         render_footer_section(mem_dc, self, g, graphics, &fonts, height);
 
         unsafe {

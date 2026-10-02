@@ -155,4 +155,10 @@ impl SessionManager {
         }
         changed
     }
+
+    pub fn set_start_with_computer(&self, enabled: bool) {
+        let mut inner = self.inner.lock().unwrap();
+        inner.config.start_with_computer = enabled;
+        let _ = inner.config.save_to(&inner.config_path);
+    }
 }

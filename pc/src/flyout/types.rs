@@ -46,6 +46,7 @@ pub enum FlyoutButton {
     ToggleAdvanced,
     ToggleAskBeforeJoin,
     ToggleStartWithComputer,
+    ToggleAutostart,
     ToggleOpenPhone,
     ToggleTrustWifi,
     OpenLogs,
