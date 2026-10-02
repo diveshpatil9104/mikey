@@ -1,11 +1,11 @@
 //! How a session ends: the phone stopping, the link dropping, and the PC's user disconnecting.
 
-use mikey::audio::pipeline::JitterBuffer;
-use mikey::config::generate_random_hex;
-use mikey::protocol::{read_frame, write_frame, Frame, FrameType, HelloPayload, PROTO_VERSION};
-use mikey::session::SessionManager;
-use mikey::transport::tcp::{configure_stream, handle_client};
-use mikey::video::VideoPipeline;
+use owlmic::audio::pipeline::JitterBuffer;
+use owlmic::config::generate_random_hex;
+use owlmic::protocol::{read_frame, write_frame, Frame, FrameType, HelloPayload, PROTO_VERSION};
+use owlmic::session::SessionManager;
+use owlmic::transport::tcp::{configure_stream, handle_client};
+use owlmic::video::VideoPipeline;
 use std::net::{TcpListener, TcpStream};
 use std::sync::Arc;
 use std::thread::{self, JoinHandle};
@@ -14,7 +14,7 @@ use std::thread::{self, JoinHandle};
 fn connected_phone() -> (SessionManager, TcpStream, JoinHandle<()>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
     let addr = listener.local_addr().expect("addr");
-    let config = std::env::temp_dir().join(format!("mikey_end_{}.toml", generate_random_hex(8)));
+    let config = std::env::temp_dir().join(format!("owlmic_end_{}.toml", generate_random_hex(8)));
     let sm = SessionManager::new(config);
     let server_sm = sm.clone();
     let server = thread::spawn(move || {

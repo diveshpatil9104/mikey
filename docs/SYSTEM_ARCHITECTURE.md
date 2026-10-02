@@ -123,22 +123,22 @@ Owlmic is a distributed, real-time media streaming system consisting of an Andro
 [Service Thread] (Looper)
        │  OwlmicService lifecycle, broadcast receiver callbacks (ACTION_USB_STATE)
        │
-[mikey-capture] (Native OS Thread)
+[owlmic-capture] (Native OS Thread)
        │  Process.THREAD_PRIORITY_URGENT_AUDIO
        │  Continuous read loop from AAudio / AudioRecord (10 ms ticks)
        │  Dumps to frames (ArrayBlockingQueue<AudioFrame>, capacity 8, drop oldest)
        │
-[mikey-video] (Single Thread Executor)
+[owlmic-video] (Single Thread Executor)
        │  CameraX ImageAnalysis analyzer callback
        │  Orientation evaluation, YUV420 to NV21 conversion, JPEG compression
        │  Dumps to videoFrames (ArrayBlockingQueue<VideoFrame>, capacity 2, drop oldest)
        │
-[mikey-session] (Dedicated Thread)
+[owlmic-session] (Dedicated Thread)
        │  SessionController loop: connects wire, performs handshake
        │  Sender loop: all waiting audio frames, then at most one picture, per turn; flushes TCP
        │  5-second periodic heartbeat sender
        │
-[mikey-upgrade] (Dedicated Thread)
+[owlmic-upgrade] (Dedicated Thread)
        │  Watches TransportManager.waitForBetterChance()
        │  Probes higher connection levels concurrently (make-before-break)
        │  Performs silent handshake and atomic socket handoff

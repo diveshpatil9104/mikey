@@ -1,7 +1,7 @@
-use mikey::protocol::{
+use owlmic::protocol::{
     read_frame, write_frame, Frame, FrameType, MediaHeader, CODEC_JPEG, MEDIA_HEADER_LEN,
 };
-use mikey::video::{decode_jpeg, DecodedFrame, VideoPipeline};
+use owlmic::video::{decode_jpeg, DecodedFrame, VideoPipeline};
 use std::io::Cursor;
 
 #[test]

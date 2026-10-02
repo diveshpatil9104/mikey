@@ -5,7 +5,7 @@ use std::thread;
 
 fn create_test_manager() -> SessionManager {
     let mut temp_path = std::env::temp_dir();
-    temp_path.push(format!("mikey_test_{}.toml", generate_random_hex(8)));
+    temp_path.push(format!("owlmic_test_{}.toml", generate_random_hex(8)));
     SessionManager::new(temp_path)
 }
 

@@ -73,7 +73,7 @@ The Owlmic audio subsystem is architected for **broadcast-grade speech fidelity,
   - Queries `AudioManager.PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED`. If true, sets `MediaRecorder.AudioSource.UNPROCESSED`. Otherwise, falls back to `MediaRecorder.AudioSource.VOICE_RECOGNITION` (which Android CDD mandates disables OEM AGC and compression, unlike `AudioSource.MIC`).
   - **System AGC Disable**: If `AutomaticGainControl.isAvailable()`, the capture loop explicitly creates and disables system AGC on the recorder's audio session ID to eliminate hardware voice ducking.
   - **The Voice Communication Rule**: Under no circumstances does Owlmic use `AudioSource.VOICE_COMMUNICATION`. Android’s native voice processing injects aggressive, non-linear hardware AGC and echo cancellation that fundamentally breaks PC-side neural noise filters.
-- **Thread Priority**: The capture loop runs inside a dedicated OS thread (`mikey-capture`) pinned to `Process.THREAD_PRIORITY_URGENT_AUDIO`.
+- **Thread Priority**: The capture loop runs inside a dedicated OS thread (`owlmic-capture`) pinned to `Process.THREAD_PRIORITY_URGENT_AUDIO`.
 
 ### 2.2 Frame Joining & Opus Encoding
 - **Native Frame Granularity**: 10 ms (480 samples @ 48 kHz mono = 960 bytes).

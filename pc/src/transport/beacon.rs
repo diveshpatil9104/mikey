@@ -6,8 +6,10 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
-pub const BEACON_QUERY_MAGIC: &[u8; 7] = b"MIKEY?1";
-pub const BEACON_REPLY_MAGIC: &[u8; 7] = b"MIKEY!1";
+pub const BEACON_QUERY_MAGIC: &[u8; 8] = b"OWLMIC?1";
+pub const BEACON_REPLY_MAGIC: &[u8; 8] = b"OWLMIC!1";
+/// Both magics are this long, and everything after them is placed from here.
+const MAGIC_LEN: usize = BEACON_QUERY_MAGIC.len();
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BeaconProbe {
@@ -16,23 +18,25 @@ pub struct BeaconProbe {
 }
 
 pub fn parse_beacon_probe(buf: &[u8]) -> Option<BeaconProbe> {
-    if buf.len() < 7 + 16 + 1 {
+    const NAME_LEN_AT: usize = MAGIC_LEN + 16;
+    const NAME_AT: usize = NAME_LEN_AT + 1;
+    if buf.len() < NAME_AT {
         return None;
     }
 
-    if &buf[0..7] != BEACON_QUERY_MAGIC {
+    if &buf[..MAGIC_LEN] != BEACON_QUERY_MAGIC {
         return None;
     }
 
     let mut device_id = [0u8; 16];
-    device_id.copy_from_slice(&buf[7..23]);
+    device_id.copy_from_slice(&buf[MAGIC_LEN..NAME_LEN_AT]);
 
-    let name_len = buf[23] as usize;
-    if buf.len() < 24 + name_len {
+    let name_len = buf[NAME_LEN_AT] as usize;
+    if buf.len() < NAME_AT + name_len {
         return None;
     }
 
-    let device_name = String::from_utf8_lossy(&buf[24..24 + name_len]).to_string();
+    let device_name = String::from_utf8_lossy(&buf[NAME_AT..NAME_AT + name_len]).to_string();
     Some(BeaconProbe {
         device_id,
         device_name,
@@ -48,7 +52,7 @@ pub fn build_beacon_reply(
     let name_bytes = pc_name.as_bytes();
     let name_len = name_bytes.len().min(255) as u8;
 
-    let mut reply = Vec::with_capacity(7 + 16 + 2 + 1 + 1 + name_len as usize);
+    let mut reply = Vec::with_capacity(MAGIC_LEN + 16 + 2 + 1 + 1 + name_len as usize);
     reply.extend_from_slice(BEACON_REPLY_MAGIC);
     reply.extend_from_slice(pc_id_bytes);
     reply.extend_from_slice(&tcp_port.to_be_bytes());
@@ -140,7 +144,7 @@ mod tests {
     #[test]
     fn test_beacon_probe_parse_and_reply() {
         let mut probe_buf = Vec::new();
-        probe_buf.extend_from_slice(b"MIKEY?1");
+        probe_buf.extend_from_slice(b"OWLMIC?1");
         let dev_id = [1u8; 16];
         probe_buf.extend_from_slice(&dev_id);
         let name = "Pixel 7";
@@ -152,14 +156,15 @@ mod tests {
         assert_eq!(probe.device_name, "Pixel 7");
 
         let pc_id = [2u8; 16];
-        let reply = build_beacon_reply(&pc_id, 7653, 1, "Mikey-PC");
+        let reply = build_beacon_reply(&pc_id, 7653, 1, "Owlmic-PC");
 
-        assert_eq!(&reply[0..7], b"MIKEY!1");
-        assert_eq!(&reply[7..23], &pc_id);
-        assert_eq!(&reply[23..25], &7653u16.to_be_bytes());
-        assert_eq!(reply[25], 1); // proto_ver
-        assert_eq!(reply[26], 8); // name_len
-        assert_eq!(&reply[27..35], b"Mikey-PC");
+        assert_eq!(&reply[0..8], b"OWLMIC!1");
+        assert_eq!(&reply[8..24], &pc_id);
+        assert_eq!(&reply[24..26], &7653u16.to_be_bytes());
+        assert_eq!(reply[26], 1); // proto_ver
+        assert_eq!(reply[27], 9); // name_len
+        assert_eq!(&reply[28..37], b"Owlmic-PC");
+        assert_eq!(reply.len(), 37);
     }
 
     #[test]

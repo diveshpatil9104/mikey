@@ -1,4 +1,4 @@
-//! Main double-buffered paint coordinator for Mikey Flyout.
+//! Main double-buffered paint coordinator for Owlmic Flyout.
 //! Android-style vertical card layout with anti-aliased GDI+ rendering.
 
 #![cfg(windows)]

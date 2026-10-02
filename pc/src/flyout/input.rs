@@ -124,7 +124,7 @@ impl FlyoutWindow {
                     self.session_manager.set_start_with_computer(next);
                 }
                 FlyoutButton::SetupVirtualMic => {
-                    // Next to mikey.exe once installed; under pc/ when run from the source tree.
+                    // Next to owlmic.exe once installed; under pc/ when run from the source tree.
                     let beside_exe = std::env::current_exe()
                         .ok()
                         .and_then(|exe| Some(exe.parent()?.join("setup-audio-device.ps1")));
@@ -136,7 +136,7 @@ impl FlyoutWindow {
                     if let Some(path) = beside_exe.into_iter().chain(in_source).find(|p| p.exists())
                     {
                         let script = path.to_string_lossy();
-                        // Not hidden: if Mikey already runs as administrator the script runs in this
+                        // Not hidden: if Owlmic already runs as administrator the script runs in this
                         // window, and it waits for Enter before closing.
                         let args = ["-ExecutionPolicy", "Bypass"];
                         let _ = crate::launch::start(

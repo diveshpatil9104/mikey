@@ -1,6 +1,6 @@
-# Mikey Windows Installer
+# Owlmic Windows Installer
 
-This directory contains the Inno Setup configuration and support scripts used to build the standalone Windows installer (`Mikey-Setup-x.y.z.exe`).
+This directory contains the Inno Setup configuration and support scripts used to build the standalone Windows installer (`Owlmic-Setup-x.y.z.exe`).
 
 ---
 
@@ -8,9 +8,9 @@ This directory contains the Inno Setup configuration and support scripts used to
 
 | Component | Target Location | Description |
 |:---|:---|:---|
-| `mikey.exe` | `{app}\mikey.exe` | Standalone PC tray server application. |
-| `softcam.dll` | `{app}\softcam.dll` | DirectShow virtual camera filter exposing "Mikey Cam". |
-| `setup-audio-device.ps1` | `{app}\setup-audio-device.ps1` | Automated PowerShell script to install and configure "Mikey Mic". |
+| `owlmic.exe` | `{app}\owlmic.exe` | Standalone PC tray server application. |
+| `softcam.dll` | `{app}\softcam.dll` | DirectShow virtual camera filter exposing "Owlmic Cam". |
+| `setup-audio-device.ps1` | `{app}\setup-audio-device.ps1` | Automated PowerShell script to install and configure the "Owlmic" microphone. |
 | `driver\*` | `{app}\driver\` | VB-Audio Virtual Cable driver installation packages. |
 | `THIRD-PARTY-NOTICES.txt` | `{app}\THIRD-PARTY-NOTICES.txt` | Attributions and third-party driver licensing notices. |
 
@@ -20,16 +20,16 @@ This directory contains the Inno Setup configuration and support scripts used to
 
 1. **Elevation**: Requires administrator privileges (`PrivilegesRequired=admin`) to register COM filters and manage audio drivers.
 2. **Virtual Camera Registration**: Executes `regsvr32.exe /s "{app}\softcam.dll"` during installation, registering the DirectShow filter system-wide so Chromium, Edge, and meeting apps can access the feed.
-3. **Firewall Rules**: Automatically creates Windows Defender inbound firewall rules for both TCP `:7653` (media and control) and UDP `:7654` (discovery beacon) on `profile=any`.
+3. **Firewall Rules**: Automatically creates Windows Defender inbound firewall rules for both TCP `:7653` (media and control) and UDP `:7654` (discovery beacon) on `profile=any`, named *Owlmic TCP* and *Owlmic UDP Beacon*, and removes the rules the app added before the rename to Owlmic.
 4. **Virtual Audio Driver Setup**: Invokes `setup-audio-device.ps1 -Silent` post-install:
    - Verifies if the driver is already present; if not, installs `VBCABLE_Setup_x64.exe`.
-   - Polls device appearance (up to 30s) and configures registry properties to label the endpoint as "Mikey Mic".
+   - Polls device appearance (up to 30s) and configures registry properties to label the endpoints as "Owlmic" (microphone) and "Owlmic Bridge" (speaker side).
    - Restarts `AudioEndpointBuilder` and `Audiosrv` to apply endpoint names immediately.
    - Restores the user's previous default audio playback and recording devices.
    - Returns exit code `0` on success or `3010` if Windows requires a restart.
-5. **Autostart**: Optionally registers `HKCU\Software\Microsoft\Windows\CurrentVersion\Run\Mikey` with the `--autostart` flag.
+5. **Autostart**: Optionally registers `HKCU\Software\Microsoft\Windows\CurrentVersion\Run\Owlmic` with the `--autostart` flag.
 6. **Clean Uninstallation**:
-   - Terminates running `mikey.exe` process to prevent locked files.
+   - Terminates the running `owlmic.exe` process to prevent locked files.
    - Unregisters the virtual camera filter (`regsvr32.exe /u /s "{app}\softcam.dll"`).
    - Deletes inbound firewall rules (`netsh advfirewall firewall delete rule ...`).
    - Cleans up the autostart registry entry.
@@ -45,7 +45,7 @@ This directory contains the Inno Setup configuration and support scripts used to
 
 ### Build Steps
 
-1. **Compile `mikey.exe`**:
+1. **Compile `owlmic.exe`**:
    ```powershell
    cargo build --release --manifest-path pc/Cargo.toml
    ```
@@ -56,11 +56,11 @@ This directory contains the Inno Setup configuration and support scripts used to
 3. **Compile the Installer**:
    ```powershell
    $version = "0.1.0"
-   & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" pc/installer/mikey.iss
+   & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" pc/installer/owlmic.iss
    ```
 
 4. **Installer Output**:
    The compiled setup file will be generated at:
    ```
-   pc/installer/Output/Mikey-Setup-0.1.0.exe
+   pc/installer/Output/Owlmic-Setup-0.1.0.exe
    ```

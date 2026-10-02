@@ -98,25 +98,28 @@ class Discovery(private val deviceId: String, private val deviceName: String) {
 /** What a PC's beacon answer says. */
 internal class BeaconReply(val id: String, val name: String, val port: Int, val proto: Int)
 
-private val PROBE_MAGIC = "MIKEY?1".toByteArray()
-private val REPLY_MAGIC = "MIKEY!1".toByteArray()
+private val PROBE_MAGIC = "OWLMIC?1".toByteArray()
+private val REPLY_MAGIC = "OWLMIC!1".toByteArray()
+
+/** Both magics are this long, and everything after them is placed from here. */
+private const val MAGIC_LEN = 8
 
 /** Magic, 16 id bytes, port, proto version, name length: the reply's fixed part. */
-private const val REPLY_FIXED = 7 + 16 + 2 + 1 + 1
+private const val REPLY_FIXED = MAGIC_LEN + 16 + 2 + 1 + 1
 
-/** `"MIKEY?1" | device_id (16 bytes) | name_len (1) | name`. */
+/** `"OWLMIC?1" | device_id (16 bytes) | name_len (1) | name`. */
 internal fun probePayload(deviceId: String, deviceName: String): ByteArray {
     val name = deviceName.toByteArray().let { if (it.size > 255) it.copyOf(255) else it }
     return PROBE_MAGIC + idBytes(deviceId) + byteArrayOf(name.size.toByte()) + name
 }
 
-/** `"MIKEY!1" | pc_id (16) | tcp_port (u16 BE) | proto_ver (u8) | name_len (1) | name`, or null if it isn't one. */
+/** `"OWLMIC!1" | pc_id (16) | tcp_port (u16 BE) | proto_ver (u8) | name_len (1) | name`, or null if it isn't one. */
 internal fun parseReply(data: ByteArray, length: Int): BeaconReply? {
-    if (length < REPLY_FIXED || !data.copyOfRange(0, 7).contentEquals(REPLY_MAGIC)) return null
-    val id = data.copyOfRange(7, 23).joinToString("") { "%02x".format(it) }
-    val port = ((data[23].toInt() and 0xFF) shl 8) or (data[24].toInt() and 0xFF)
-    val proto = data[25].toInt() and 0xFF
-    val nameLength = data[26].toInt() and 0xFF
+    if (length < REPLY_FIXED || !data.copyOfRange(0, MAGIC_LEN).contentEquals(REPLY_MAGIC)) return null
+    val id = data.copyOfRange(MAGIC_LEN, MAGIC_LEN + 16).joinToString("") { "%02x".format(it) }
+    val port = ((data[MAGIC_LEN + 16].toInt() and 0xFF) shl 8) or (data[MAGIC_LEN + 17].toInt() and 0xFF)
+    val proto = data[MAGIC_LEN + 18].toInt() and 0xFF
+    val nameLength = data[MAGIC_LEN + 19].toInt() and 0xFF
     if (length < REPLY_FIXED + nameLength) return null
     return BeaconReply(id, String(data, REPLY_FIXED, nameLength), port, proto)
 }

@@ -1,4 +1,4 @@
-//! Header and status badge rendering for the Mikey Flyout.
+//! Header and status badge rendering for the Owlmic Flyout.
 //! Ultra-compact, web-style minimal header with smooth pill badge.
 
 #![cfg(windows)]

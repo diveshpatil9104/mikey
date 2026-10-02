@@ -1,4 +1,4 @@
-//! Raw Win32 GDI and User32 types and constants for Mikey Flyout.
+//! Raw Win32 GDI and User32 types and constants for Owlmic Flyout.
 
 #![cfg(windows)]
 #![allow(non_snake_case)]

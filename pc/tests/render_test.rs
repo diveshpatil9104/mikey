@@ -2,8 +2,8 @@
 
 #[test]
 fn test_export_icons_preview() {
-    use mikey::flyout::heroicons::*;
-    use mikey::flyout::win32::Gdiplus;
+    use owlmic::flyout::heroicons::*;
+    use owlmic::flyout::win32::Gdiplus;
     use std::ffi::c_void;
 
     let g = Gdiplus::init().expect("gdiplus init");
@@ -100,7 +100,7 @@ fn test_export_icons_preview() {
     draw_hero_power(&g, graphics, 200.0, 180.0, 0xFFFF453A);
 
     // Saved to the temp folder, to look at by eye.
-    let artifact_path = std::env::temp_dir().join("mikey-icons-preview.bmp");
+    let artifact_path = std::env::temp_dir().join("owlmic-icons-preview.bmp");
 
     // BMP Header (14 bytes) + DIB Header (40 bytes) + pixel data
     let mut bmp_data = Vec::new();

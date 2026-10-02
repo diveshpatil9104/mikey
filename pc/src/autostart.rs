@@ -2,6 +2,16 @@ use std::env;
 use std::io;
 
 #[cfg(windows)]
+const RUN_VALUE: &str = "Owlmic";
+/// Written before the rename to Owlmic. It starts the old mikey.exe, so syncing removes it.
+#[cfg(windows)]
+const OLD_RUN_VALUE: &str = "Mikey";
+#[cfg(not(windows))]
+const DESKTOP_FILE: &str = "owlmic.desktop";
+#[cfg(not(windows))]
+const OLD_DESKTOP_FILE: &str = "mikey.desktop";
+
+#[cfg(windows)]
 pub fn format_autostart_cmd(exe_path: &std::path::Path) -> String {
     format!("\"{}\" --autostart", exe_path.to_string_lossy())
 }
@@ -9,7 +19,7 @@ pub fn format_autostart_cmd(exe_path: &std::path::Path) -> String {
 #[cfg(not(windows))]
 pub fn format_autostart_cmd(exe_path: &std::path::Path) -> String {
     format!(
-        "[Desktop Entry]\nType=Application\nName=Mikey\nExec={} --autostart\nTerminal=false\n",
+        "[Desktop Entry]\nType=Application\nName=Owlmic\nExec={} --autostart\nTerminal=false\n",
         exe_path.to_string_lossy()
     )
 }
@@ -47,7 +57,7 @@ fn write_registry_value(val: &str) -> io::Result<()> {
         .encode_wide()
         .chain(std::iter::once(0))
         .collect();
-    let value_name: Vec<u16> = OsStr::new("Mikey")
+    let value_name: Vec<u16> = OsStr::new(RUN_VALUE)
         .encode_wide()
         .chain(std::iter::once(0))
         .collect();
@@ -92,7 +102,7 @@ fn write_registry_value(val: &str) -> io::Result<()> {
 }
 
 #[cfg(windows)]
-fn delete_registry_value() -> io::Result<()> {
+fn delete_registry_value(name: &str) -> io::Result<()> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
 
@@ -116,7 +126,7 @@ fn delete_registry_value() -> io::Result<()> {
         .encode_wide()
         .chain(std::iter::once(0))
         .collect();
-    let value_name: Vec<u16> = OsStr::new("Mikey")
+    let value_name: Vec<u16> = OsStr::new(name)
         .encode_wide()
         .chain(std::iter::once(0))
         .collect();
@@ -181,7 +191,7 @@ pub fn get_autostart_value() -> Option<String> {
         .encode_wide()
         .chain(std::iter::once(0))
         .collect();
-    let value_name: Vec<u16> = OsStr::new("Mikey")
+    let value_name: Vec<u16> = OsStr::new(RUN_VALUE)
         .encode_wide()
         .chain(std::iter::once(0))
         .collect();
@@ -236,7 +246,7 @@ pub fn get_autostart_value() -> Option<String> {
         let desktop_file = std::path::PathBuf::from(home)
             .join(".config")
             .join("autostart")
-            .join("mikey.desktop");
+            .join(DESKTOP_FILE);
         if desktop_file.exists() {
             return std::fs::read_to_string(desktop_file).ok();
         }
@@ -250,7 +260,7 @@ pub fn set_autostart(enable: bool) -> io::Result<()> {
         let exe_path = env::current_exe()?;
         write_registry_value(&format_autostart_cmd(&exe_path))
     } else {
-        delete_registry_value()
+        delete_registry_value(RUN_VALUE)
     }
 }
 
@@ -260,7 +270,7 @@ pub fn set_autostart(enable: bool) -> io::Result<()> {
         let dir = std::path::PathBuf::from(home)
             .join(".config")
             .join("autostart");
-        let desktop_file = dir.join("mikey.desktop");
+        let desktop_file = dir.join(DESKTOP_FILE);
 
         if enable {
             std::fs::create_dir_all(&dir)?;
@@ -276,6 +286,7 @@ pub fn set_autostart(enable: bool) -> io::Result<()> {
 
 #[cfg(windows)]
 pub fn sync_autostart(cfg: &crate::config::Config) -> io::Result<()> {
+    let _ = delete_registry_value(OLD_RUN_VALUE);
     let current_val = get_autostart_value();
     if cfg.start_with_computer {
         let exe_path = env::current_exe()?;
@@ -290,12 +301,19 @@ pub fn sync_autostart(cfg: &crate::config::Config) -> io::Result<()> {
         if current_val.is_none() {
             return Ok(());
         }
-        delete_registry_value()
+        delete_registry_value(RUN_VALUE)
     }
 }
 
 #[cfg(not(windows))]
 pub fn sync_autostart(cfg: &crate::config::Config) -> io::Result<()> {
+    if let Ok(home) = env::var("HOME") {
+        let old = std::path::PathBuf::from(home)
+            .join(".config")
+            .join("autostart")
+            .join(OLD_DESKTOP_FILE);
+        let _ = std::fs::remove_file(old);
+    }
     if cfg.start_with_computer {
         let exe_path = env::current_exe()?;
         let expected = format_autostart_cmd(&exe_path);
@@ -337,20 +355,20 @@ mod tests {
     #[cfg(windows)]
     #[test]
     fn test_autostart_command_line_formatting() {
-        let p = Path::new(r"C:\Program Files\Mikey\mikey.exe");
+        let p = Path::new(r"C:\Program Files\Owlmic\owlmic.exe");
         assert_eq!(
             format_autostart_cmd(p),
-            r#""C:\Program Files\Mikey\mikey.exe" --autostart"#
+            r#""C:\Program Files\Owlmic\owlmic.exe" --autostart"#
         );
     }
 
     #[cfg(not(windows))]
     #[test]
     fn test_autostart_command_line_formatting_linux() {
-        let p = Path::new("/usr/bin/mikey");
+        let p = Path::new("/usr/bin/owlmic");
         assert_eq!(
             format_autostart_cmd(p),
-            "[Desktop Entry]\nType=Application\nName=Mikey\nExec=/usr/bin/mikey --autostart\nTerminal=false\n"
+            "[Desktop Entry]\nType=Application\nName=Owlmic\nExec=/usr/bin/owlmic --autostart\nTerminal=false\n"
         );
     }
 
@@ -376,7 +394,7 @@ mod tests {
                     let _ = write_registry_value(val);
                 }
                 None => {
-                    let _ = delete_registry_value();
+                    let _ = delete_registry_value(RUN_VALUE);
                 }
             }
         }
@@ -387,7 +405,7 @@ mod tests {
     fn test_sync_writes_registry_when_missing() {
         let _lock = TEST_LOCK.lock().unwrap();
         let _guard = RegBackup::new();
-        let _ = delete_registry_value();
+        let _ = delete_registry_value(RUN_VALUE);
         assert_eq!(get_autostart_value(), None);
 
         let cfg = Config {
@@ -423,10 +441,10 @@ mod tests {
     fn test_sync_updates_stale_path() {
         let _lock = TEST_LOCK.lock().unwrap();
         let _guard = RegBackup::new();
-        let _ = write_registry_value(r#""C:\Old\Path\mikey.exe" --autostart"#);
+        let _ = write_registry_value(r#""C:\Old\Path\owlmic.exe" --autostart"#);
         assert_eq!(
             get_autostart_value(),
-            Some(r#""C:\Old\Path\mikey.exe" --autostart"#.to_string())
+            Some(r#""C:\Old\Path\owlmic.exe" --autostart"#.to_string())
         );
 
         let cfg = Config {

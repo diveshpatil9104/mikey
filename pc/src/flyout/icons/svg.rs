@@ -1,4 +1,4 @@
-//! SVG Vector parser and renderer for Mikey Flyout.
+//! SVG Vector parser and renderer for Owlmic Flyout.
 //! Parses 24x24 standard Lucide SVG assets from pc/assets/icons.
 
 #![cfg(windows)]

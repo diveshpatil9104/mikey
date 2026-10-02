@@ -13,7 +13,7 @@ Owlmic feels less like software you operate and more like a physical hardware ca
 | Component | Responsibility & Interface |
 | :--- | :--- |
 | **Owlmic (Android Client)** | Native Android app. Two split interactive halves: camera on top, mic on the bottom. One chevron drawer for settings. |
-| **Owlmic for PC (`mikey`)** | Lightweight native Rust companion executable. Autostarts with the computer, lives in the notification tray, and exposes virtual microphone and webcam endpoints to all meeting applications. |
+| **Owlmic for PC (`owlmic`)** | Lightweight native Rust companion executable. Autostarts with the computer, lives in the notification tray, and exposes virtual microphone and webcam endpoints to all meeting applications. |
 
 ### 1.1 Empathy: Who We Are Building For
 1. **The Student or Remote Worker**: Has a laptop with a broken or subpar mic/webcam and cannot justify buying expensive hardware. Their phone’s camera sensor and microphone array are dramatically superior to low-end external webcams.
@@ -67,7 +67,7 @@ Owlmic feels less like software you operate and more like a physical hardware ca
 
 ### 4.1 First-Time PC Setup
 1. User downloads the single-file installer from GitHub Releases and executes it.
-2. The installer copies the `mikey` binary, registers the DirectShow virtual camera (`softcam.dll`) system-wide, sets an autostart registry entry, configures inbound firewall rules across all network profiles (`profile=any`), and starts the tray icon.
+2. The installer copies the `owlmic` binary, registers the DirectShow virtual camera (`softcam.dll`) system-wide, sets an autostart registry entry, configures inbound firewall rules across all network profiles (`profile=any`), and starts the tray icon.
 3. The installer also sets up **Owlmic**, the virtual microphone (it runs on the bundled VB-Audio Cable driver), and keeps the user's default speakers and microphone as they were. If Owlmic is missing later, the flyout shows a *Mic setup needed* banner whose **Setup Mic** button sets it up again. Owlmic detects it automatically without an application restart.
 
 ### 4.2 First-Time Phone Setup
@@ -106,7 +106,7 @@ If a user begins a meeting over Wi-Fi and connects a USB cable mid-call:
 | **R5** | ADB binary conflicts with developer Android SDKs | Low | Prefer `adb` on system `PATH` if present; fall back to local bundled platform-tools binary only when missing. |
 | **R6** | Bluetooth RFCOMM throughput instability | Low | Designate Bluetooth as Level 4 fallback; compress audio via Opus at 48 kbps CBR; strictly disable video streaming over Bluetooth. |
 | **R7** | USB tethering routes PC traffic through phone mobile data | Medium | Present a one-time informative tip explaining upstream tethering behavior; prefer Level 1 (ADB) when available. |
-| **R8** | Linux desktop environments hide standard tray icons | Medium | Support StatusNotifier/AppIndicator protocols; provide fallback command-line options (`mikey --settings`). |
+| **R8** | Linux desktop environments hide standard tray icons | Medium | Support StatusNotifier/AppIndicator protocols; provide fallback command-line options (`owlmic --settings`). |
 | **R9** | Linux Secure Boot blocks unsigned `v4l2loopback` kernel module | Medium | Recommend distro DKMS packages (auto-signed with MOK on Ubuntu/Fedora); provide comprehensive troubleshooting documentation. |
 | **R10**| The virtual mic depends on the third-party VB-Audio Cable driver | Low | The installer bundles it (VB-Audio's licensing page allows embedding it in an installer) as *Owlmic*, credited in `THIRD-PARTY-NOTICES.txt`; a Owlmic-owned signed driver is the long-term option. |
 | **R11**| Client-isolated enterprise Wi-Fi blocks broadcast discovery | Low | Provide `manualPcAddress` in Advanced settings and retain `lastPcAddress` cache for direct IP connection. |

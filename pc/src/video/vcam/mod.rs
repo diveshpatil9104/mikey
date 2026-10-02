@@ -1,4 +1,4 @@
-//! Thread-safe Virtual Camera manager for Mikey.
+//! Thread-safe Virtual Camera manager for Owlmic.
 
 pub mod api;
 #[cfg(windows)]
@@ -11,7 +11,7 @@ use std::sync::{Mutex, OnceLock};
 
 const FPS: f32 = 30.0;
 
-/// Mikey Cam's only size. Apps like Chrome remember a camera's sizes from when they last listed
+/// Owlmic Cam's only size. Apps like Chrome remember a camera's sizes from when they last listed
 /// cameras, which for a DirectShow camera only happens again after a real camera comes or goes,
 /// and softcam only serves the size it was created at. A camera that changed size showed nothing
 /// in them, so it never changes: every picture is scaled to fit (video-pipeline.md).
@@ -140,7 +140,7 @@ mod tests {
 
     #[test]
     fn test_camera_keeps_one_size_whatever_the_phone_sends() {
-        // Changing size made Mikey Cam go blank in apps that listed cameras before the change.
+        // Changing size made Owlmic Cam go blank in apps that listed cameras before the change.
         let cam = VirtualCamera::new();
         assert!(cam
             .api

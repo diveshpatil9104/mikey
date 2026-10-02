@@ -1,6 +1,6 @@
 # Installing and Running Owlmic on PC
 
-Owlmic for PC runs as a standalone tray application (`mikey`) that acts as the receiver server for audio and webcam streaming from your Android phone.
+Owlmic for PC runs as a standalone tray application (`owlmic`) that acts as the receiver server for audio and webcam streaming from your Android phone.
 
 ---
 
@@ -50,7 +50,7 @@ cargo run -- --test-tone
 ```
 
 ### Build the Windows installer
-The [Windows installer workflow](../.github/workflows/windows-installer.yml) builds `mikey.exe` and `Owlmic-Setup-x.y.z.exe` on every version tag, and on demand. To build it by hand on Windows, put the Owlmic driver files (VB-CABLE's `VBCABLE_Driver_Pack45.zip`, unzipped) in `pc/installer/driver/`, build `mikey.exe`, then run Inno Setup 6: `ISCC /DMyAppVersion=x.y.z pc\installer\mikey.iss`.
+The [Windows installer workflow](../.github/workflows/windows-installer.yml) builds `owlmic.exe` and `Owlmic-Setup-x.y.z.exe` on every version tag, and on demand. To build it by hand on Windows, put the Owlmic driver files (VB-CABLE's `VBCABLE_Driver_Pack45.zip`, unzipped) in `pc/installer/driver/`, build `owlmic.exe`, then run Inno Setup 6: `ISCC /DMyAppVersion=x.y.z pc\installer\owlmic.iss`.
 
 ---
 
@@ -62,14 +62,14 @@ If running without the installer, ensure incoming connections on private network
 
 ### Windows (PowerShell as Admin)
 ```powershell
-netsh advfirewall firewall add rule name="Mikey TCP" dir=in action=allow protocol=TCP localport=7653 profile=private
-netsh advfirewall firewall add rule name="Mikey UDP Beacon" dir=in action=allow protocol=UDP localport=7654 profile=private
+netsh advfirewall firewall add rule name="Owlmic TCP" dir=in action=allow protocol=TCP localport=7653 profile=private
+netsh advfirewall firewall add rule name="Owlmic UDP Beacon" dir=in action=allow protocol=UDP localport=7654 profile=private
 ```
 
 ### Linux (UFW)
 ```bash
-sudo ufw allow 7653/tcp comment "Mikey TCP"
-sudo ufw allow 7654/udp comment "Mikey UDP Beacon"
+sudo ufw allow 7653/tcp comment "Owlmic TCP"
+sudo ufw allow 7654/udp comment "Owlmic UDP Beacon"
 ```
 
 ---

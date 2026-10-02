@@ -83,7 +83,7 @@ impl DecodedFrame {
     }
 
     /// Generates a neutral placeholder frame for when the camera is off:
-    /// Black background with a subtle, clean Mikey mark in the center (#3A3A3C / #8E8E93).
+    /// Black background with a subtle, clean Owlmic mark in the center (#3A3A3C / #8E8E93).
     pub fn placeholder(width: usize, height: usize) -> Self {
         let mut bgr = vec![0x11u8; width * height * 3]; // dark surface #111111
 

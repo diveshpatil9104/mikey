@@ -97,8 +97,8 @@ pub fn ensure_softcam_installed() -> Option<PathBuf> {
     }
 
     let local_app_data = std::env::var_os("LOCALAPPDATA")?;
-    let mikey_dir = PathBuf::from(local_app_data).join("Mikey");
-    let target_dll = mikey_dir.join("softcam.dll");
+    let app_dir = PathBuf::from(local_app_data).join("Owlmic");
+    let target_dll = app_dir.join("softcam.dll");
 
     let needs_write = match std::fs::metadata(&target_dll) {
         Ok(meta) => meta.len() != EMBEDDED_SOFTCAM_DLL.len() as u64,
@@ -106,7 +106,7 @@ pub fn ensure_softcam_installed() -> Option<PathBuf> {
     };
 
     if needs_write {
-        let _ = std::fs::create_dir_all(&mikey_dir);
+        let _ = std::fs::create_dir_all(&app_dir);
         if let Err(e) = std::fs::write(&target_dll, EMBEDDED_SOFTCAM_DLL) {
             eprintln!(
                 "[vcam] Failed to extract softcam.dll to {:?}: {}",

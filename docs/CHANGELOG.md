@@ -14,9 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Mikey is now called Owlmic.** The apps, the installer and the docs use the new name. The microphone shows up as *Owlmic* and the camera as *Owlmic Cam*. On a PC set up before the rename, the camera is renamed the next time Owlmic starts, and the microphone the next time Setup Mic runs
 - Mic setup keeps the user's own default speakers and microphone, and no longer turns off other apps' audio devices
 - The mic shows up in apps as *Owlmic (Owlmic Audio)*
+- **The apps' own names changed too, so Owlmic installs as a new app.** On Android it is `com.owlmic`: install Owlmic and pair again. On the PC it is `owlmic.exe`. On first launch it moves the old settings folder to `%APPDATA%\Owlmic` (`~/.config/owlmic` on Linux) and replaces the old autostart entry. The installer swaps the old firewall rules for *Owlmic TCP* and *Owlmic UDP Beacon*
+- Wi-Fi and USB tethering discovery now use `OWLMIC?1` and `OWLMIC!1`, and Bluetooth a new service UUID, so Mikey and Owlmic builds only connect to each other over USB debugging or a manual address
 
 ### Fixed
-- The panel's **Setup Mic** button finds its script next to `mikey.exe`
+- The panel's **Setup Mic** button finds its script next to `owlmic.exe`
 
 ---
 

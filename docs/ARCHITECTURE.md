@@ -18,7 +18,7 @@
 │    └─ VideoCapture         CameraX → JPEG → frames             │
 └─────────── L1 USB │ L2 Tether │ L3 Wi-Fi │ L4 Bluetooth ───────┘
                     ▼                           ▼
-┌──────────────────── PC: Owlmic for PC (mikey) ────────────────────┐
+┌──────────────────── PC: Owlmic for PC (owlmic) ───────────────────┐
 │  Listeners: TCP :7653 · UDP beacon :7654 · RFCOMM · AdbWatcher  │
 │  SessionManager   tokens, trust, ask-before-join, session hold   │
 │  Audio pipeline   Opus decode → RNNoise → jitter buf            │

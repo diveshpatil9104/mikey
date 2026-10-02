@@ -3,7 +3,7 @@
 ## Option 1: Download the APK (Recommended)
 
 1. Go to [Releases](https://github.com/diveshpatil9104/mikey/releases)
-2. Download the latest `mikey-vX.Y.Z.apk`
+2. Download the latest `Owlmic-vX.Y.Z-android.apk`
 3. On your phone:
    - Open Settings → Security → enable "Install from unknown sources" for your browser (or Files app)
    - Open the downloaded APK and tap Install

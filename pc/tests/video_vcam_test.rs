@@ -55,7 +55,7 @@ fn test_softcam_dll_registration() {
         std::path::PathBuf::from("softcam.dll")
     } else if std::path::Path::new("pc/softcam.dll").exists() {
         std::path::PathBuf::from("pc/softcam.dll")
-    } else if let Some(p) = mikey::video::vcam::install::ensure_softcam_installed() {
+    } else if let Some(p) = owlmic::video::vcam::install::ensure_softcam_installed() {
         p
     } else {
         std::path::PathBuf::from("softcam.dll")
@@ -100,13 +100,13 @@ fn test_directshow_device_enumeration() {
         std::path::PathBuf::from("softcam.dll")
     } else if std::path::Path::new("pc/softcam.dll").exists() {
         std::path::PathBuf::from("pc/softcam.dll")
-    } else if let Some(p) = mikey::video::vcam::install::ensure_softcam_installed() {
+    } else if let Some(p) = owlmic::video::vcam::install::ensure_softcam_installed() {
         p
     } else {
         std::path::PathBuf::from("softcam.dll")
     };
 
-    mikey::video::vcam::install::ensure_directshow_registered(&dll_path);
+    owlmic::video::vcam::install::ensure_directshow_registered(&dll_path);
 
     let key_path = "Software\\Classes\\CLSID\\{860BB310-5D01-11D0-BD3B-00A0C911CE86}\\Instance\\DirectShow Softcam\0";
     let subkey: Vec<u16> = key_path.encode_utf16().collect();
@@ -114,7 +114,7 @@ fn test_directshow_device_enumeration() {
     const HKEY_CURRENT_USER: usize = 0xFFFF_FFFF_8000_0001;
     const HKEY_LOCAL_MACHINE: usize = 0xFFFF_FFFF_8000_0002;
 
-    let root_key = if mikey::video::vcam::install::is_admin() {
+    let root_key = if owlmic::video::vcam::install::is_admin() {
         HKEY_LOCAL_MACHINE
     } else {
         HKEY_CURRENT_USER
@@ -199,6 +199,6 @@ fn test_directshow_device_enumeration() {
 
 #[test]
 fn test_camera_off_frame_readiness() {
-    let vcam = mikey::video::vcam::VirtualCamera::new();
+    let vcam = owlmic::video::vcam::VirtualCamera::new();
     vcam.show_off_frame();
 }

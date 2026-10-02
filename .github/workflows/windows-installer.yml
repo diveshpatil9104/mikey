@@ -1,6 +1,6 @@
 name: Windows installer
 
-# Builds mikey.exe and Owlmic-Setup-x.y.z.exe on Windows. The installer bundles the Owlmic microphone
+# Builds owlmic.exe and Owlmic-Setup-x.y.z.exe on Windows. The installer bundles the Owlmic microphone
 # driver files, downloaded here and checked against a known checksum.
 on:
   workflow_dispatch:
@@ -39,8 +39,8 @@ jobs:
             }
           }
 
-      # Static C runtime: mikey.exe runs without the Visual C++ Redistributable.
-      - name: Build mikey.exe
+      # Static C runtime: owlmic.exe runs without the Visual C++ Redistributable.
+      - name: Build owlmic.exe
         env:
           RUSTFLAGS: -C target-feature=+crt-static
         run: cargo build --release --manifest-path pc/Cargo.toml
@@ -55,7 +55,7 @@ jobs:
       - name: Download the microphone driver files
         shell: pwsh
         run: |
-          $zip = "$env:RUNNER_TEMP\mikey-mic-driver.zip"
+          $zip = "$env:RUNNER_TEMP\owlmic-mic-driver.zip"
           $expectedHash = 'B950E39F01AF1D04EA623C8F6D8EB9B6EA5C477C637295FABF20631C85116BFB'
           $sources = @(
             'https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip',
@@ -65,7 +65,7 @@ jobs:
           $ProgressPreference = 'SilentlyContinue'
           foreach ($url in $sources) {
             try {
-              Write-Host "Downloading Mikey Mic driver from $url..."
+              Write-Host "Downloading the Owlmic microphone driver from $url..."
               if (Test-Path $zip) { Remove-Item $zip -Force }
               Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing -UserAgent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' -TimeoutSec 60
               $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
@@ -106,11 +106,11 @@ jobs:
           $version = (Select-String -Path pc\Cargo.toml -Pattern '^version = "(.+)"').Matches[0].Groups[1].Value
           $iscc = Get-ChildItem "${env:ProgramFiles(x86)}\Inno Setup *\ISCC.exe", "$env:ProgramFiles\Inno Setup *\ISCC.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
           if (-not $iscc) { throw "Inno Setup's compiler wasn't found" }
-          & $iscc.FullName "/DMyAppVersion=$version" pc\installer\mikey.iss
+          & $iscc.FullName "/DMyAppVersion=$version" pc\installer\owlmic.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          Copy-Item pc\target\release\mikey.exe "pc\installer\Output\Owlmic-v$version-windows-x64.exe"
+          Copy-Item pc\target\release\owlmic.exe "pc\installer\Output\Owlmic-v$version-windows-x64.exe"
 
-      - name: Upload the installer and mikey.exe
+      - name: Upload the installer and owlmic.exe
         uses: actions/upload-artifact@v7
         with:
           name: owlmic-windows

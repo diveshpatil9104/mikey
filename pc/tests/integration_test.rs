@@ -1,12 +1,12 @@
-use mikey::audio::pipeline::JitterBuffer;
-use mikey::config::generate_random_hex;
-use mikey::protocol::{
+use owlmic::audio::pipeline::JitterBuffer;
+use owlmic::config::generate_random_hex;
+use owlmic::protocol::{
     read_frame, write_frame, Frame, FrameType, HelloPayload, MediaHeader, WelcomePayload,
     CODEC_PCM, PROTO_VERSION,
 };
-use mikey::session::SessionManager;
-use mikey::transport::tcp::{configure_stream, handle_client};
-use mikey::video::VideoPipeline;
+use owlmic::session::SessionManager;
+use owlmic::transport::tcp::{configure_stream, handle_client};
+use owlmic::video::VideoPipeline;
 use std::net::{TcpListener, TcpStream};
 use std::sync::Arc;
 use std::thread;
@@ -22,7 +22,7 @@ fn test_end_to_end_streaming_and_handshake() {
     let vp_clone = Arc::clone(&vp);
 
     let mut temp_cfg = std::env::temp_dir();
-    temp_cfg.push(format!("mikey_it_{}.toml", generate_random_hex(8)));
+    temp_cfg.push(format!("owlmic_it_{}.toml", generate_random_hex(8)));
     let sm = SessionManager::new(temp_cfg);
     let sm_clone = sm.clone();
     let expected_pc_id = sm.config().pc_id.clone();
@@ -102,7 +102,7 @@ fn test_end_to_end_handover_with_session_hold() {
     let vp_clone = Arc::clone(&vp);
 
     let mut temp_cfg = std::env::temp_dir();
-    temp_cfg.push(format!("mikey_it_ho_{}.toml", generate_random_hex(8)));
+    temp_cfg.push(format!("owlmic_it_ho_{}.toml", generate_random_hex(8)));
     let sm = SessionManager::new(temp_cfg);
     let sm_clone = sm.clone();
 
@@ -197,7 +197,7 @@ fn test_control_settings_sync() {
     let vp_clone = Arc::clone(&vp);
 
     let mut temp_cfg = std::env::temp_dir();
-    temp_cfg.push(format!("mikey_it_ctrl_{}.toml", generate_random_hex(8)));
+    temp_cfg.push(format!("owlmic_it_ctrl_{}.toml", generate_random_hex(8)));
     let sm = SessionManager::new(temp_cfg);
     let sm_clone = sm.clone();
 

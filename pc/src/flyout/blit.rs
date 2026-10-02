@@ -1,4 +1,4 @@
-//! Camera preview bitmap blitting and embedded preview box rendering for the Mikey Flyout.
+//! Camera preview bitmap blitting and embedded preview box rendering for the Owlmic Flyout.
 
 #![cfg(windows)]
 
