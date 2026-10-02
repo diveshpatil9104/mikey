@@ -20,7 +20,7 @@ This directory contains the Inno Setup configuration and support scripts used to
 
 1. **Elevation**: Requires administrator privileges (`PrivilegesRequired=admin`) to register COM filters and manage audio drivers.
 2. **Virtual Camera Registration**: Executes `regsvr32.exe /s "{app}\softcam.dll"` during installation, registering the DirectShow filter system-wide so Chromium, Edge, and meeting apps can access the feed.
-3. **Firewall Rules**: Automatically creates Windows Defender inbound firewall rules for both TCP `:7653` (media and control) and UDP `:7654` (discovery beacon) on `profile=any`, named *Owlmic TCP* and *Owlmic UDP Beacon*, and removes the rules the app added before the rename to Owlmic.
+3. **Firewall Rules**: Automatically creates Windows Defender inbound firewall rules for both TCP `:7653` (media and control) and UDP `:7654` (discovery beacon) on `profile=any`, named *Owlmic TCP* and *Owlmic UDP Beacon*. Rules from an earlier install are removed first, so they are never added twice.
 4. **Virtual Audio Driver Setup**: Invokes `setup-audio-device.ps1 -Silent` post-install:
    - Verifies if the driver is already present; if not, installs `VBCABLE_Setup_x64.exe`.
    - Polls device appearance (up to 30s) and configures registry properties to label the endpoints as "Owlmic" (microphone) and "Owlmic Bridge" (speaker side).

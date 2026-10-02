@@ -39,7 +39,6 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
 # The Owlmic microphone runs on this virtual cable driver. Its device and endpoint names as Windows reports them.
 $DriverDevice = "VB-Audio Virtual Cable"
 $OwlmicAudio = "Owlmic Audio"
-$OldAudio = "Owlmic Audio"   # the name from before the rename to Owlmic, so setup renames it
 $EndpointName = "{a45c254e-df1c-4efd-8020-67d146a850e0},2"   # PKEY_Device_DeviceDesc: "CABLE Output"
 $AdapterName  = "{b3f8fa53-0004-438e-9003-51a46e139bfc},6"   # PKEY_DeviceInterface_FriendlyName: the part in brackets
 
@@ -197,7 +196,7 @@ function Rename-Endpoints([string]$flow, [string]$name) {
     Get-ChildItem -Path $root -ErrorAction SilentlyContinue | ForEach-Object {
         $props = Join-Path $_.PSPath "Properties"
         $values = Get-ItemProperty -Path $props -ErrorAction SilentlyContinue
-        if ($values -and ($values.$AdapterName -in @($DriverDevice, $OwlmicAudio, $OldAudio))) {
+        if ($values -and ($values.$AdapterName -in @($DriverDevice, $OwlmicAudio))) {
             Set-ItemProperty -Path $props -Name $EndpointName -Value $name -ErrorAction SilentlyContinue
             Set-ItemProperty -Path $props -Name $AdapterName -Value $OwlmicAudio -ErrorAction SilentlyContinue
             $check = Get-ItemProperty -Path $props -ErrorAction SilentlyContinue

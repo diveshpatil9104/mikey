@@ -8,10 +8,6 @@ pub const SAMPLE_RATE: u32 = 48_000;
 
 const VIRTUAL_DEVICE_PATTERNS: &[&str] = &[
     "Owlmic Bridge",
-    // Names from before the rename to Owlmic, until Setup Mic renames the devices.
-    "Owlmic Mic Bridge",
-    "Owlmic Audio Bridge",
-    "Owlmic",
     "Owlmic",
     "CABLE In 16 Ch",
     "CABLE Input",
@@ -96,7 +92,6 @@ pub fn check_virtual_device_status() -> (bool, &'static str) {
         devices.filter_map(|d| d.name().ok()).any(|name| {
             !name.contains("AudioRelay")
                 && (name.contains("Owlmic")
-                    || name.contains("Owlmic")
                     || name.contains("CABLE Output")
                     || name.contains("VB-Audio")
                     || name.contains("CABLE"))

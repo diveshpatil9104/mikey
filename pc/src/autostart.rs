@@ -3,13 +3,8 @@ use std::io;
 
 #[cfg(windows)]
 const RUN_VALUE: &str = "Owlmic";
-/// Written before the rename to Owlmic. It starts the old owlmic.exe, so syncing removes it.
-#[cfg(windows)]
-const OLD_RUN_VALUE: &str = "Owlmic";
 #[cfg(not(windows))]
 const DESKTOP_FILE: &str = "owlmic.desktop";
-#[cfg(not(windows))]
-const OLD_DESKTOP_FILE: &str = "owlmic.desktop";
 
 #[cfg(windows)]
 pub fn format_autostart_cmd(exe_path: &std::path::Path) -> String {
@@ -102,7 +97,7 @@ fn write_registry_value(val: &str) -> io::Result<()> {
 }
 
 #[cfg(windows)]
-fn delete_registry_value(name: &str) -> io::Result<()> {
+fn delete_registry_value() -> io::Result<()> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
 
@@ -126,7 +121,7 @@ fn delete_registry_value(name: &str) -> io::Result<()> {
         .encode_wide()
         .chain(std::iter::once(0))
         .collect();
-    let value_name: Vec<u16> = OsStr::new(name)
+    let value_name: Vec<u16> = OsStr::new(RUN_VALUE)
         .encode_wide()
         .chain(std::iter::once(0))
         .collect();
@@ -260,7 +255,7 @@ pub fn set_autostart(enable: bool) -> io::Result<()> {
         let exe_path = env::current_exe()?;
         write_registry_value(&format_autostart_cmd(&exe_path))
     } else {
-        delete_registry_value(RUN_VALUE)
+        delete_registry_value()
     }
 }
 
@@ -286,7 +281,6 @@ pub fn set_autostart(enable: bool) -> io::Result<()> {
 
 #[cfg(windows)]
 pub fn sync_autostart(cfg: &crate::config::Config) -> io::Result<()> {
-    let _ = delete_registry_value(OLD_RUN_VALUE);
     let current_val = get_autostart_value();
     if cfg.start_with_computer {
         let exe_path = env::current_exe()?;
@@ -301,19 +295,12 @@ pub fn sync_autostart(cfg: &crate::config::Config) -> io::Result<()> {
         if current_val.is_none() {
             return Ok(());
         }
-        delete_registry_value(RUN_VALUE)
+        delete_registry_value()
     }
 }
 
 #[cfg(not(windows))]
 pub fn sync_autostart(cfg: &crate::config::Config) -> io::Result<()> {
-    if let Ok(home) = env::var("HOME") {
-        let old = std::path::PathBuf::from(home)
-            .join(".config")
-            .join("autostart")
-            .join(OLD_DESKTOP_FILE);
-        let _ = std::fs::remove_file(old);
-    }
     if cfg.start_with_computer {
         let exe_path = env::current_exe()?;
         let expected = format_autostart_cmd(&exe_path);
@@ -394,7 +381,7 @@ mod tests {
                     let _ = write_registry_value(val);
                 }
                 None => {
-                    let _ = delete_registry_value(RUN_VALUE);
+                    let _ = delete_registry_value();
                 }
             }
         }
@@ -405,7 +392,7 @@ mod tests {
     fn test_sync_writes_registry_when_missing() {
         let _lock = TEST_LOCK.lock().unwrap();
         let _guard = RegBackup::new();
-        let _ = delete_registry_value(RUN_VALUE);
+        let _ = delete_registry_value();
         assert_eq!(get_autostart_value(), None);
 
         let cfg = Config {

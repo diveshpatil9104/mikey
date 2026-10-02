@@ -11,11 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Windows installer (`Owlmic-Setup-x.y.z.exe`) that installs Owlmic and sets up its virtual microphone, built by a new Windows installer workflow
 
 ### Changed
-- **Owlmic is now called Owlmic.** The apps, the installer and the docs use the new name. The microphone shows up as *Owlmic* and the camera as *Owlmic Cam*. On a PC set up before the rename, the camera is renamed the next time Owlmic starts, and the microphone the next time Setup Mic runs
+- **New name: Owlmic.** The apps, the installer, the docs and the repository use it. The microphone shows up as *Owlmic* and the camera as *Owlmic Cam*
 - Mic setup keeps the user's own default speakers and microphone, and no longer turns off other apps' audio devices
 - The mic shows up in apps as *Owlmic (Owlmic Audio)*
-- **The apps' own names changed too, so Owlmic installs as a new app.** On Android it is `com.owlmic`: install Owlmic and pair again. On the PC it is `owlmic.exe`. On first launch it moves the old settings folder to `%APPDATA%\Owlmic` (`~/.config/owlmic` on Linux) and replaces the old autostart entry. The installer swaps the old firewall rules for *Owlmic TCP* and *Owlmic UDP Beacon*
-- Wi-Fi and USB tethering discovery now use `OWLMIC?1` and `OWLMIC!1`, and Bluetooth a new service UUID, so Owlmic and Owlmic builds only connect to each other over USB debugging or a manual address
+- **Owlmic installs as a new app.** On Android it is `com.owlmic`: install it and pair again. On the PC it is `owlmic.exe`, with its settings in `%APPDATA%\Owlmic` (`~/.config/owlmic` on Linux) and the firewall rules *Owlmic TCP* and *Owlmic UDP Beacon*. Version 0.1.0 isn't removed automatically: turn off its autostart and delete it before installing Owlmic
+- Wi-Fi and USB tethering discovery now use `OWLMIC?1` and `OWLMIC!1`, and Bluetooth a new service UUID, so version 0.1.0 and newer builds only connect to each other over USB debugging or a manual address
 
 ### Fixed
 - The panel's **Setup Mic** button finds its script next to `owlmic.exe`
@@ -39,7 +39,7 @@ The first preview release.
 - Tray app with a native panel: mic level, mute, camera preview and noise suppression
 - TCP listener (`:7653`), UDP discovery beacon (`:7654`), Bluetooth RFCOMM and an adb watcher
 - Sessions with trust on first use, ask-before-join and a 30 s hold when the link drops
-- Audio: Opus or PCM decode, RNNoise noise suppression, an adaptive jitter buffer, smooth drift correction with cubic interpolation, fades at gaps and a soft clip, into the virtual microphone as *Owlmic Mic*
+- Audio: Opus or PCM decode, RNNoise noise suppression, an adaptive jitter buffer, smooth drift correction with cubic interpolation, fades at gaps and a soft clip, into the virtual microphone *Owlmic*
 - Video: JPEG decode, smooth scaling to one fixed 1920×1080 size, into the built-in virtual camera *Owlmic Cam* (softcam)
 
 ### Project

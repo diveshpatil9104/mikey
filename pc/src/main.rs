@@ -60,7 +60,6 @@ fn main() {
     let _video_handle = video_pipeline.start_pipeline_thread(Arc::clone(&running));
 
     // 1. Initialize configuration and session manager
-    Config::move_old_config_dir();
     let config_path = Config::default_config_path();
     let session_manager = SessionManager::new(config_path);
     let cfg = session_manager.config();
