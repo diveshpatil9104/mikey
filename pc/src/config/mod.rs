@@ -77,14 +77,6 @@ impl Config {
         PathBuf::from("config.toml")
     }
 
-    /// Moves the settings, paired phones and logs from before the rename to Owlmic into the new
-    /// folder, once. If that fails, for example while the old app still runs, Owlmic starts fresh.
-    pub fn move_old_config_dir() {
-        if let Some(dir) = Self::default_config_path().parent() {
-            move_old_dir(dir);
-        }
-    }
-
     pub fn default_log_dir() -> PathBuf {
         Self::default_config_path()
             .parent()
@@ -168,18 +160,5 @@ impl Config {
 
     pub fn forget_device(&mut self, device_id: &str) -> bool {
         self.trusted_devices.remove(device_id).is_some()
-    }
-}
-
-/// The settings folder's name from before the rename to Owlmic.
-#[cfg(windows)]
-const OLD_DIR_NAME: &str = "Owlmic";
-#[cfg(not(windows))]
-const OLD_DIR_NAME: &str = "owlmic";
-
-fn move_old_dir(dir: &Path) {
-    let old = dir.with_file_name(OLD_DIR_NAME);
-    if dir.file_name().is_some() && !dir.exists() && old.is_dir() {
-        let _ = fs::rename(old, dir);
     }
 }

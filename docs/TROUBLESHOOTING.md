@@ -91,7 +91,7 @@ Common issues and solutions for Owlmic. If your problem isn't listed here, [open
 **Solutions:**
 1. **Windows:** Owlmic registers *Owlmic Cam* for your user the first time it runs; no admin step is needed.
 2. **Linux:** Ensure `v4l2loopback` is loaded: `sudo modprobe v4l2loopback`.
-3. Browsers (Chrome, Edge) and some apps list cameras once and keep that list until a real camera is plugged in or removed. If Owlmic started after the browser was already open, or you just updated from a Owlmic whose camera was 1280×720, restart the browser once. Starting Owlmic before the browser avoids this.
+3. Browsers (Chrome, Edge) and some apps list cameras once and keep that list until a real camera is plugged in or removed. If Owlmic started after the browser was already open, or you just updated from an older Owlmic whose camera was 1280×720, restart the browser once. Starting Owlmic before the browser avoids this.
 4. Video is not available on Bluetooth (Level 4).
 
 ### Camera preview is sideways or upside down

@@ -8,9 +8,6 @@ use std::io;
 
 pub const TCP_RULE_NAME: &str = "Owlmic TCP";
 pub const UDP_RULE_NAME: &str = "Owlmic UDP Beacon";
-/// Rules from before the rename to Owlmic, removed when the new ones are added.
-#[cfg(windows)]
-const OLD_RULE_NAMES: [&str; 3] = ["Owlmic", "Owlmic TCP", "Owlmic UDP Beacon"];
 pub const TCP_PORT: u16 = 7653;
 pub const UDP_PORT: u16 = 7654;
 
@@ -145,9 +142,8 @@ pub fn ensure_rules_elevated() -> io::Result<()> {
         "netsh advfirewall firewall delete rule name=all program=\"{}\"",
         exe_str
     );
-    let del_old = OLD_RULE_NAMES
-        .map(|name| format!("netsh advfirewall firewall delete rule name=\"{}\"", name))
-        .join(" & ");
+    // Also by name: a rule left by an install in another folder doesn't match this exe's path.
+    let del_old = "netsh advfirewall firewall delete rule name=\"Owlmic\"";
     let del_tcp = format!(
         "netsh advfirewall firewall delete rule name=\"{}\"",
         TCP_RULE_NAME
