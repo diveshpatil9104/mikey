@@ -110,10 +110,14 @@ fn test_directshow_device_enumeration() {
 
     let key_path = "Software\\Classes\\CLSID\\{860BB310-5D01-11D0-BD3B-00A0C911CE86}\\Instance\\DirectShow Softcam\0";
     let subkey: Vec<u16> = key_path.encode_utf16().collect();
+    const HKEY_CLASSES_ROOT: usize = 0xFFFF_FFFF_8000_0000;
+    const HKEY_CURRENT_USER: usize = 0xFFFF_FFFF_8000_0001;
+    const HKEY_LOCAL_MACHINE: usize = 0xFFFF_FFFF_8000_0002;
+
     let root_key = if mikey::video::vcam::install::is_admin() {
-        0x8000_0002usize // HKEY_LOCAL_MACHINE
+        HKEY_LOCAL_MACHINE
     } else {
-        0x8000_0001usize // HKEY_CURRENT_USER
+        HKEY_CURRENT_USER
     };
     let mut h_key = 0usize;
 
@@ -139,13 +143,27 @@ fn test_directshow_device_enumeration() {
 
     let mut open_res = unsafe { RegOpenKeyExW(root_key, subkey.as_ptr(), 0, 0x20019, &mut h_key) };
     if open_res != 0 {
-        // Fallback to the other root key if already registered system-wide/per-user
-        let alt_root = if root_key == 0x8000_0002 {
-            0x8000_0001usize
+        // Fallback to the other root key or HKEY_CLASSES_ROOT merged view
+        let alt_root = if root_key == HKEY_LOCAL_MACHINE {
+            HKEY_CURRENT_USER
         } else {
-            0x8000_0002usize
+            HKEY_LOCAL_MACHINE
         };
         open_res = unsafe { RegOpenKeyExW(alt_root, subkey.as_ptr(), 0, 0x20019, &mut h_key) };
+        if open_res != 0 {
+            let cr_key_path =
+                "CLSID\\{860BB310-5D01-11D0-BD3B-00A0C911CE86}\\Instance\\DirectShow Softcam\0";
+            let cr_subkey: Vec<u16> = cr_key_path.encode_utf16().collect();
+            open_res = unsafe {
+                RegOpenKeyExW(
+                    HKEY_CLASSES_ROOT,
+                    cr_subkey.as_ptr(),
+                    0,
+                    0x20019,
+                    &mut h_key,
+                )
+            };
+        }
     }
     assert_eq!(open_res, 0, "Mikey Cam DirectShow key must be openable");
 

@@ -62,14 +62,12 @@ jobs:
             'https://web.archive.org/web/20240901000000id_/https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip'
           )
           $downloaded = $false
+          $ProgressPreference = 'SilentlyContinue'
           foreach ($url in $sources) {
             try {
               Write-Host "Downloading Mikey Mic driver from $url..."
-              if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
-                & curl.exe -fSL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -o $zip $url --max-time 60
-              } else {
-                Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing -UserAgent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' -TimeoutSec 60
-              }
+              if (Test-Path $zip) { Remove-Item $zip -Force }
+              Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing -UserAgent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' -TimeoutSec 60
               $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
               if ($hash -eq $expectedHash) {
                 $downloaded = $true
@@ -78,7 +76,20 @@ jobs:
               }
               Write-Warning "Checksum mismatch for $url: got $hash, expected $expectedHash"
             } catch {
-              Write-Warning "Failed to download from $url: $($_.Exception.Message)"
+              Write-Warning "Invoke-WebRequest failed for $url: $($_.Exception.Message)"
+              try {
+                if (Test-Path $zip) { Remove-Item $zip -Force }
+                & curl.exe -sS -f -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -o $zip $url --max-time 60
+                $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
+                if ($hash -eq $expectedHash) {
+                  $downloaded = $true
+                  Write-Host "Driver checksum verified via curl: $hash"
+                  break
+                }
+                Write-Warning "Checksum mismatch via curl for $url: got $hash, expected $expectedHash"
+              } catch {
+                Write-Warning "curl failed for $url: $($_.Exception.Message)"
+              }
             }
           }
           if (-not $downloaded) {
