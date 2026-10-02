@@ -86,29 +86,29 @@ Owlmic is a distributed, real-time media streaming system consisting of an Andro
 
 | Class / Component | Source File | Core Responsibility |
 | :--- | :--- | :--- |
-| **`MainActivity`** | [`MainActivity.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/MainActivity.kt) | Pure Compose activity. Observes `OwlmicService.state` and renders [`MainScreen`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/ui/MainScreen.kt). Dispatches user intents. |
-| **`OwlmicService`** | [`OwlmicService.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/service/OwlmicService.kt) | Foreground service. Manages OS capture permissions, dynamic foreground service types, and notification media actions. |
-| **`SessionController`** | [`SessionController.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/service/SessionController.kt) | Master state machine. Manages network loops, wire handshake, frame writing, 5s heartbeats, and make-before-break upgrade handoffs. |
-| **`TransportManager`** | [`TransportManager.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/transport/TransportManager.kt) | Network interface observer. Manages candidate ranking across L1–L4, network socket pinning, and anti-flapping probation (`DEAD_MS = 10_000`). |
-| **`AudioCapture`** | [`AudioCapture.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/media/AudioCapture.kt) | Ingests 48 kHz mono PCM in 10 ms frames on `mikey-capture` thread with AAudio NDK low latency or AudioRecord fallback. |
-| **`VideoCapture`** | [`VideoCapture.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/media/VideoCapture.kt) | Manages CameraX `ImageAnalysis`, gravity orientation hysteresis, NV21 conversion, and adaptive JPEG encoding. |
-| **`LevelMeter`** | [`LevelMeter.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/media/LevelMeter.kt) | Computes instantaneous audio loudness RMS for UI volume bars. |
-| **`Discovery`** | [`Discovery.kt`](file:///e:/Programs/mikey/android/app/src/main/java/com/owlmic/transport/Discovery.kt) | Scans network interfaces, computes broadcast addresses, and emits UDP discovery probes on port `7654`. |
+| **`MainActivity`** | [`MainActivity.kt`](../android/app/src/main/java/com/owlmic/MainActivity.kt) | Pure Compose activity. Observes `OwlmicService.state` and renders [`MainScreen`](../android/app/src/main/java/com/owlmic/ui/MainScreen.kt). Dispatches user intents. |
+| **`OwlmicService`** | [`OwlmicService.kt`](../android/app/src/main/java/com/owlmic/service/OwlmicService.kt) | Foreground service. Manages OS capture permissions, dynamic foreground service types, and notification media actions. |
+| **`SessionController`** | [`SessionController.kt`](../android/app/src/main/java/com/owlmic/service/SessionController.kt) | Master state machine. Manages network loops, wire handshake, frame writing, 5s heartbeats, and make-before-break upgrade handoffs. |
+| **`TransportManager`** | [`TransportManager.kt`](../android/app/src/main/java/com/owlmic/transport/TransportManager.kt) | Network interface observer. Manages candidate ranking across L1–L4, network socket pinning, and anti-flapping probation (`DEAD_MS = 10_000`). |
+| **`AudioCapture`** | [`AudioCapture.kt`](../android/app/src/main/java/com/owlmic/media/AudioCapture.kt) | Ingests 48 kHz mono PCM in 10 ms frames on `owlmic-capture` thread with AAudio NDK low latency or AudioRecord fallback. |
+| **`VideoCapture`** | [`VideoCapture.kt`](../android/app/src/main/java/com/owlmic/media/VideoCapture.kt) | Manages CameraX `ImageAnalysis`, gravity orientation hysteresis, NV21 conversion, and adaptive JPEG encoding. |
+| **`LevelMeter`** | [`LevelMeter.kt`](../android/app/src/main/java/com/owlmic/media/LevelMeter.kt) | Computes instantaneous audio loudness RMS for UI volume bars. |
+| **`Discovery`** | [`Discovery.kt`](../android/app/src/main/java/com/owlmic/transport/Discovery.kt) | Scans network interfaces, computes broadcast addresses, and emits UDP discovery probes on port `7654`. |
 
 ### 2.2 PC Subsystem Breakdown
 
 | Module / Struct | Source File | Core Responsibility |
 | :--- | :--- | :--- |
-| **`main`** | [`main.rs`](file:///e:/Programs/mikey/pc/src/main.rs) | Detaches console, enforces single-instance mutex, coordinates pipeline threads, and starts network listeners. |
-| **`autostart`** | [`autostart.rs`](file:///e:/Programs/mikey/pc/src/autostart.rs) | Queries and synchronizes Windows `Run` registry key with `config.toml` (`start_with_computer`), ensuring silent `--autostart` launch at login. |
-| **`firewall`** | [`firewall.rs`](file:///e:/Programs/mikey/pc/src/firewall.rs) | Inspects Windows Firewall rules for TCP :7653 and UDP :7654 at startup, providing one-click elevated UAC rule creation. |
-| **`SessionManager`** | [`session/mod.rs`](file:///e:/Programs/mikey/pc/src/session/mod.rs) | Manages authentication, TOFU pairing prompts, session hold grace periods, and control message routing. |
-| **`JitterBuffer`** | [`audio/pipeline/mod.rs`](file:///e:/Programs/mikey/pc/src/audio/pipeline/mod.rs) | Thread-safe sample ring buffer with arrival timestamp tracking, adaptive depth calculation, and latency caps. |
-| **`AudioNormalizer`**| [`audio/pipeline/normalizer.rs`](file:///e:/Programs/mikey/pc/src/audio/pipeline/normalizer.rs) | Speech leveling and boost up to +12 dB with anti-pumping noise hold and soft clipping. |
-| **`AudioDsp`** | [`audio/dsp/denoise.rs`](file:///e:/Programs/mikey/pc/src/audio/dsp/denoise.rs) | Neural network speech noise suppression (RNNoise) and adjustable strength mixing. |
-| **`VideoPipeline`** | [`video/pipeline.rs`](file:///e:/Programs/mikey/pc/src/video/pipeline.rs) | Dedicated worker thread decompressing JPEG to BGRA, pushing frames to softcam driver, and updating preview. |
-| **`VirtualCamera`** | [`video/vcam/mod.rs`](file:///e:/Programs/mikey/pc/src/video/vcam/mod.rs) | DirectShow filter registration with InprocServer32 path repair, HKLM/HKCU dual strategy, and shared memory frame delivery. |
-| **`FlyoutWindow`** | [`flyout/window.rs`](file:///e:/Programs/mikey/pc/src/flyout/window.rs) | Native Win32 GDI/GDI+ double-buffered companion card with interactive volume meter and controls. |
+| **`main`** | [`main.rs`](../pc/src/main.rs) | Detaches console, enforces single-instance mutex, coordinates pipeline threads, and starts network listeners. |
+| **`autostart`** | [`autostart.rs`](../pc/src/autostart.rs) | Queries and synchronizes Windows `Run` registry key with `config.toml` (`start_with_computer`), ensuring silent `--autostart` launch at login. |
+| **`firewall`** | [`firewall.rs`](../pc/src/firewall.rs) | Inspects Windows Firewall rules for TCP :7653 and UDP :7654 at startup, providing one-click elevated UAC rule creation. |
+| **`SessionManager`** | [`session/mod.rs`](../pc/src/session/mod.rs) | Manages authentication, TOFU pairing prompts, session hold grace periods, and control message routing. |
+| **`JitterBuffer`** | [`audio/pipeline/mod.rs`](../pc/src/audio/pipeline/mod.rs) | Thread-safe sample ring buffer with arrival timestamp tracking, adaptive depth calculation, and latency caps. |
+| **`AudioNormalizer`**| [`audio/pipeline/normalizer.rs`](../pc/src/audio/pipeline/normalizer.rs) | Speech leveling and boost up to +12 dB with anti-pumping noise hold and soft clipping. |
+| **`AudioDsp`** | [`audio/dsp/denoise.rs`](../pc/src/audio/dsp/denoise.rs) | Neural network speech noise suppression (RNNoise) and adjustable strength mixing. |
+| **`VideoPipeline`** | [`video/pipeline.rs`](../pc/src/video/pipeline.rs) | Dedicated worker thread decompressing JPEG to BGRA, pushing frames to softcam driver, and updating preview. |
+| **`VirtualCamera`** | [`video/vcam/mod.rs`](../pc/src/video/vcam/mod.rs) | DirectShow filter registration with InprocServer32 path repair, HKLM/HKCU dual strategy, and shared memory frame delivery. |
+| **`FlyoutWindow`** | [`flyout/window.rs`](../pc/src/flyout/window.rs) | Native Win32 GDI/GDI+ double-buffered companion card with interactive volume meter and controls. |
 
 ---
 

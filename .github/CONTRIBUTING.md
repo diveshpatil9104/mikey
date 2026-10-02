@@ -33,11 +33,11 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
 
 ### Report Bugs
 
-Found something broken? [Open a bug report](https://github.com/diveshpatil9104/mikey/issues/new?template=bug_report.yml). Include steps to reproduce, your environment, and any logs or screenshots.
+Found something broken? [Open a bug report](https://github.com/diveshpatil9104/owlmic/issues/new?template=bug_report.yml). Include steps to reproduce, your environment, and any logs or screenshots.
 
 ### Suggest Features
 
-Have an idea? [Open a feature request](https://github.com/diveshpatil9104/mikey/issues/new?template=feature_request.yml). Check the [roadmap](../docs/ROADMAP_AND_TEST_MATRIX.md) first to see if it's already planned.
+Have an idea? [Open a feature request](https://github.com/diveshpatil9104/owlmic/issues/new?template=feature_request.yml). Check the [roadmap](../docs/ROADMAP_AND_TEST_MATRIX.md) first to see if it's already planned.
 
 ### Improve Documentation
 
@@ -45,7 +45,7 @@ Documentation improvements are always welcome. Fix typos, clarify instructions, 
 
 ### Fix Bugs or Implement Features
 
-Browse [open issues](https://github.com/diveshpatil9104/mikey/issues) for something that interests you. Issues labeled **`good first issue`** are ideal for newcomers.
+Browse [open issues](https://github.com/diveshpatil9104/owlmic/issues) for something that interests you. Issues labeled **`good first issue`** are ideal for newcomers.
 
 ### Test on Your Devices
 
@@ -59,8 +59,8 @@ We need real-device testing across different phones, OS versions, and connection
 
 ```bash
 # Fork the repo on GitHub, then:
-git clone https://github.com/<your-username>/mikey.git
-cd mikey
+git clone https://github.com/<your-username>/owlmic.git
+cd owlmic
 git submodule update --init    # pulls libopus
 ```
 
@@ -131,7 +131,7 @@ See [INSTALL_PC.md](../docs/INSTALL_PC.md) for detailed platform setup.
 ## Project Structure
 
 ```
-mikey/
+owlmic/
 ├── android/           # Android app (Kotlin, Jetpack Compose)
 │   └── app/
 │       └── src/main/
@@ -318,9 +318,9 @@ Owlmic has a detailed architecture documented in `docs/`. Here's what to read ba
 
 ## Getting Help
 
-- **Questions?** Open a [Discussion](https://github.com/diveshpatil9104/mikey/discussions).
+- **Questions?** Open a [Discussion](https://github.com/diveshpatil9104/owlmic/discussions).
 - **Stuck on setup?** Check [TROUBLESHOOTING.md](../docs/TROUBLESHOOTING.md) or ask in Discussions.
-- **Not sure where to start?** Look for issues labeled [`good first issue`](https://github.com/diveshpatil9104/mikey/labels/good%20first%20issue).
+- **Not sure where to start?** Look for issues labeled [`good first issue`](https://github.com/diveshpatil9104/owlmic/labels/good%20first%20issue).
 
 ---
 

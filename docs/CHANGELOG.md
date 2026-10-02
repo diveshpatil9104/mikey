@@ -45,5 +45,5 @@ The first preview release.
 ### Project
 - CI for the PC app (Windows and Linux) and the Android app, grouped weekly Dependabot updates, a contributing guide, code of conduct, security policy, and issue and pull request templates
 
-[Unreleased]: https://github.com/diveshpatil9104/mikey/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/diveshpatil9104/mikey/releases/tag/v0.1.0
+[Unreleased]: https://github.com/diveshpatil9104/owlmic/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/diveshpatil9104/owlmic/releases/tag/v0.1.0

@@ -2,7 +2,7 @@
 
 ## Option 1: Download the APK (Recommended)
 
-1. Go to [Releases](https://github.com/diveshpatil9104/mikey/releases)
+1. Go to [Releases](https://github.com/diveshpatil9104/owlmic/releases)
 2. Download the latest `Owlmic-vX.Y.Z-android.apk`
 3. On your phone:
    - Open Settings → Security → enable "Install from unknown sources" for your browser (or Files app)
@@ -28,8 +28,8 @@
 
 ```bash
 # Clone the repo (if you haven't already)
-git clone https://github.com/diveshpatil9104/mikey.git
-cd mikey
+git clone https://github.com/diveshpatil9104/owlmic.git
+cd owlmic
 
 # Initialize submodules (libopus)
 git submodule update --init

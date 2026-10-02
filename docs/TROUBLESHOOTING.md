@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Common issues and solutions for Owlmic. If your problem isn't listed here, [open a Discussion](https://github.com/diveshpatil9104/mikey/discussions) or [file a bug report](https://github.com/diveshpatil9104/mikey/issues/new?template=bug_report.yml).
+Common issues and solutions for Owlmic. If your problem isn't listed here, [open a Discussion](https://github.com/diveshpatil9104/owlmic/discussions) or [file a bug report](https://github.com/diveshpatil9104/owlmic/issues/new?template=bug_report.yml).
 
 ---
 
@@ -131,6 +131,6 @@ sudo apt install libbluez-dev
 
 ## Still stuck?
 
-1. Check the [open issues](https://github.com/diveshpatil9104/mikey/issues) - someone may have reported the same problem.
-2. Ask in [Discussions](https://github.com/diveshpatil9104/mikey/discussions).
-3. [File a bug report](https://github.com/diveshpatil9104/mikey/issues/new?template=bug_report.yml) with your environment details and logs.
+1. Check the [open issues](https://github.com/diveshpatil9104/owlmic/issues) - someone may have reported the same problem.
+2. Ask in [Discussions](https://github.com/diveshpatil9104/owlmic/discussions).
+3. [File a bug report](https://github.com/diveshpatil9104/owlmic/issues/new?template=bug_report.yml) with your environment details and logs.
