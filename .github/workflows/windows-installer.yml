@@ -26,6 +26,19 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Ensure softcam.dll
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "pc\softcam.dll")) {
+            $expectedHash = '9D635E0AF682A883C3C7D407513D47E59B0883771701B101216820DFCF997F0B'
+            $url = 'https://raw.githubusercontent.com/diveshpatil9104/mikey/3f78b5767f64f4542b4307c586da4b609d54d38e/pc/softcam.dll'
+            Invoke-WebRequest -Uri $url -OutFile pc\softcam.dll -UseBasicParsing
+            $hash = (Get-FileHash pc\softcam.dll -Algorithm SHA256).Hash
+            if ($hash -ne $expectedHash) {
+              throw "Downloaded softcam.dll checksum mismatch: $hash"
+            }
+          }
+
       # Static C runtime: mikey.exe runs without the Visual C++ Redistributable.
       - name: Build mikey.exe
         env:
@@ -52,7 +65,11 @@ jobs:
           foreach ($url in $sources) {
             try {
               Write-Host "Downloading Mikey Mic driver from $url..."
-              Invoke-WebRequest -Uri $url -OutFile $zip -TimeoutSec 60
+              if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
+                & curl.exe -fSL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -o $zip $url --max-time 60
+              } else {
+                Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing -UserAgent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' -TimeoutSec 60
+              }
               $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
               if ($hash -eq $expectedHash) {
                 $downloaded = $true

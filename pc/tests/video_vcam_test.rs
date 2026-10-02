@@ -1,4 +1,5 @@
-#[cfg(windows)]
+#![cfg(windows)]
+
 #[test]
 fn test_softcam_dll_registration() {
     #[link(name = "kernel32")]
@@ -50,7 +51,20 @@ fn test_softcam_dll_registration() {
     let override_res = unsafe { RegOverridePredefKey(HKEY_CLASSES_ROOT, hkcu_classes) };
     println!("RegOverridePredefKey result: {}", override_res);
 
-    let dll_path: Vec<u16> = "softcam.dll\0".encode_utf16().collect();
+    let dll_path_buf = if std::path::Path::new("softcam.dll").exists() {
+        std::path::PathBuf::from("softcam.dll")
+    } else if std::path::Path::new("pc/softcam.dll").exists() {
+        std::path::PathBuf::from("pc/softcam.dll")
+    } else if let Some(p) = mikey::video::vcam::install::ensure_softcam_installed() {
+        p
+    } else {
+        std::path::PathBuf::from("softcam.dll")
+    };
+    let dll_path: Vec<u16> = dll_path_buf
+        .to_string_lossy()
+        .encode_utf16()
+        .chain(std::iter::once(0))
+        .collect();
     let h_module = unsafe { LoadLibraryW(dll_path.as_ptr()) };
     assert_ne!(h_module, 0, "Failed to load softcam.dll");
 
@@ -82,13 +96,25 @@ fn test_directshow_device_enumeration() {
 
     unsafe { CoInitialize(std::ptr::null_mut()) };
 
-    mikey::video::vcam::install::ensure_directshow_registered(&std::path::PathBuf::from(
-        "softcam.dll",
-    ));
+    let dll_path = if std::path::Path::new("softcam.dll").exists() {
+        std::path::PathBuf::from("softcam.dll")
+    } else if std::path::Path::new("pc/softcam.dll").exists() {
+        std::path::PathBuf::from("pc/softcam.dll")
+    } else if let Some(p) = mikey::video::vcam::install::ensure_softcam_installed() {
+        p
+    } else {
+        std::path::PathBuf::from("softcam.dll")
+    };
+
+    mikey::video::vcam::install::ensure_directshow_registered(&dll_path);
 
     let key_path = "Software\\Classes\\CLSID\\{860BB310-5D01-11D0-BD3B-00A0C911CE86}\\Instance\\DirectShow Softcam\0";
     let subkey: Vec<u16> = key_path.encode_utf16().collect();
-    const HKEY_CURRENT_USER: usize = 0x8000_0001;
+    let root_key = if mikey::video::vcam::install::is_admin() {
+        0x8000_0002usize // HKEY_LOCAL_MACHINE
+    } else {
+        0x8000_0001usize // HKEY_CURRENT_USER
+    };
     let mut h_key = 0usize;
 
     #[link(name = "advapi32")]
@@ -111,8 +137,16 @@ fn test_directshow_device_enumeration() {
         fn RegCloseKey(hKey: usize) -> i32;
     }
 
-    let open_res =
-        unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, subkey.as_ptr(), 0, 0x20019, &mut h_key) };
+    let mut open_res = unsafe { RegOpenKeyExW(root_key, subkey.as_ptr(), 0, 0x20019, &mut h_key) };
+    if open_res != 0 {
+        // Fallback to the other root key if already registered system-wide/per-user
+        let alt_root = if root_key == 0x8000_0002 {
+            0x8000_0001usize
+        } else {
+            0x8000_0002usize
+        };
+        open_res = unsafe { RegOpenKeyExW(alt_root, subkey.as_ptr(), 0, 0x20019, &mut h_key) };
+    }
     assert_eq!(open_res, 0, "Mikey Cam DirectShow key must be openable");
 
     let friendly_name_key: Vec<u16> = "FriendlyName\0".encode_utf16().collect();
