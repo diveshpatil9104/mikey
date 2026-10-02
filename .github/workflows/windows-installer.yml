@@ -43,9 +43,30 @@ jobs:
         shell: pwsh
         run: |
           $zip = "$env:RUNNER_TEMP\mikey-mic-driver.zip"
-          Invoke-WebRequest https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip -OutFile $zip
-          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
-          if ($hash -ne 'B950E39F01AF1D04EA623C8F6D8EB9B6EA5C477C637295FABF20631C85116BFB') { throw "Unexpected driver files: $hash" }
+          $expectedHash = 'B950E39F01AF1D04EA623C8F6D8EB9B6EA5C477C637295FABF20631C85116BFB'
+          $sources = @(
+            'https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip',
+            'https://web.archive.org/web/20240901000000id_/https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip'
+          )
+          $downloaded = $false
+          foreach ($url in $sources) {
+            try {
+              Write-Host "Downloading Mikey Mic driver from $url..."
+              Invoke-WebRequest -Uri $url -OutFile $zip -TimeoutSec 60
+              $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
+              if ($hash -eq $expectedHash) {
+                $downloaded = $true
+                Write-Host "Driver checksum verified: $hash"
+                break
+              }
+              Write-Warning "Checksum mismatch for $url: got $hash, expected $expectedHash"
+            } catch {
+              Write-Warning "Failed to download from $url: $($_.Exception.Message)"
+            }
+          }
+          if (-not $downloaded) {
+            throw "Failed to download verified driver pack from any source."
+          }
           Expand-Archive $zip -DestinationPath pc\installer\driver -Force
 
       - name: Install Inno Setup

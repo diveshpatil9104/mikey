@@ -67,7 +67,7 @@ Mikey feels less like software you operate and more like a physical hardware cab
 
 ### 4.1 First-Time PC Setup
 1. User downloads the single-file installer from GitHub Releases and executes it.
-2. The installer copies the `mikey` binary, registers the DirectShow virtual camera (`softcam.dll`), sets an autostart registry entry, adds a private network firewall rule, and starts the tray icon.
+2. The installer copies the `mikey` binary, registers the DirectShow virtual camera (`softcam.dll`) system-wide, sets an autostart registry entry, configures inbound firewall rules across all network profiles (`profile=any`), and starts the tray icon.
 3. The installer also sets up **Mikey Mic**, the virtual microphone (it runs on the bundled VB-Audio Cable driver), and keeps the user's default speakers and microphone as they were. If Mikey Mic is missing later, the flyout shows a *Mic setup needed* banner whose **Setup Mic** button sets it up again. Mikey detects it automatically without an application restart.
 
 ### 4.2 First-Time Phone Setup

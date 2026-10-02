@@ -116,8 +116,54 @@ if (Test-Driver) {
 } else {
     $setup = Join-Path $DriverDir "VBCABLE_Setup_x64.exe"
     if (-not (Test-Path $setup)) {
-        Say "Mikey Mic's driver files are missing. Reinstall Mikey to set it up." "Yellow"
-        Finish 1
+        $tempDriverDir = Join-Path $env:TEMP "mikey-driver"
+        $tempSetup = Join-Path $tempDriverDir "VBCABLE_Setup_x64.exe"
+        if (Test-Path $tempSetup) {
+            $setup = $tempSetup
+            $DriverDir = $tempDriverDir
+            Say "Using cached driver in $tempDriverDir" "DarkGray"
+        } else {
+            Say "Mikey Mic driver files not found locally. Downloading package..." "Cyan"
+            $zip = Join-Path $env:TEMP "VBCABLE_Driver_Pack45.zip"
+            $expectedHash = 'B950E39F01AF1D04EA623C8F6D8EB9B6EA5C477C637295FABF20631C85116BFB'
+            $sources = @(
+                'https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip',
+                'https://web.archive.org/web/20240901000000id_/https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip'
+            )
+            $downloaded = $false
+            foreach ($url in $sources) {
+                try {
+                    Say "Connecting to ${url}..." "DarkGray"
+                    $prevPref = $ProgressPreference
+                    $ProgressPreference = if ($Silent) { 'SilentlyContinue' } else { 'Continue' }
+                    Invoke-WebRequest -Uri $url -OutFile $zip -TimeoutSec 60 -UseBasicParsing
+                    $ProgressPreference = $prevPref
+                    $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
+                    if ($hash -eq $expectedHash) {
+                        $downloaded = $true
+                        Say "Driver download verified successfully (SHA256 OK)." "Green"
+                        break
+                    } else {
+                        Say "Checksum verification mismatch ($hash), attempting fallback mirror..." "Yellow"
+                    }
+                } catch {
+                    Say "Download failed from ${url}: $($_.Exception.Message)" "Yellow"
+                }
+            }
+            if ($downloaded) {
+                Say "Extracting driver files..." "Cyan"
+                New-Item -ItemType Directory -Path $tempDriverDir -Force | Out-Null
+                Expand-Archive -Path $zip -DestinationPath $tempDriverDir -Force
+                Remove-Item $zip -Force -ErrorAction SilentlyContinue
+                $setup = $tempSetup
+                $DriverDir = $tempDriverDir
+            } else {
+                Restore-Defaults
+                Say "Mikey Mic driver could not be found or downloaded." "Yellow"
+                Say "Please check your network connection or reinstall Mikey." "Yellow"
+                Finish 1
+            }
+        }
     }
     Say "Installing Mikey Mic. This can take a minute..."
     $proc = Start-Process -FilePath $setup -ArgumentList "-i", "-h" -WorkingDirectory $DriverDir -PassThru
@@ -128,7 +174,7 @@ if (Test-Driver) {
     }
     # The setup's exit code isn't documented, so check that the driver's device actually appeared.
     # Present devices only: a leftover entry from an old, removed install doesn't count.
-    $deadline = (Get-Date).AddSeconds(15)
+    $deadline = (Get-Date).AddSeconds(30)
     do {
         $installed = Get-PnpDevice -Class Media -PresentOnly -ErrorAction SilentlyContinue |
             Where-Object { $_.FriendlyName -eq $DriverDevice }
@@ -151,12 +197,28 @@ function Rename-Endpoints([string]$flow, [string]$name) {
         $props = Join-Path $_.PSPath "Properties"
         $values = Get-ItemProperty -Path $props -ErrorAction SilentlyContinue
         if ($values -and ($values.$AdapterName -eq $DriverDevice -or $values.$AdapterName -eq $MikeyAudio)) {
-            Set-ItemProperty -Path $props -Name $EndpointName -Value $name
-            Set-ItemProperty -Path $props -Name $AdapterName -Value $MikeyAudio
-            $found++
+            Set-ItemProperty -Path $props -Name $EndpointName -Value $name -ErrorAction SilentlyContinue
+            Set-ItemProperty -Path $props -Name $AdapterName -Value $MikeyAudio -ErrorAction SilentlyContinue
+            $check = Get-ItemProperty -Path $props -ErrorAction SilentlyContinue
+            if ($check -and $check.$EndpointName -eq $name) {
+                $found++
+            }
         }
     }
     return $found
+}
+
+function Verify-Endpoint([string]$flow, [string]$expectedName) {
+    $root = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\$flow"
+    $matched = $false
+    Get-ChildItem -Path $root -ErrorAction SilentlyContinue | ForEach-Object {
+        $props = Join-Path $_.PSPath "Properties"
+        $values = Get-ItemProperty -Path $props -ErrorAction SilentlyContinue
+        if ($values -and $values.$EndpointName -eq $expectedName -and $values.$AdapterName -eq $MikeyAudio) {
+            $matched = $true
+        }
+    }
+    return $matched
 }
 
 try {
@@ -185,13 +247,25 @@ if ($mics -eq 0) {
 
 # 4. Apply the names, then put the user's defaults back.
 try {
-    Restart-Service -Name "Audiosrv" -Force
+    # AudioEndpointBuilder caches endpoint registry properties. Restarting it forces Windows
+    # to reload friendly endpoint names without requiring a system reboot.
+    Restart-Service -Name "AudioEndpointBuilder" -Force
+    Start-Service -Name "Audiosrv"
     Start-Sleep -Seconds 2
 } catch {
-    Say "The new name shows after Windows restarts." "Yellow"
+    try {
+        Restart-Service -Name "Audiosrv" -Force
+        Start-Sleep -Seconds 2
+    } catch {
+        Say "The new name shows after Windows restarts." "Yellow"
+    }
 }
 Restore-Defaults
 
-Say "Mikey Mic is ready. Pick it as the microphone in Meet, Zoom or Teams." "Green"
+if (Verify-Endpoint "Capture" "Mikey Mic") {
+    Say "Mikey Mic is verified and ready. Pick it as the microphone in Meet, Zoom or Teams." "Green"
+} else {
+    Say "Mikey Mic is ready. Pick it as the microphone in Meet, Zoom or Teams." "Green"
+}
 if ($restartNeeded) { Finish 3010 }
 Finish 0

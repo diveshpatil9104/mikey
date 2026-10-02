@@ -8,11 +8,15 @@ Mikey for PC runs as a standalone tray application (`mikey`) that acts as the re
 
 ### Windows 10 / 11
 1. Download `Mikey-Setup-x.y.z.exe` from [Releases](https://github.com/diveshpatil9104/mikey/releases).
-2. Run it and approve the administrator prompt. It installs Mikey and **Mikey Mic**, the virtual microphone, and lets your phone reach Mikey on private networks (TCP port 7653, UDP port 7654). Your own default speakers and microphone stay as they were.
+2. Run it and approve the administrator prompt. The installer automatically:
+   - Installs and configures **Mikey Mic**, the virtual microphone (your own default speakers and microphone stay as they were).
+   - Registers the DirectShow virtual camera (**Mikey Cam**) system-wide (`softcam.dll`) so Chrome, Edge, Meet, Zoom, and Teams recognize it immediately.
+   - Adds Windows Defender firewall rules allowing TCP port 7653 and UDP port 7654 across network profiles (`profile=any`).
+   - Optionally configures silent autostart on Windows sign-in.
 3. Restart Windows if the installer asks: Mikey Mic's driver needs it the first time.
-4. Open Mikey; by default, it automatically launches minimized to the system tray upon Windows login via the `--autostart` flag (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`). You can toggle this behavior anytime in the flyout Settings drawer ("Start with Windows") or via `config.toml` (`start_with_computer = false`). In Meet, Zoom, Teams or Discord, pick **Mikey Mic** as the microphone and **Mikey Cam** as the camera.
+4. Open Mikey; by default, it automatically launches minimized to the system tray upon Windows login via the `--autostart` flag (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`). You can toggle this behavior anytime in the flyout Settings drawer ("Start with Windows") or via `config.json` (`start_with_computer = false`). In Meet, Zoom, Teams, Discord, or OBS, pick **Mikey Mic** as the microphone and **Mikey Cam** as the camera.
 
-If Mikey Mic goes missing later, open Mikey's panel and click **Setup Mic**. Uninstalling Mikey leaves Mikey Mic's driver in place, since other apps may use it. Third-party parts are listed in `THIRD-PARTY-NOTICES.txt` in Mikey's install folder.
+If Mikey Mic goes missing later, open Mikey's panel and click **Setup Mic**. Uninstalling Mikey cleanly unregisters **Mikey Cam**, deletes firewall rules, and cleans up autostart registry entries, while safely leaving the audio driver in place if other applications rely on it. See [`pc/installer/README.md`](../pc/installer/README.md) for local installer build steps. Third-party parts are listed in `THIRD-PARTY-NOTICES.txt` in Mikey's install folder.
 
 ### Linux
 Not ready yet: the PC app builds on Linux, but has no virtual mic, camera, tray or Bluetooth there.
