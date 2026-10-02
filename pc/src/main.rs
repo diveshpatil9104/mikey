@@ -1,12 +1,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use mikey::audio::pipeline::JitterBuffer;
-use mikey::audio::{sink, test_tone};
-use mikey::config::Config;
-use mikey::protocol::PORT_TCP;
-use mikey::session::SessionManager;
-use mikey::transport::{adb, beacon, bt, tcp};
-use mikey::video::VideoPipeline;
+use owlmic::audio::pipeline::JitterBuffer;
+use owlmic::audio::{sink, test_tone};
+use owlmic::config::Config;
+use owlmic::protocol::PORT_TCP;
+use owlmic::session::SessionManager;
+use owlmic::transport::{adb, beacon, bt, tcp};
+use owlmic::video::VideoPipeline;
 use std::env;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -14,16 +14,16 @@ use std::thread;
 use std::time::Duration;
 
 fn main() {
-    // First thing, so Windows drops the busy pointer it shows while Mikey starts.
+    // First thing, so Windows drops the busy pointer it shows while Owlmic starts.
     #[cfg(windows)]
-    mikey::launch::end_busy_pointer();
+    owlmic::launch::end_busy_pointer();
 
     let args: Vec<String> = env::args().collect();
     let test_mode = args.iter().any(|a| a == "--test-tone");
     #[cfg(windows)]
     let keep_console = args.iter().any(|a| a == "--console" || a == "--test-tone");
 
-    // Hide and detach any console window immediately so Mikey runs silently in the tray
+    // Hide and detach any console window immediately so Owlmic runs silently in the tray
     #[cfg(windows)]
     if !keep_console {
         unsafe {
@@ -45,14 +45,14 @@ fn main() {
         }
     }
 
-    // A second launch opens the running Mikey instead of starting another.
+    // A second launch opens the running Owlmic instead of starting another.
     #[cfg(windows)]
-    if !test_mode && mikey::instance::already_running() {
-        mikey::instance::open_running();
+    if !test_mode && owlmic::instance::already_running() {
+        owlmic::instance::open_running();
         return;
     }
 
-    println!("=== Mikey PC (Multi-Transport Engine) ===");
+    println!("=== Owlmic PC (Multi-Transport Engine) ===");
 
     let running = Arc::new(AtomicBool::new(true));
     let jitter_buffer = Arc::new(JitterBuffer::new());
@@ -60,19 +60,20 @@ fn main() {
     let _video_handle = video_pipeline.start_pipeline_thread(Arc::clone(&running));
 
     // 1. Initialize configuration and session manager
+    Config::move_old_config_dir();
     let config_path = Config::default_config_path();
     let session_manager = SessionManager::new(config_path);
     let cfg = session_manager.config();
     println!("[pc] ID: {}, Name: {}", cfg.pc_id, cfg.pc_name);
 
-    if let Err(e) = mikey::autostart::sync_autostart(&cfg) {
-        eprintln!("[mikey] autostart sync failed: {e}");
+    if let Err(e) = owlmic::autostart::sync_autostart(&cfg) {
+        eprintln!("[owlmic] autostart sync failed: {e}");
     }
 
     // Inspect firewall rules for Wi-Fi / Tethering (TCP :7653, UDP :7654)
     #[cfg(windows)]
     if cfg.levels.wifi || cfg.levels.usb_tethering {
-        let (tcp_ok, udp_ok) = mikey::firewall::check_rules();
+        let (tcp_ok, udp_ok) = owlmic::firewall::check_rules();
         if !tcp_ok || !udp_ok {
             eprintln!(
                 "[firewall] Inbound traffic blocked (TCP: {tcp_ok}, UDP: {udp_ok}). Showing banner."
@@ -89,10 +90,10 @@ fn main() {
         return;
     }
 
-    // 2. The tray comes up first, so Mikey shows at once. Started by hand, not at login, it
+    // 2. The tray comes up first, so Owlmic shows at once. Started by hand, not at login, it
     // opens its flyout too.
     #[cfg(windows)]
-    let _tray_handle = mikey::tray::start_tray_thread(
+    let _tray_handle = owlmic::tray::start_tray_thread(
         session_manager.clone(),
         Arc::clone(&video_pipeline),
         Arc::clone(&jitter_buffer),
@@ -116,7 +117,7 @@ fn main() {
             #[cfg(windows)]
             if !sink::update_virtual_device_status() {
                 println!(
-                    "[mikey] Note: Virtual microphone not yet configured as 'Owlmic'. Setup available via flyout companion."
+                    "[owlmic] Note: Virtual microphone not yet configured as 'Owlmic'. Setup available via flyout companion."
                 );
             }
             while running.load(Ordering::Relaxed) {
@@ -152,7 +153,7 @@ fn main() {
     }
 
     // 6. Bind and run TCP listener on 0.0.0.0:PORT_TCP (Level 1, Level 2, Level 3). A busy port
-    // (often an older Mikey still running) is retried rather than quitting with no word.
+    // (often an older Owlmic still running) is retried rather than quitting with no word.
     let listener = loop {
         match tcp::bind_listener() {
             Ok(l) => break l,
@@ -177,7 +178,7 @@ fn main() {
 
     println!("[tcp] Listening on 0.0.0.0:{}", PORT_TCP);
 
-    println!("[ready] Waiting for Mikey Android client to connect...");
+    println!("[ready] Waiting for Owlmic Android client to connect...");
     println!("[hint] Run with --test-tone to verify audio without a phone.");
 
     // Keep main thread alive

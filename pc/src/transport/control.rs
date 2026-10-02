@@ -91,7 +91,7 @@ mod tests {
     #[test]
     fn the_phone_settings_drive_the_processing() {
         let jb = JitterBuffer::new();
-        let sm = SessionManager::new(std::env::temp_dir().join("mikey-control-test.toml"));
+        let sm = SessionManager::new(std::env::temp_dir().join("owlmic-control-test.toml"));
         let full =
             br#"{"audio":{"ns":false,"ns_strength":0.8,"aec":false,"gate_db":-40.0,"muted":true}}"#;
         apply_phone_control(full, &jb, None, &sm);

@@ -1,4 +1,4 @@
-//! Mikey Flyout companion window module.
+//! Owlmic Flyout companion window module.
 //!
 //! Provides a compact, borderless Win32 companion window anchored to the system tray,
 //! matching the reference visual design system with double-buffered GDI rendering.

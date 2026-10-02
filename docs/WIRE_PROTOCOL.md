@@ -89,7 +89,7 @@ For `AUDIO` and `VIDEO` frames, the first **14 bytes** of the payload consist of
 {
   "proto": 2,
   "pc_id": "a1b2c3d4e5f60718",
-  "pc_name": "DESKTOP-MIKEY",
+  "pc_name": "DESKTOP-OWLMIC",
   "token": "4a7f9b2c...32_hex_chars...1e0d",
   "session_token": "99e8d7c6b5a43210",
   "resumed": false,

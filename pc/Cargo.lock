@@ -1038,21 +1038,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mikey"
-version = "0.1.0"
-dependencies = [
- "cpal",
- "minifb",
- "nnnoiseless",
- "opus-decoder",
- "serde",
- "serde_json",
- "toml",
- "tray-icon",
- "zune-jpeg",
-]
-
-[[package]]
 name = "minifb"
 version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1455,6 +1440,21 @@ dependencies = [
  "libc",
  "libredox",
  "sdl2",
+]
+
+[[package]]
+name = "owlmic"
+version = "0.1.0"
+dependencies = [
+ "cpal",
+ "minifb",
+ "nnnoiseless",
+ "opus-decoder",
+ "serde",
+ "serde_json",
+ "toml",
+ "tray-icon",
+ "zune-jpeg",
 ]
 
 [[package]]

@@ -1,13 +1,16 @@
 //! Windows Firewall rule inspection and automated elevation.
 //!
-//! Mikey listens on 0.0.0.0:7653 (TCP) and 0.0.0.0:7654 (UDP). Windows Firewall
+//! Owlmic listens on 0.0.0.0:7653 (TCP) and 0.0.0.0:7654 (UDP). Windows Firewall
 //! drops inbound packets by default for apps without rules. This module checks for
 //! existing rules and invokes an elevated UAC helper via ShellExecuteExW if missing.
 
 use std::io;
 
-pub const TCP_RULE_NAME: &str = "Mikey TCP";
-pub const UDP_RULE_NAME: &str = "Mikey UDP Beacon";
+pub const TCP_RULE_NAME: &str = "Owlmic TCP";
+pub const UDP_RULE_NAME: &str = "Owlmic UDP Beacon";
+/// Rules from before the rename to Owlmic, removed when the new ones are added.
+#[cfg(windows)]
+const OLD_RULE_NAMES: [&str; 3] = ["Mikey", "Mikey TCP", "Mikey UDP Beacon"];
 pub const TCP_PORT: u16 = 7653;
 pub const UDP_PORT: u16 = 7654;
 
@@ -142,7 +145,9 @@ pub fn ensure_rules_elevated() -> io::Result<()> {
         "netsh advfirewall firewall delete rule name=all program=\"{}\"",
         exe_str
     );
-    let del_old = "netsh advfirewall firewall delete rule name=\"mikey\"";
+    let del_old = OLD_RULE_NAMES
+        .map(|name| format!("netsh advfirewall firewall delete rule name=\"{}\"", name))
+        .join(" & ");
     let del_tcp = format!(
         "netsh advfirewall firewall delete rule name=\"{}\"",
         TCP_RULE_NAME
@@ -151,7 +156,7 @@ pub fn ensure_rules_elevated() -> io::Result<()> {
         "netsh advfirewall firewall delete rule name=\"{}\"",
         UDP_RULE_NAME
     );
-    let add_prog = format!("netsh advfirewall firewall add rule name=\"Mikey\" dir=in action=allow program=\"{}\" enable=yes profile=any", exe_str);
+    let add_prog = format!("netsh advfirewall firewall add rule name=\"Owlmic\" dir=in action=allow program=\"{}\" enable=yes profile=any", exe_str);
 
     let full_args = format!(
         "/c \"{} & {} & {} & {} & {} & {} & {}\"",
@@ -204,7 +209,7 @@ mod tests {
     #[test]
     fn test_parse_netsh_output_present() {
         let stdout = "
-Rule Name:                            Mikey TCP
+Rule Name:                            Owlmic TCP
 ----------------------------------------------------------------------
 Enabled:                              Yes
 Direction:                            In
@@ -219,14 +224,14 @@ Edge traversal:                       No
 Action:                               Allow
 Ok.
 ";
-        assert!(parse_netsh_output(stdout, "Mikey TCP"));
-        assert!(!parse_netsh_output(stdout, "Mikey UDP Beacon"));
+        assert!(parse_netsh_output(stdout, "Owlmic TCP"));
+        assert!(!parse_netsh_output(stdout, "Owlmic UDP Beacon"));
     }
 
     #[test]
     fn test_parse_netsh_output_private_only_rejected() {
         let stdout = "
-Rule Name:                            Mikey TCP
+Rule Name:                            Owlmic TCP
 ----------------------------------------------------------------------
 Enabled:                              Yes
 Direction:                            In
@@ -234,28 +239,28 @@ Profiles:                             Private
 Action:                               Allow
 Ok.
 ";
-        assert!(!parse_netsh_output(stdout, "Mikey TCP"));
+        assert!(!parse_netsh_output(stdout, "Owlmic TCP"));
     }
 
     #[test]
     fn test_parse_netsh_output_missing() {
         let stdout = "\nNo rules match the specified criteria.\n";
-        assert!(!parse_netsh_output(stdout, "Mikey TCP"));
-        assert!(!parse_netsh_output(stdout, "Mikey UDP Beacon"));
-        assert!(!parse_netsh_output("", "Mikey TCP"));
+        assert!(!parse_netsh_output(stdout, "Owlmic TCP"));
+        assert!(!parse_netsh_output(stdout, "Owlmic UDP Beacon"));
+        assert!(!parse_netsh_output("", "Owlmic TCP"));
     }
 
     #[test]
     fn test_command_arguments_format() {
         let tcp_cmd = format_add_rule_cmd(TCP_RULE_NAME, "TCP", TCP_PORT);
-        assert!(tcp_cmd.contains("name=\"Mikey TCP\""));
+        assert!(tcp_cmd.contains("name=\"Owlmic TCP\""));
         assert!(tcp_cmd.contains("protocol=TCP"));
         assert!(tcp_cmd.contains("localport=7653"));
         assert!(tcp_cmd.contains("dir=in action=allow"));
         assert!(tcp_cmd.contains("profile=any"));
 
         let udp_cmd = format_add_rule_cmd(UDP_RULE_NAME, "UDP", UDP_PORT);
-        assert!(udp_cmd.contains("name=\"Mikey UDP Beacon\""));
+        assert!(udp_cmd.contains("name=\"Owlmic UDP Beacon\""));
         assert!(udp_cmd.contains("protocol=UDP"));
         assert!(udp_cmd.contains("localport=7654"));
         assert!(udp_cmd.contains("profile=any"));

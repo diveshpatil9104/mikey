@@ -1,4 +1,4 @@
-//! Design language palette constants for the Mikey Flyout.
+//! Design language palette constants for the Owlmic Flyout.
 
 #![cfg(windows)]
 

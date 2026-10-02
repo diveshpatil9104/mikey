@@ -1,4 +1,4 @@
-//! One Mikey per user session. Launching it again opens the running one's flyout, instead of
+//! One Owlmic per user session. Launching it again opens the running one's flyout, instead of
 //! a second copy that can't bind the ports and quits without a word.
 
 #![cfg(windows)]
@@ -22,17 +22,17 @@ extern "system" {
 
 const ERROR_ALREADY_EXISTS: u32 = 183;
 
-/// True when Mikey already runs in this session. The mutex handle is never closed, so it marks
+/// True when Owlmic already runs in this session. The mutex handle is never closed, so it marks
 /// this process until it exits.
 pub fn already_running() -> bool {
-    let name = to_wide("Local\\MikeyPcTray");
+    let name = to_wide("Local\\OwlmicPcTray");
     unsafe {
         CreateMutexW(std::ptr::null(), 0, name.as_ptr()) != 0
             && GetLastError() == ERROR_ALREADY_EXISTS
     }
 }
 
-/// Asks the running Mikey to open its flyout. Windows only lets the process the user just
+/// Asks the running Owlmic to open its flyout. Windows only lets the process the user just
 /// started take focus, so this one passes that right on first.
 pub fn open_running() {
     let class_name = to_wide(FLYOUT_CLASS);

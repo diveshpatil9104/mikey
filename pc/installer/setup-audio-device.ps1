@@ -14,7 +14,7 @@ $ErrorActionPreference = "Stop"
 if (-not $DriverDir) { $DriverDir = Join-Path $PSScriptRoot "driver" }
 
 function Say([string]$text, [string]$color = "Cyan") {
-    if (-not $Silent) { Write-Host "[mikey] $text" -ForegroundColor $color }
+    if (-not $Silent) { Write-Host "[owlmic] $text" -ForegroundColor $color }
 }
 
 function Finish([int]$code) {

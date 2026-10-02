@@ -25,7 +25,7 @@ class BluetoothTransport private constructor(private val device: BluetoothDevice
     /** Connects, giving up after [CONNECT_TIMEOUT_MS]: a BluetoothSocket has no timeout of its own. */
     @SuppressLint("MissingPermission") // Only made by [candidates], which checks the permission first.
     override fun open(): Connection {
-        val socket = device.createRfcommSocketToServiceRecord(MIKEY_UUID)
+        val socket = device.createRfcommSocketToServiceRecord(OWLMIC_UUID)
         val done = CountDownLatch(1)
         thread(name = "owlmic-bt-connect", isDaemon = true) {
             if (!done.await(CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)) socket.close()
@@ -44,7 +44,7 @@ class BluetoothTransport private constructor(private val device: BluetoothDevice
 
     companion object {
         /** The service the PC publishes (pc/src/transport/bt/mod.rs). */
-        val MIKEY_UUID: UUID = UUID.fromString("6d696b65-7900-4000-8000-00805f9b34fb")
+        val OWLMIC_UUID: UUID = UUID.fromString("6f776c6d-6963-4000-8000-00805f9b34fb")
 
         private const val CONNECT_TIMEOUT_MS = 4_000L
 

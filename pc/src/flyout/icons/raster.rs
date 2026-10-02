@@ -1,4 +1,4 @@
-//! High-definition anti-aliased icon rasterizer for Mikey based on Lucide SVG geometry.
+//! High-definition anti-aliased icon rasterizer for Owlmic based on Lucide SVG geometry.
 //! Produces crystal-clear 32x32 RGBA buffers with dark contour for any taskbar theme.
 
 use std::f32::consts::{PI, TAU};
@@ -50,8 +50,8 @@ fn dist_capsule(px: f32, py: f32, cx: f32, top_y: f32, bot_y: f32, r: f32) -> f3
     dist_segment(px, py, cx, top_y + r, cx, bot_y - r) - r
 }
 
-/// Generates 32x32 RGBA pixels for Mikey's microphone tray icon.
-pub fn generate_mikey_tray_rgba(mode: TrayIconMode) -> Vec<u8> {
+/// Generates 32x32 RGBA pixels for Owlmic's microphone tray icon.
+pub fn generate_owlmic_tray_rgba(mode: TrayIconMode) -> Vec<u8> {
     const SIZE: usize = 32;
     let mut rgba = vec![0u8; SIZE * SIZE * 4];
 
@@ -159,7 +159,7 @@ pub fn generate_mikey_tray_rgba(mode: TrayIconMode) -> Vec<u8> {
 }
 
 #[cfg(windows)]
-pub fn create_mikey_tray_icon(mode: TrayIconMode) -> tray_icon::Icon {
-    let rgba = generate_mikey_tray_rgba(mode);
+pub fn create_owlmic_tray_icon(mode: TrayIconMode) -> tray_icon::Icon {
+    let rgba = generate_owlmic_tray_rgba(mode);
     tray_icon::Icon::from_rgba(rgba, 32, 32).expect("create Owlmic tray icon")
 }

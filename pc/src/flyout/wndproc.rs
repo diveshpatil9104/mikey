@@ -1,4 +1,4 @@
-//! Win32 window message procedure and dispatch for Mikey Flyout.
+//! Win32 window message procedure and dispatch for Owlmic Flyout.
 
 #![cfg(windows)]
 

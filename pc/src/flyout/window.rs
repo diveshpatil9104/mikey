@@ -1,4 +1,4 @@
-//! Win32 window management, layout, and life cycle for Mikey Flyout.
+//! Win32 window management, layout, and life cycle for Owlmic Flyout.
 
 #![cfg(windows)]
 
@@ -109,7 +109,7 @@ impl FlyoutWindow {
         self.is_muted = self.session_manager.is_phone_muted();
     }
 
-    /// True once after another launch of Mikey asked this one to open.
+    /// True once after another launch of Owlmic asked this one to open.
     pub fn take_show_request(&mut self) -> bool {
         std::mem::take(&mut self.show_requested)
     }

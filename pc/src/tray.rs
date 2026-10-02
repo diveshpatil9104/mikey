@@ -8,7 +8,7 @@ use std::thread;
 use std::time::Duration;
 use tray_icon::{Icon, TrayIcon, TrayIconBuilder, TrayIconEvent};
 
-use crate::flyout::icons::{create_mikey_tray_icon, TrayIconMode};
+use crate::flyout::icons::{create_owlmic_tray_icon, TrayIconMode};
 
 pub struct TrayApp {
     tray: TrayIcon,
@@ -20,14 +20,14 @@ pub struct TrayApp {
 }
 
 impl TrayApp {
-    /// None only if Mikey quits first. At login the taskbar can come up after Mikey, and adding
+    /// None only if Owlmic quits first. At login the taskbar can come up after Owlmic, and adding
     /// the icon fails until it does, so keep trying instead of giving up.
     pub fn new(session_manager: SessionManager, running: &AtomicBool) -> Option<Self> {
-        let icon_grey = create_mikey_tray_icon(TrayIconMode::Idle);
-        let icon_green = create_mikey_tray_icon(TrayIconMode::Active);
-        let icon_amber = create_mikey_tray_icon(TrayIconMode::Pending);
+        let icon_grey = create_owlmic_tray_icon(TrayIconMode::Idle);
+        let icon_green = create_owlmic_tray_icon(TrayIconMode::Active);
+        let icon_amber = create_owlmic_tray_icon(TrayIconMode::Pending);
 
-        // No OS popup context menu: clicking tray icon directly toggles custom Mikey Flyout
+        // No OS popup context menu: clicking tray icon directly toggles custom Owlmic Flyout
         let tray = loop {
             match TrayIconBuilder::new()
                 .with_tooltip("Owlmic - Phone Mic & Webcam")

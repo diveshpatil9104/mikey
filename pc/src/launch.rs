@@ -68,7 +68,7 @@ extern "system" {
     fn CloseHandle(handle: usize) -> i32;
 }
 
-/// Ends Mikey's own busy pointer at once, instead of after startup. An empty PeekMessage is
+/// Ends Owlmic's own busy pointer at once, instead of after startup. An empty PeekMessage is
 /// where Windows counts a program as waiting for input, and the docs name the first GetMessage,
 /// so this does both; a message is posted first so GetMessage never blocks.
 #[cfg(windows)]
@@ -153,8 +153,8 @@ mod tests {
     #[test]
     fn test_command_line_quoting() {
         assert_eq!(
-            command_line("explorer.exe", &[r"C:\Users\A B\AppData\Mikey\logs"]),
-            r#""explorer.exe" "C:\Users\A B\AppData\Mikey\logs""#
+            command_line("explorer.exe", &[r"C:\Users\A B\AppData\Owlmic\logs"]),
+            r#""explorer.exe" "C:\Users\A B\AppData\Owlmic\logs""#
         );
         // A trailing backslash would otherwise escape the closing quote
         assert_eq!(command_line("x", &[r"C:\dir\"]), r#""x" "C:\dir\\""#);

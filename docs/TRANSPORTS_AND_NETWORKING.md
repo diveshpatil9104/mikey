@@ -11,7 +11,7 @@ Owlmic automatically negotiates the optimal physical transport between the Andro
 | **1** | **USB Debugging** | ADB Reverse Tunnel | `127.0.0.1:7653` | Lossless PCM (48 kHz 16-bit) | MJPEG ≤1080p @ 30 fps | **≤ 20 ms** |
 | **2** | **USB Tethering** | USB NIC (`rndis0`/`ncm0`) | Gateway IP `:7653` | Lossless PCM (48 kHz 16-bit) | MJPEG ≤1080p @ 30 fps | **≤ 25 ms** |
 | **3** | **Wi-Fi / LAN** | 802.11 Wireless / LAN | Subnet IP `:7653` | Opus (96 kbps CBR) | MJPEG ≤720p @ 30 fps | **≤ 40 ms** |
-| **4** | **Bluetooth** | RFCOMM Serial Profile | SPP UUID `:1` | Opus (48 kbps CBR) | *None (Audio Only)* | **≤ 80 ms** |
+| **4** | **Bluetooth** | RFCOMM | Owlmic service UUID | Opus (48 kbps CBR) | *None (Audio Only)* | **≤ 80 ms** |
 
 ---
 
@@ -38,25 +38,26 @@ Owlmic automatically negotiates the optimal physical transport between the Andro
 - **Mechanism**: Standard TCP streaming over local WLAN.
 - **UDP Discovery Beacon (`PORT_UDP_BEACON = 7654`)**:
   - The PC listens on `0.0.0.0:7654` (`pc/src/transport/beacon.rs`).
-  - Android broadcasts a discovery packet containing:
-    ```json
-    { "mikey_probe": true, "version": 2, "device_id": "...", "device_name": "..." }
+  - Android broadcasts a binary probe (`Discovery.kt`):
+    ```text
+    "OWLMIC?1" (8 bytes) | device_id (16) | name_len (1) | device_name (UTF-8)
     ```
   - The PC responds directly to the sender's unicast address with:
-    ```json
-    { "mikey_pc": true, "version": 2, "pc_id": "...", "pc_name": "...", "port": 7653 }
+    ```text
+    "OWLMIC!1" (8 bytes) | pc_id (16) | tcp_port (u16 BE) | proto_ver (1) | name_len (1) | pc_name (UTF-8)
     ```
+  - Packets that don't start with these magics are ignored. Builds from before the rename to Owlmic used `MIKEY?1` and `MIKEY!1`, so they don't find Owlmic builds this way; USB debugging and a manual address still connect them.
 - **Manual Address Fallback**: In restricted corporate or university networks where UDP broadcast packets are filtered by managed switches, Owlmic provides `manualPcAddress` in Android settings to bypass discovery.
 - **Wi-Fi Latency Lock (`WifiLatencyLock.kt`)**: Acquires an Android `WifiManager.WifiLock` with `WIFI_MODE_FULL_LOW_LATENCY` to instruct the wireless chipset to stay in high-power, low-latency mode.
-- **Windows Firewall Detection & One-Click Elevation (`pc/src/firewall.rs`)**: On startup, when Wi-Fi or USB tethering is enabled, Owlmic queries Windows Firewall for `Mikey TCP` (port 7653) and `Mikey UDP Beacon` (port 7654). If either rule is missing, a non-intrusive alert banner ("Wi-Fi Blocked — Allow Access") appears in the flyout. Clicking "Allow Access" triggers a single elevated UAC execution adding both rules without requiring manual terminal commands.
+- **Windows Firewall Detection & One-Click Elevation (`pc/src/firewall.rs`)**: On startup, when Wi-Fi or USB tethering is enabled, Owlmic queries Windows Firewall for `Owlmic TCP` (port 7653) and `Owlmic UDP Beacon` (port 7654). If either rule is missing, a non-intrusive alert banner ("Wi-Fi Blocked — Allow Access") appears in the flyout. Clicking "Allow Access" triggers a single elevated UAC execution adding both rules, and removing the ones from before the rename to Owlmic, without requiring manual terminal commands.
 
 ### 2.4 Level 4: Bluetooth RFCOMM
-- **Mechanism**: Uses standard Bluetooth Serial Port Profile (SPP).
-- **UUID**:
+- **Mechanism**: An RFCOMM stream, as in the Serial Port Profile, under Owlmic's own service UUID instead of the standard SPP one.
+- **UUID** (`OWLMIC_UUID` in `BluetoothTransport.kt`, `OWLMIC_BT_SERVICE_UUID` in `pc/src/transport/bt/mod.rs`; its first six bytes spell "owlmic"):
   ```text
-  00001101-0000-1000-8000-00805F9B34FB
+  6f776c6d-6963-4000-8000-00805f9b34fb
   ```
-- **Android**: `BluetoothAdapter.getBondedDevices()` identifies paired PCs. `device.createRfcommSocketToServiceRecord(SPP_UUID)` connects directly to the PC's Bluetooth radio.
+- **Android**: `BluetoothAdapter.getBondedDevices()` identifies paired PCs. `device.createRfcommSocketToServiceRecord(OWLMIC_UUID)` connects directly to the PC's Bluetooth radio.
 - **PC Implementation**:
   - **Windows**: Standard WinSock using `AF_BTH` address family and `BTHPROTO_RFCOMM`.
   - **Linux**: BlueZ profile registration using the `bluer` crate (the only Tokio-dependent module in the entire PC project).
@@ -72,7 +73,7 @@ When Owlmic is streaming on a lower-priority connection (e.g. Wi-Fi) and a highe
 sequenceDiagram
     autonumber
     participant App as SessionController (Android)
-    participant Upgrader as mikey-upgrade Thread
+    participant Upgrader as owlmic-upgrade Thread
     participant TM as TransportManager
     participant OldWire as Old Socket (Level 3 Wi-Fi)
     participant NewWire as New Socket (Level 1 USB)

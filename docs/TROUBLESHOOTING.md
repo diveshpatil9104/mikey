@@ -50,7 +50,7 @@ Common issues and solutions for Owlmic. If your problem isn't listed here, [open
 
 **Solutions:**
 1. **Check virtual mic setup:**
-   - **Windows:** In your meeting app, select **Owlmic** as the microphone (**CABLE Output** if you use `mikey.exe` without the installer). If Owlmic is missing, open Owlmic's panel and click **Setup Mic**, or run the installer again.
+   - **Windows:** In your meeting app, select **Owlmic** as the microphone (**CABLE Output** if you use `owlmic.exe` without the installer). If Owlmic is missing, open Owlmic's panel and click **Setup Mic**, or run the installer again.
    - **Linux:** There's no virtual mic on Linux yet.
 2. **Check Owlmic is receiving:** Look at the VU meter in the PC tray flyout. If it's showing activity, the audio is reaching the PC - the issue is in your meeting app's mic selection.
 3. **Check mic permission on Android:** Settings → Apps → Owlmic → Permissions → Microphone must be "Allowed".

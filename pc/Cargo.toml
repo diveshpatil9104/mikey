@@ -1,5 +1,5 @@
 [package]
-name = "mikey"
+name = "owlmic"
 version = "0.1.0"
 edition = "2021"
 description = "Turn your phone into a microphone and webcam for your PC over USB, Wi-Fi, or Bluetooth"

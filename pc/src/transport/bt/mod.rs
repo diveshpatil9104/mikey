@@ -10,7 +10,7 @@ use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 use std::thread;
 
-pub const MIKEY_BT_SERVICE_UUID: &str = "6d696b65-7900-4000-8000-00805f9b34fb";
+pub const OWLMIC_BT_SERVICE_UUID: &str = "6f776c6d-6963-4000-8000-00805f9b34fb";
 
 #[cfg(windows)]
 pub fn start_bt_listener(
@@ -43,7 +43,7 @@ mod tests {
 
     #[test]
     fn test_bt_service_uuid_format() {
-        assert_eq!(MIKEY_BT_SERVICE_UUID.len(), 36);
-        assert!(MIKEY_BT_SERVICE_UUID.starts_with("6d696b65"));
+        assert_eq!(OWLMIC_BT_SERVICE_UUID.len(), 36);
+        assert!(OWLMIC_BT_SERVICE_UUID.starts_with("6f776c6d"));
     }
 }
