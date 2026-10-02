@@ -12,7 +12,7 @@
 #endif
 #define MyAppName "Owlmic"
 #define MyAppPublisher "Owlmic Contributors"
-#define MyAppURL "https://github.com/diveshpatil9104/mikey"
+#define MyAppURL "https://github.com/diveshpatil9104/owlmic"
 #define MyAppExeName "owlmic.exe"
 
 [Setup]

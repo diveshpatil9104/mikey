@@ -7,7 +7,7 @@ Owlmic for PC runs as a standalone tray application (`owlmic`) that acts as the 
 ## 1. Quick Start
 
 ### Windows 10 / 11
-1. Download `Owlmic-Setup-x.y.z.exe` from [Releases](https://github.com/diveshpatil9104/mikey/releases).
+1. Download `Owlmic-Setup-x.y.z.exe` from [Releases](https://github.com/diveshpatil9104/owlmic/releases).
 2. Run it and approve the administrator prompt. The installer automatically:
    - Installs and configures **Owlmic**, the virtual microphone (your own default speakers and microphone stay as they were).
    - Registers the DirectShow virtual camera (**Owlmic Cam**) system-wide (`softcam.dll`) so Chrome, Edge, Meet, Zoom, and Teams recognize it immediately.
@@ -33,8 +33,8 @@ Not ready yet: the PC app builds on Linux, but has no virtual mic, camera, tray 
 ### Build & Run
 ```bash
 # Clone the repository
-git clone https://github.com/diveshpatil9104/mikey.git
-cd mikey/pc
+git clone https://github.com/diveshpatil9104/owlmic.git
+cd owlmic/pc
 
 # Build release binary
 cargo build --release

@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Question or discussion
-    url: https://github.com/diveshpatil9104/mikey/discussions
+    url: https://github.com/diveshpatil9104/owlmic/discussions
     about: Ask questions, share ideas, or get help from the community.
   - name: Security vulnerability
-    url: https://github.com/diveshpatil9104/mikey/security/policy
+    url: https://github.com/diveshpatil9104/owlmic/security/policy
     about: Report a security vulnerability privately. Do not open a public issue.

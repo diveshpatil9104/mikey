@@ -3,11 +3,11 @@
   <img src="docs/images/banner.png" alt="Owlmic: your Android phone as a webcam and mic for your PC, over USB, Wi-Fi or Bluetooth" width="100%">
 </p>
 <p align="center">
-  <a href="https://github.com/diveshpatil9104/mikey/releases"><img src="https://img.shields.io/github/v/release/diveshpatil9104/mikey?include_prereleases&style=for-the-badge&color=D71921&label=Download" alt="Download"></a>
-  <a href="https://github.com/diveshpatil9104/mikey/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/diveshpatil9104/mikey/ci.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
+  <a href="https://github.com/diveshpatil9104/owlmic/releases"><img src="https://img.shields.io/github/v/release/diveshpatil9104/owlmic?include_prereleases&style=for-the-badge&color=D71921&label=Download" alt="Download"></a>
+  <a href="https://github.com/diveshpatil9104/owlmic/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/diveshpatil9104/owlmic/ci.yml?branch=main&style=for-the-badge&label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License: MIT"></a>
-  <a href="https://github.com/diveshpatil9104/mikey/discussions"><img src="https://img.shields.io/badge/Discussions-Join-blue?style=for-the-badge&logo=github" alt="Discussions"></a>
-  <a href="https://github.com/diveshpatil9104/mikey/stargazers"><img src="https://img.shields.io/github/stars/diveshpatil9104/mikey?style=for-the-badge&color=FFD60A&logo=github" alt="Stars"></a>
+  <a href="https://github.com/diveshpatil9104/owlmic/discussions"><img src="https://img.shields.io/badge/Discussions-Join-blue?style=for-the-badge&logo=github" alt="Discussions"></a>
+  <a href="https://github.com/diveshpatil9104/owlmic/stargazers"><img src="https://img.shields.io/github/stars/diveshpatil9104/owlmic?style=for-the-badge&color=FFD60A&logo=github" alt="Stars"></a>
 </p>
 
 
@@ -18,7 +18,7 @@
 The camera and microphone in your phone are far better than the ones built into most laptops. Owlmic turns them into a webcam and mic that every app on your PC can use: Google Meet, Zoom, Teams, Discord and OBS. No accounts, no cloud, no setup ritual.
 
 > [!NOTE]
-> **v0.1.0 is an early preview** for Windows 10 / 11 and Android 8.0+. If something doesn't work, please [open an issue](https://github.com/diveshpatil9104/mikey/issues).
+> **v0.1.0 is an early preview** for Windows 10 / 11 and Android 8.0+. If something doesn't work, please [open an issue](https://github.com/diveshpatil9104/owlmic/issues).
 
 ---
 
@@ -42,7 +42,7 @@ The camera and microphone in your phone are far better than the ones built into 
 
 ### 1. Download Owlmic
 
-From the [latest release](https://github.com/diveshpatil9104/mikey/releases):
+From the [latest release](https://github.com/diveshpatil9104/owlmic/releases):
 
 | File | Where it goes |
 |---|---|
@@ -70,8 +70,8 @@ Something not working? See [Troubleshooting](docs/TROUBLESHOOTING.md).
 You need [Rust](https://rustup.rs) and [Android Studio](https://developer.android.com/studio) (Quail 4 or newer).
 
 ```powershell
-git clone --recursive https://github.com/diveshpatil9104/mikey.git
-cd mikey/pc
+git clone --recursive https://github.com/diveshpatil9104/owlmic.git
+cd owlmic/pc
 cargo run --release
 ```
 
@@ -143,7 +143,7 @@ Details and the device test matrix are in the [Roadmap & Test Matrix](docs/ROADM
 
 ## Contributing
 
-Contributions are welcome, from typo fixes to new features. Read [CONTRIBUTING.md](.github/CONTRIBUTING.md) first, and look for issues labeled [`good first issue`](https://github.com/diveshpatil9104/mikey/labels/good%20first%20issue).
+Contributions are welcome, from typo fixes to new features. Read [CONTRIBUTING.md](.github/CONTRIBUTING.md) first, and look for issues labeled [`good first issue`](https://github.com/diveshpatil9104/owlmic/labels/good%20first%20issue).
 
 1. Fork the repo and create a branch, like `feat/your-idea`.
 2. Read the [`docs/`](docs/README.md) for the part you're changing.
@@ -174,7 +174,7 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 
 </details>
 
-Questions and ideas go in [Discussions](https://github.com/diveshpatil9104/mikey/discussions). Please report security problems privately, as described in the [security policy](.github/SECURITY.md).
+Questions and ideas go in [Discussions](https://github.com/diveshpatil9104/owlmic/discussions). Please report security problems privately, as described in the [security policy](.github/SECURITY.md).
 
 ---
 

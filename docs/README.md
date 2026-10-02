@@ -67,7 +67,7 @@ The project is built on strict **lean engineering principles**: zero accounts, z
 ## 3. Repository Structure Overview
 
 ```text
-mikey/
+owlmic/
 ├── android/                  # Android Client (Kotlin, Jetpack Compose, CameraX, AAudio, NDK)
 │   ├── app/
 │   │   ├── src/main/
