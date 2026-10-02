@@ -7,8 +7,11 @@ use std::thread;
 pub const SAMPLE_RATE: u32 = 48_000;
 
 const VIRTUAL_DEVICE_PATTERNS: &[&str] = &[
+    "Owlmic Bridge",
+    // Names from before the rename to Owlmic, until Setup Mic renames the devices.
     "Mikey Mic Bridge",
     "Mikey Audio Bridge",
+    "Owlmic",
     "Mikey",
     "CABLE In 16 Ch",
     "CABLE Input",
@@ -92,7 +95,8 @@ pub fn check_virtual_device_status() -> (bool, &'static str) {
     let has_input = if let Ok(devices) = host.input_devices() {
         devices.filter_map(|d| d.name().ok()).any(|name| {
             !name.contains("AudioRelay")
-                && (name.contains("Mikey")
+                && (name.contains("Owlmic")
+                    || name.contains("Mikey")
                     || name.contains("CABLE Output")
                     || name.contains("VB-Audio")
                     || name.contains("CABLE"))

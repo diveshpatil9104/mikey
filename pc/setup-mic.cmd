@@ -10,9 +10,9 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-title Mikey Mic Setup
+title Owlmic Microphone Setup
 echo ==============================================
-echo   Setting up Mikey Mic Audio Device...
+echo   Setting up the Owlmic microphone...
 echo ==============================================
 powershell.exe -ExecutionPolicy Bypass -NoProfile -File "%~dp0installer\setup-audio-device.ps1"
 echo.

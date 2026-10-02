@@ -116,7 +116,7 @@ fn main() {
             #[cfg(windows)]
             if !sink::update_virtual_device_status() {
                 println!(
-                    "[mikey] Note: Virtual microphone not yet configured as 'Mikey Mic'. Setup available via flyout companion."
+                    "[mikey] Note: Virtual microphone not yet configured as 'Owlmic'. Setup available via flyout companion."
                 );
             }
             while running.load(Ordering::Relaxed) {

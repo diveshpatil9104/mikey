@@ -1,6 +1,6 @@
 # UI Design Language & Styling Specification
 
-Mikey’s visual design is governed by **pure functional minimalism**. Both the Android client and the PC companion flyout share an identical, disciplined design system rooted in **OLED pure black**, crisp typographic hierarchy, and zero visual bloat.
+Owlmic’s visual design is governed by **pure functional minimalism**. Both the Android client and the PC companion flyout share an identical, disciplined design system rooted in **OLED pure black**, crisp typographic hierarchy, and zero visual bloat.
 
 ---
 
@@ -50,7 +50,7 @@ The primary screen is split into two massive, thumb-friendly touch targets:
 
 ## 4. PC Companion Flyout (`pc/src/flyout/`)
 
-Unlike modern desktop utilities that package multi-hundred-megabyte Chromium/Electron bundles, Mikey’s PC companion features a **custom, ultra-lightweight native Win32 GDI/GDI+ software rendering engine**.
+Unlike modern desktop utilities that package multi-hundred-megabyte Chromium/Electron bundles, Owlmic’s PC companion features a **custom, ultra-lightweight native Win32 GDI/GDI+ software rendering engine**.
 
 ```text
  ┌───────────────────────────────────────────┐

@@ -1,6 +1,6 @@
 # System Architecture & Topology
 
-Mikey is a distributed, real-time media streaming system consisting of an Android capture client and a lightweight PC companion daemon. This document provides an exhaustive, code-level architectural breakdown of the system topology, component responsibilities, threading models, and inter-process boundaries.
+Owlmic is a distributed, real-time media streaming system consisting of an Android capture client and a lightweight PC companion daemon. This document provides an exhaustive, code-level architectural breakdown of the system topology, component responsibilities, threading models, and inter-process boundaries.
 
 ---
 
@@ -62,7 +62,7 @@ Mikey is a distributed, real-time media streaming system consisting of an Androi
 │    ├── Drift Resampler (resample.rs): Cubic interpolation phase accumulator (clamped to ±0.2%)         │
 │    ├── Loudness Normalizer (normalizer.rs): Speech leveling (+12 dB max boost) & anti-pumping noise hold│
 │    ├── Audio DSP (denoise.rs): RNNoise neural network model with dynamic strength control              │
-│    └── Virtual Audio Sink (sink/): WASAPI event-driven shared stream feeding virtual mic (Mikey Mic)   │
+│    └── Virtual Audio Sink (sink/): WASAPI event-driven shared stream feeding virtual mic (Owlmic)   │
 │                                                                                                        │
 │   Video Pipeline (pc/src/video/):                                                                      │
 │    ├── latest_jpeg Slot: Condvar-synchronized worker queue enforcing KEEP_ONLY_LATEST                  │
@@ -192,4 +192,4 @@ Mikey is a distributed, real-time media streaming system consisting of an Androi
 | **Wi-Fi Packet Storm / High Jitter** | `JitterBuffer` measures arrival timestamp delta variance $\Delta_{\text{jitter}}$. | Adaptive buffer expands from 40 ms up to 120 ms. If queue exceeds 200 ms, oldest frames dropped. | Audio remains glitch-free; latency slightly increases temporarily, then recovers. |
 | **Camera Thermal Throttling** | `PowerManager` triggers `thermalListener`. | `VideoCapture` drops JPEG quality from 80% to 50%, reducing byte volume by 60%. | Frame rate remains 30 fps; subtle reduction in sharpness prevents phone overheating. |
 | **PC Sleep / Wake Cycle** | TCP socket write fails with `ConnectionReset`. | Android detects dropped link, emits searching state, initiates exponential backoff reconnect. | Re-pairs automatically within 2 seconds of PC waking up. |
-| **Port 7653 Conflict** | `bind_listener()` returns `EADDRINUSE`. | Loop sleeps 2 seconds and retries indefinitely while logging clean diagnostic warning. | Mikey waits for prior process to terminate without crashing. |
+| **Port 7653 Conflict** | `bind_listener()` returns `EADDRINUSE`. | Loop sleeps 2 seconds and retries indefinitely while logging clean diagnostic warning. | Owlmic waits for prior process to terminate without crashing. |

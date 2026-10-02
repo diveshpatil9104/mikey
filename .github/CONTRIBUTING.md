@@ -1,6 +1,6 @@
-# Contributing to Mikey
+# Contributing to Owlmic
 
-Thank you for your interest in contributing to Mikey! Whether you're fixing a typo, squashing a bug, or building a new feature - every contribution matters and is deeply appreciated.
+Thank you for your interest in contributing to Owlmic! Whether you're fixing a typo, squashing a bug, or building a new feature - every contribution matters and is deeply appreciated.
 
 > **New to open source?** Welcome! This guide is written with you in mind. Follow the steps and you'll have your first PR merged in no time.
 
@@ -121,7 +121,7 @@ cargo run --release
 
 ### Virtual audio/video devices
 
-- **Windows:** Install [VB-CABLE](https://vb-audio.com/Cable/) for the virtual mic, then run `pc\setup-mic.cmd` as Administrator once (or click **Setup Mic** in the panel) to name it *Mikey Mic*. The [softcam](https://github.com/tshino/softcam) DLL is bundled for the virtual webcam, *Mikey Cam*.
+- **Windows:** Install [VB-CABLE](https://vb-audio.com/Cable/) for the virtual mic, then run `pc\setup-mic.cmd` as Administrator once (or click **Setup Mic** in the panel) to name it *Owlmic*. The [softcam](https://github.com/tshino/softcam) DLL is bundled for the virtual webcam, *Owlmic Cam*.
 - **Linux:** PipeWire/PulseAudio creates the virtual mic automatically. For virtual webcam, load `v4l2loopback`.
 
 See [INSTALL_PC.md](../docs/INSTALL_PC.md) for detailed platform setup.
@@ -202,7 +202,7 @@ The PR template has a dedicated section for this. **PRs without proof of change 
 
 ### Why?
 
-Mikey is a real-time audio/video system. "It compiles" is not enough - we need to see that it actually works on a real device or in a real scenario. This also serves as documentation for future contributors.
+Owlmic is a real-time audio/video system. "It compiles" is not enough - we need to see that it actually works on a real device or in a real scenario. This also serves as documentation for future contributors.
 
 ---
 
@@ -301,7 +301,7 @@ The complete set of 18 coding rules lives in [`docs/PERFORMANCE_AND_REALTIME_BUD
 
 ## Architecture Guide
 
-Mikey has a detailed architecture documented in `docs/`. Here's what to read based on what you're working on:
+Owlmic has a detailed architecture documented in `docs/`. Here's what to read based on what you're working on:
 
 | Working on | Read first |
 |-----------|-----------|
@@ -324,4 +324,4 @@ Mikey has a detailed architecture documented in `docs/`. Here's what to read bas
 
 ---
 
-*Thank you for helping make Mikey better. Every contribution - code, docs, testing, or ideas - makes a difference.*
+*Thank you for helping make Owlmic better. Every contribution - code, docs, testing, or ideas - makes a difference.*

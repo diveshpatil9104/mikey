@@ -1,6 +1,6 @@
 # Developer Playbooks, Workflows & Operational Skills
 
-This document provides operational playbooks and engineering protocols for developers and AI agents working on the Mikey repository.
+This document provides operational playbooks and engineering protocols for developers and AI agents working on the Owlmic repository.
 
 ---
 

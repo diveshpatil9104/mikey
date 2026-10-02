@@ -4,7 +4,7 @@
 
 **Please do NOT open a public issue for security vulnerabilities.**
 
-If you discover a security vulnerability in Mikey, please report it responsibly:
+If you discover a security vulnerability in Owlmic, please report it responsibly:
 
 1. **Email:** Send a detailed report to **diveshpatil9104@gmail.com**
 2. **Subject line:** `[SECURITY] Brief description of the vulnerability`
@@ -35,14 +35,14 @@ The following are in scope for security reports:
 
 ### Out of Scope
 
-- Denial of service on the local network (Mikey is local-only by design)
+- Denial of service on the local network (Owlmic is local-only by design)
 - Social engineering attacks
 - Vulnerabilities in dependencies - report these to the upstream project, but let us know so we can update
-- Physical access attacks (if someone has physical access to your PC, Mikey's security is the least of your concerns)
+- Physical access attacks (if someone has physical access to your PC, Owlmic's security is the least of your concerns)
 
 ## Security Design
 
-Mikey's security model is documented in [`docs/SESSIONS_AND_TRUST.md`](../docs/SESSIONS_AND_TRUST.md). Key properties:
+Owlmic's security model is documented in [`docs/SESSIONS_AND_TRUST.md`](../docs/SESSIONS_AND_TRUST.md). Key properties:
 
 - **Local-only:** All traffic stays on the direct link between your phone and PC. No cloud relay, no internet-facing server.
 - **Trust-on-first-use:** New devices require explicit approval on the PC. Trust is stored as a random 32-byte pairing token.
@@ -63,4 +63,4 @@ We appreciate responsible disclosure. Security reporters will be credited in the
 
 ---
 
-*Thank you for helping keep Mikey and its users safe.*
+*Thank you for helping keep Owlmic and its users safe.*

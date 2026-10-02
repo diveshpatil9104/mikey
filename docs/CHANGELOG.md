@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Mikey will be documented in this file.
+All notable changes to Owlmic will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -8,11 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Windows installer (`Mikey-Setup-x.y.z.exe`) that installs Mikey and sets up **Mikey Mic**, the virtual microphone, built by a new Windows installer workflow
+- Windows installer (`Owlmic-Setup-x.y.z.exe`) that installs Owlmic and sets up its virtual microphone, built by a new Windows installer workflow
 
 ### Changed
+- **Mikey is now called Owlmic.** The apps, the installer and the docs use the new name. The microphone shows up as *Owlmic* and the camera as *Owlmic Cam*. On a PC set up before the rename, the camera is renamed the next time Owlmic starts, and the microphone the next time Setup Mic runs
 - Mic setup keeps the user's own default speakers and microphone, and no longer turns off other apps' audio devices
-- The mic shows up in apps as *Mikey Mic (Mikey Audio)*
+- The mic shows up in apps as *Owlmic (Owlmic Audio)*
 
 ### Fixed
 - The panel's **Setup Mic** button finds its script next to `mikey.exe`

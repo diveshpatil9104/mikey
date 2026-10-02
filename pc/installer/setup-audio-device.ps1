@@ -1,4 +1,4 @@
-# Mikey Mic setup: installs the virtual microphone driver if it's missing, names it "Mikey Mic",
+# Owlmic microphone setup: installs the virtual microphone driver if it's missing, names it "Owlmic",
 # and leaves the user's own default speakers and microphone exactly as they were.
 #
 # Run by the installer (-Silent) and by the panel's Setup Mic button. Needs administrator rights.
@@ -25,20 +25,21 @@ function Finish([int]$code) {
 $principal = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     if ($Silent) { exit 1 }
-    Say "Setting up Mikey Mic needs administrator rights. Asking Windows..." "Yellow"
+    Say "Setting up the Owlmic microphone needs administrator rights. Asking Windows..." "Yellow"
     $elevated = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -DriverDir `"$DriverDir`""
     try {
         $proc = Start-Process powershell.exe -ArgumentList $elevated -Verb RunAs -PassThru -Wait
         exit $proc.ExitCode
     } catch {
-        Say "Windows didn't allow it, so Mikey Mic wasn't set up." "Yellow"
+        Say "Windows didn't allow it, so the Owlmic microphone wasn't set up." "Yellow"
         Finish 1
     }
 }
 
-# Mikey Mic runs on this virtual cable driver. Its device and endpoint names as Windows reports them.
+# The Owlmic microphone runs on this virtual cable driver. Its device and endpoint names as Windows reports them.
 $DriverDevice = "VB-Audio Virtual Cable"
-$MikeyAudio = "Mikey Audio"
+$OwlmicAudio = "Owlmic Audio"
+$OldAudio = "Mikey Audio"   # the name from before the rename to Owlmic, so setup renames it
 $EndpointName = "{a45c254e-df1c-4efd-8020-67d146a850e0},2"   # PKEY_Device_DeviceDesc: "CABLE Output"
 $AdapterName  = "{b3f8fa53-0004-438e-9003-51a46e139bfc},6"   # PKEY_DeviceInterface_FriendlyName: the part in brackets
 
@@ -73,7 +74,7 @@ interface IPolicyConfig {
 [ComImport, Guid("870AF99C-171D-4F9E-AF0D-E63DF40C2BC9")]
 class PolicyConfigClient {}
 
-public static class MikeyDefaults {
+public static class OwlmicDefaults {
     // flow 0 = speakers, 1 = microphones; role 0 = console, 1 = multimedia, 2 = communications
     public static string Get(int flow, int role) {
         IMMDevice device;
@@ -92,7 +93,7 @@ public static class MikeyDefaults {
 $saved = @()
 foreach ($flow in 0, 1) {
     foreach ($role in 0, 1, 2) {
-        $id = [MikeyDefaults]::Get($flow, $role)
+        $id = [OwlmicDefaults]::Get($flow, $role)
         if ($id) { $saved += [pscustomobject]@{ Id = $id; Role = $role } }
     }
 }
@@ -100,7 +101,7 @@ foreach ($flow in 0, 1) {
 # Installing the driver can make it the default device; put the user's own ones back.
 function Restore-Defaults {
     foreach ($d in $saved) {
-        try { [void][MikeyDefaults]::Set($d.Id, $d.Role) } catch {}
+        try { [void][OwlmicDefaults]::Set($d.Id, $d.Role) } catch {}
     }
 }
 
@@ -112,18 +113,18 @@ function Test-Driver {
 
 $restartNeeded = $false
 if (Test-Driver) {
-    Say "Mikey Mic's driver is already installed." "Green"
+    Say "The Owlmic microphone driver is already installed." "Green"
 } else {
     $setup = Join-Path $DriverDir "VBCABLE_Setup_x64.exe"
     if (-not (Test-Path $setup)) {
-        Say "Mikey Mic's driver files are missing. Reinstall Mikey to set it up." "Yellow"
+        Say "The Owlmic microphone driver files are missing. Reinstall Owlmic to set it up." "Yellow"
         Finish 1
     }
-    Say "Installing Mikey Mic. This can take a minute..."
+    Say "Installing the Owlmic microphone. This can take a minute..."
     $proc = Start-Process -FilePath $setup -ArgumentList "-i", "-h" -WorkingDirectory $DriverDir -PassThru
     if (-not $proc.WaitForExit(180000)) {
         Restore-Defaults
-        Say "Installing Mikey Mic took too long." "Yellow"
+        Say "Installing the Owlmic microphone took too long." "Yellow"
         Finish 1
     }
     # The setup's exit code isn't documented, so check that the driver's device actually appeared.
@@ -137,22 +138,22 @@ if (Test-Driver) {
     } while ((Get-Date) -lt $deadline)
     if (-not $installed) {
         Restore-Defaults
-        Say "Windows didn't install Mikey Mic's driver." "Yellow"
+        Say "Windows didn't install the Owlmic microphone driver." "Yellow"
         Finish 1
     }
     $restartNeeded = $true
 }
 
-# 3. Name it Mikey Mic. Its endpoints appear shortly after the driver installs.
+# 3. Name it Owlmic. Its endpoints appear shortly after the driver installs.
 function Rename-Endpoints([string]$flow, [string]$name) {
     $root = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\$flow"
     $found = 0
     Get-ChildItem -Path $root -ErrorAction SilentlyContinue | ForEach-Object {
         $props = Join-Path $_.PSPath "Properties"
         $values = Get-ItemProperty -Path $props -ErrorAction SilentlyContinue
-        if ($values -and ($values.$AdapterName -eq $DriverDevice -or $values.$AdapterName -eq $MikeyAudio)) {
+        if ($values -and ($values.$AdapterName -in @($DriverDevice, $OwlmicAudio, $OldAudio))) {
             Set-ItemProperty -Path $props -Name $EndpointName -Value $name
-            Set-ItemProperty -Path $props -Name $AdapterName -Value $MikeyAudio
+            Set-ItemProperty -Path $props -Name $AdapterName -Value $OwlmicAudio
             $found++
         }
     }
@@ -162,24 +163,24 @@ function Rename-Endpoints([string]$flow, [string]$name) {
 try {
     $deadline = (Get-Date).AddSeconds(30)
     do {
-        $mics = Rename-Endpoints "Capture" "Mikey Mic"
+        $mics = Rename-Endpoints "Capture" "Owlmic"
         if ($mics -gt 0) { break }
         Start-Sleep -Seconds 2
     } while ((Get-Date) -lt $deadline)
-    [void](Rename-Endpoints "Render" "Mikey Mic Bridge")
+    [void](Rename-Endpoints "Render" "Owlmic Bridge")
 } catch {
     Restore-Defaults
-    Say "Couldn't name the microphone Mikey Mic: $($_.Exception.Message)" "Yellow"
+    Say "Couldn't name the microphone Owlmic: $($_.Exception.Message)" "Yellow"
     Finish 1
 }
 
 if ($mics -eq 0) {
     Restore-Defaults
     if ($restartNeeded) {
-        Say "Mikey Mic is installed. Restart Windows, then click Setup Mic in Mikey's panel to finish." "Yellow"
+        Say "The Owlmic microphone is installed. Restart Windows, then click Setup Mic in Owlmic's panel to finish." "Yellow"
         Finish 3010
     }
-    Say "Mikey Mic's driver is installed, but Windows hasn't created the microphone yet. Restart Windows and try again." "Yellow"
+    Say "The Owlmic microphone driver is installed, but Windows hasn't created the microphone yet. Restart Windows and try again." "Yellow"
     Finish 1
 }
 
@@ -192,6 +193,6 @@ try {
 }
 Restore-Defaults
 
-Say "Mikey Mic is ready. Pick it as the microphone in Meet, Zoom or Teams." "Green"
+Say "Owlmic is ready. Pick it as the microphone in Meet, Zoom or Teams." "Green"
 if ($restartNeeded) { Finish 3010 }
 Finish 0
