@@ -39,7 +39,7 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
 # The Owlmic microphone runs on this virtual cable driver. Its device and endpoint names as Windows reports them.
 $DriverDevice = "VB-Audio Virtual Cable"
 $OwlmicAudio = "Owlmic Audio"
-$OldAudio = "Mikey Audio"   # the name from before the rename to Owlmic, so setup renames it
+$OldAudio = "Owlmic Audio"   # the name from before the rename to Owlmic, so setup renames it
 $EndpointName = "{a45c254e-df1c-4efd-8020-67d146a850e0},2"   # PKEY_Device_DeviceDesc: "CABLE Output"
 $AdapterName  = "{b3f8fa53-0004-438e-9003-51a46e139bfc},6"   # PKEY_DeviceInterface_FriendlyName: the part in brackets
 

@@ -10,7 +10,7 @@ pub const TCP_RULE_NAME: &str = "Owlmic TCP";
 pub const UDP_RULE_NAME: &str = "Owlmic UDP Beacon";
 /// Rules from before the rename to Owlmic, removed when the new ones are added.
 #[cfg(windows)]
-const OLD_RULE_NAMES: [&str; 3] = ["Mikey", "Mikey TCP", "Mikey UDP Beacon"];
+const OLD_RULE_NAMES: [&str; 3] = ["Owlmic", "Owlmic TCP", "Owlmic UDP Beacon"];
 pub const TCP_PORT: u16 = 7653;
 pub const UDP_PORT: u16 = 7654;
 

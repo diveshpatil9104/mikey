@@ -73,8 +73,8 @@ class DiscoveryTest {
     @Test
     fun ignoresOtherPacketsAndCutOffReplies() {
         assertNull(parseReply("OWLMIC?1".toByteArray() + ByteArray(20), 28))
-        // A Mikey PC's reply, from before the rename to Owlmic.
-        assertNull(parseReply("MIKEY!1".toByteArray() + reply.copyOfRange(8, reply.size), reply.size - 1))
+        // A Owlmic PC's reply, from before the rename to Owlmic.
+        assertNull(parseReply("OWLMIC!1".toByteArray() + reply.copyOfRange(8, reply.size), reply.size - 1))
         assertNull(parseReply(reply, reply.size - 1))
         assertNull(parseReply(reply, 10))
     }

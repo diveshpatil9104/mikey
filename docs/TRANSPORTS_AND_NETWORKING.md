@@ -46,7 +46,7 @@ Owlmic automatically negotiates the optimal physical transport between the Andro
     ```text
     "OWLMIC!1" (8 bytes) | pc_id (16) | tcp_port (u16 BE) | proto_ver (1) | name_len (1) | pc_name (UTF-8)
     ```
-  - Packets that don't start with these magics are ignored. Builds from before the rename to Owlmic used `MIKEY?1` and `MIKEY!1`, so they don't find Owlmic builds this way; USB debugging and a manual address still connect them.
+  - Packets that don't start with these magics are ignored. Builds from before the rename to Owlmic used `OWLMIC?1` and `OWLMIC!1`, so they don't find Owlmic builds this way; USB debugging and a manual address still connect them.
 - **Manual Address Fallback**: In restricted corporate or university networks where UDP broadcast packets are filtered by managed switches, Owlmic provides `manualPcAddress` in Android settings to bypass discovery.
 - **Wi-Fi Latency Lock (`WifiLatencyLock.kt`)**: Acquires an Android `WifiManager.WifiLock` with `WIFI_MODE_FULL_LOW_LATENCY` to instruct the wireless chipset to stay in high-power, low-latency mode.
 - **Windows Firewall Detection & One-Click Elevation (`pc/src/firewall.rs`)**: On startup, when Wi-Fi or USB tethering is enabled, Owlmic queries Windows Firewall for `Owlmic TCP` (port 7653) and `Owlmic UDP Beacon` (port 7654). If either rule is missing, a non-intrusive alert banner ("Wi-Fi Blocked — Allow Access") appears in the flyout. Clicking "Allow Access" triggers a single elevated UAC execution adding both rules, and removing the ones from before the rename to Owlmic, without requiring manual terminal commands.
