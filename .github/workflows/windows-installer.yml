@@ -74,9 +74,9 @@ jobs:
                 Write-Host "Driver checksum verified: $hash"
                 break
               }
-              Write-Warning "Checksum mismatch for $url: got $hash, expected $expectedHash"
+              Write-Warning "Checksum mismatch for ${url}: got $hash, expected $expectedHash"
             } catch {
-              Write-Warning "Invoke-WebRequest failed for $url: $($_.Exception.Message)"
+              Write-Warning "Invoke-WebRequest failed for ${url}: $($_.Exception.Message)"
               try {
                 if (Test-Path $zip) { Remove-Item $zip -Force }
                 & curl.exe -sS -f -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -o $zip $url --max-time 60
@@ -86,9 +86,9 @@ jobs:
                   Write-Host "Driver checksum verified via curl: $hash"
                   break
                 }
-                Write-Warning "Checksum mismatch via curl for $url: got $hash, expected $expectedHash"
+                Write-Warning "Checksum mismatch via curl for ${url}: got $hash, expected $expectedHash"
               } catch {
-                Write-Warning "curl failed for $url: $($_.Exception.Message)"
+                Write-Warning "curl failed for ${url}: $($_.Exception.Message)"
               }
             }
           }
