@@ -86,3 +86,10 @@ To prevent window flicker during fast volume meter repaints:
 
 ### 4.3 Asset-Driven Vector Icons (`pc/src/flyout/icons/`)
 Vector icons in the PC flyout are not hardcoded coordinate arrays; they are embedded at compile time directly from official Lucide SVG source files in `pc/assets/icons/` (`include_str!`). A zero-dependency, real-time SVG micro-parser and renderer (`pc/src/flyout/icons/svg.rs` and `path.rs`) maps standard 24×24 SVG elements (`<line>`, `<circle>`, `<rect>`, `<polygon>`, and `<path>` commands `M/m`, `L/l`, `H/h`, `V/v`, `A/a`, and `Z/z`) directly to anti-aliased GDI+ vector draw primitives (`GdipDrawLine`, `GdipDrawArc`, `GdipDrawEllipse`) scaled to target bounds.
+
+### 4.4 Settings Drawer (`pc/src/flyout/render_drawer.rs`)
+The settings drawer expands upon clicking the **Settings** pill button in the footer:
+- **Noise Suppression**: Real-time slider with audio icon and percentage readout (0% to 100%).
+- **Divider Hairline**: 1px subtle divider (`ARGB_BORDER`).
+- **Start with Windows**: Interactive toggle switch adhering strictly to pure functional minimalism. Reflects and toggles `start_with_computer` in `config.toml`, synchronizing the Windows `Run` key registry state (`--autostart`) with zero write syscalls on fast-path query.
+

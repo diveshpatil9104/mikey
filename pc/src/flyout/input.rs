@@ -117,6 +117,12 @@ impl FlyoutWindow {
                     let new_h = self.current_height();
                     self.update_window_region(new_h);
                 }
+                FlyoutButton::ToggleStartWithComputer | FlyoutButton::ToggleAutostart => {
+                    let current = self.session_manager.config().start_with_computer;
+                    let next = !current;
+                    let _ = crate::autostart::set_autostart(next);
+                    self.session_manager.set_start_with_computer(next);
+                }
                 FlyoutButton::SetupVirtualMic => {
                     // Next to mikey.exe once installed; under pc/ when run from the source tree.
                     let beside_exe = std::env::current_exe()

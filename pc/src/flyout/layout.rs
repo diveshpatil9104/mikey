@@ -14,7 +14,7 @@ pub fn compute_flyout_height(
 ) -> i32 {
     let mut h = FLYOUT_HEIGHT_COLLAPSED;
     if settings_expanded {
-        h += 80;
+        h += 106;
     }
     if video_pipe.is_camera_on() && !video_pipe.is_preview_visible() {
         h += 110;

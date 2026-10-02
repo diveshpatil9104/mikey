@@ -16,6 +16,7 @@ pub mod palette;
 pub mod render;
 pub mod render_audio;
 pub mod render_banners;
+pub mod render_drawer;
 pub mod render_dsp;
 pub mod render_footer;
 pub mod render_header;
