@@ -41,7 +41,6 @@ pub fn parse_netsh_output(stdout: &str, rule_name: &str) -> bool {
     true
 }
 
-#[cfg(windows)]
 fn check_rule_present(name: &str) -> bool {
     use std::os::windows::process::CommandExt;
     use std::process::Command;
@@ -73,17 +72,11 @@ fn check_rule_present(name: &str) -> bool {
 }
 
 /// Checks whether inbound rules for TCP :7653 and UDP :7654 exist and cover public/private networks.
-#[cfg(windows)]
 pub fn check_rules() -> (bool, bool) {
     (
         check_rule_present(TCP_RULE_NAME),
         check_rule_present(UDP_RULE_NAME),
     )
-}
-
-#[cfg(not(windows))]
-pub fn check_rules() -> (bool, bool) {
-    (true, true)
 }
 
 /// Returns true if both TCP and UDP rules are allowed in the firewall.
@@ -95,7 +88,6 @@ pub fn is_firewall_allowed() -> bool {
 /// Prompts for UAC elevation to add firewall rules for TCP :7653 and UDP :7654 across all profiles.
 /// Also purges any stale or conflicting block rules created by Windows Defender for the current executable.
 /// Executes in a single hidden elevated cmd.exe process so the user only sees one UAC dialog.
-#[cfg(windows)]
 pub fn ensure_rules_elevated() -> io::Result<()> {
     use std::ffi::c_void;
 
@@ -191,11 +183,6 @@ pub fn ensure_rules_elevated() -> io::Result<()> {
             "Firewall rules were not added after elevation",
         ))
     }
-}
-
-#[cfg(not(windows))]
-pub fn ensure_rules_elevated() -> io::Result<()> {
-    Ok(())
 }
 
 #[cfg(test)]

@@ -103,7 +103,7 @@ begin
         '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and ((ResultCode = 0) or (ResultCode = 3010)) then
       MicNeedsRestart := ResultCode = 3010
     else
-      SuppressibleMsgBox('Owlmic is installed, but its microphone couldn''t be set up yet. Restart Windows, open Owlmic, and click Setup Mic in its panel.',
+      SuppressibleMsgBox('Owlmic is installed, but its microphone couldn''t be set up yet. Restart Windows, then run the Owlmic installer again.',
         mbInformation, MB_OK, IDOK);
   finally
     WizardForm.ProgressGauge.Style := npbstNormal;

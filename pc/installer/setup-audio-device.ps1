@@ -1,7 +1,7 @@
 # Owlmic microphone setup: installs the virtual microphone driver if it's missing, names it "Owlmic",
 # and leaves the user's own default speakers and microphone exactly as they were.
 #
-# Run by the installer (-Silent) and by the panel's Setup Mic button. Needs administrator rights.
+# Run by the installer (-Silent). Needs administrator rights.
 # The driver files come from -DriverDir, by default the "driver" folder next to this script.
 # Exit codes: 0 ready, 3010 ready after Windows restarts, 1 failed.
 
@@ -238,7 +238,7 @@ try {
 if ($mics -eq 0) {
     Restore-Defaults
     if ($restartNeeded) {
-        Say "The Owlmic microphone is installed. Restart Windows, then click Setup Mic in Owlmic's panel to finish." "Yellow"
+        Say "The Owlmic microphone is installed. Restart Windows, then run the Owlmic installer again to finish." "Yellow"
         Finish 3010
     }
     Say "The Owlmic microphone driver is installed, but Windows hasn't created the microphone yet. Restart Windows and try again." "Yellow"

@@ -1,25 +1,12 @@
 use std::env;
 use std::io;
 
-#[cfg(windows)]
 const RUN_VALUE: &str = "Owlmic";
-#[cfg(not(windows))]
-const DESKTOP_FILE: &str = "owlmic.desktop";
 
-#[cfg(windows)]
 pub fn format_autostart_cmd(exe_path: &std::path::Path) -> String {
     format!("\"{}\" --autostart", exe_path.to_string_lossy())
 }
 
-#[cfg(not(windows))]
-pub fn format_autostart_cmd(exe_path: &std::path::Path) -> String {
-    format!(
-        "[Desktop Entry]\nType=Application\nName=Owlmic\nExec={} --autostart\nTerminal=false\n",
-        exe_path.to_string_lossy()
-    )
-}
-
-#[cfg(windows)]
 fn write_registry_value(val: &str) -> io::Result<()> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
@@ -96,7 +83,6 @@ fn write_registry_value(val: &str) -> io::Result<()> {
     }
 }
 
-#[cfg(windows)]
 fn delete_registry_value() -> io::Result<()> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
@@ -152,7 +138,6 @@ fn delete_registry_value() -> io::Result<()> {
     }
 }
 
-#[cfg(windows)]
 pub fn get_autostart_value() -> Option<String> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
@@ -235,21 +220,6 @@ pub fn get_autostart_value() -> Option<String> {
     Some(String::from_utf16_lossy(trimmed))
 }
 
-#[cfg(not(windows))]
-pub fn get_autostart_value() -> Option<String> {
-    if let Ok(home) = env::var("HOME") {
-        let desktop_file = std::path::PathBuf::from(home)
-            .join(".config")
-            .join("autostart")
-            .join(DESKTOP_FILE);
-        if desktop_file.exists() {
-            return std::fs::read_to_string(desktop_file).ok();
-        }
-    }
-    None
-}
-
-#[cfg(windows)]
 pub fn set_autostart(enable: bool) -> io::Result<()> {
     if enable {
         let exe_path = env::current_exe()?;
@@ -259,30 +229,9 @@ pub fn set_autostart(enable: bool) -> io::Result<()> {
     }
 }
 
-#[cfg(not(windows))]
-pub fn set_autostart(enable: bool) -> io::Result<()> {
-    if let Ok(home) = env::var("HOME") {
-        let dir = std::path::PathBuf::from(home)
-            .join(".config")
-            .join("autostart");
-        let desktop_file = dir.join(DESKTOP_FILE);
-
-        if enable {
-            std::fs::create_dir_all(&dir)?;
-            let exe_path = env::current_exe()?;
-            let content = format_autostart_cmd(&exe_path);
-            std::fs::write(&desktop_file, content)?;
-        } else if desktop_file.exists() {
-            std::fs::remove_file(&desktop_file)?;
-        }
-    }
-    Ok(())
-}
-
-#[cfg(windows)]
-pub fn sync_autostart(cfg: &crate::config::Config) -> io::Result<()> {
+pub fn sync_autostart(start_with_computer: bool) -> io::Result<()> {
     let current_val = get_autostart_value();
-    if cfg.start_with_computer {
+    if start_with_computer {
         let exe_path = env::current_exe()?;
         let expected_cmd = format_autostart_cmd(&exe_path);
         if let Some(ref val) = current_val {
@@ -299,47 +248,18 @@ pub fn sync_autostart(cfg: &crate::config::Config) -> io::Result<()> {
     }
 }
 
-#[cfg(not(windows))]
-pub fn sync_autostart(cfg: &crate::config::Config) -> io::Result<()> {
-    if cfg.start_with_computer {
-        let exe_path = env::current_exe()?;
-        let expected = format_autostart_cmd(&exe_path);
-        if let Some(content) = get_autostart_value() {
-            if content == expected {
-                return Ok(());
-            }
-        }
-        set_autostart(true)
-    } else {
-        if get_autostart_value().is_none() {
-            return Ok(());
-        }
-        set_autostart(false)
-    }
-}
-
-#[cfg(windows)]
 pub fn is_autostart_enabled() -> bool {
     get_autostart_value().is_some()
 }
 
-#[cfg(not(windows))]
-pub fn is_autostart_enabled() -> bool {
-    get_autostart_value().is_some()
-}
-
-// Every test here is about the Windows Run key; other systems format and store autostart
-// differently.
-#[cfg(all(test, windows))]
+#[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::Config;
     use std::path::Path;
     use std::sync::Mutex;
 
     static TEST_LOCK: Mutex<()> = Mutex::new(());
 
-    #[cfg(windows)]
     #[test]
     fn test_autostart_command_line_formatting() {
         let p = Path::new(r"C:\Program Files\Owlmic\owlmic.exe");
@@ -349,22 +269,10 @@ mod tests {
         );
     }
 
-    #[cfg(not(windows))]
-    #[test]
-    fn test_autostart_command_line_formatting_linux() {
-        let p = Path::new("/usr/bin/owlmic");
-        assert_eq!(
-            format_autostart_cmd(p),
-            "[Desktop Entry]\nType=Application\nName=Owlmic\nExec=/usr/bin/owlmic --autostart\nTerminal=false\n"
-        );
-    }
-
-    #[cfg(windows)]
     struct RegBackup {
         original: Option<String>,
     }
 
-    #[cfg(windows)]
     impl RegBackup {
         fn new() -> Self {
             Self {
@@ -373,7 +281,6 @@ mod tests {
         }
     }
 
-    #[cfg(windows)]
     impl Drop for RegBackup {
         fn drop(&mut self) {
             match &self.original {
@@ -387,19 +294,15 @@ mod tests {
         }
     }
 
-    #[cfg(windows)]
     #[test]
+    #[ignore = "changes the real Windows Run key; run with --ignored"]
     fn test_sync_writes_registry_when_missing() {
         let _lock = TEST_LOCK.lock().unwrap();
         let _guard = RegBackup::new();
         let _ = delete_registry_value();
         assert_eq!(get_autostart_value(), None);
 
-        let cfg = Config {
-            start_with_computer: true,
-            ..Default::default()
-        };
-        assert!(sync_autostart(&cfg).is_ok());
+        assert!(sync_autostart(true).is_ok());
 
         let val = get_autostart_value().expect("value should be written");
         assert!(val.ends_with(" --autostart"));
@@ -407,24 +310,20 @@ mod tests {
         assert!(val.contains(&current_exe.to_string_lossy().to_string()));
     }
 
-    #[cfg(windows)]
     #[test]
+    #[ignore = "changes the real Windows Run key; run with --ignored"]
     fn test_sync_removes_registry_when_disabled() {
         let _lock = TEST_LOCK.lock().unwrap();
         let _guard = RegBackup::new();
         let _ = set_autostart(true);
         assert!(get_autostart_value().is_some());
 
-        let cfg = Config {
-            start_with_computer: false,
-            ..Default::default()
-        };
-        assert!(sync_autostart(&cfg).is_ok());
+        assert!(sync_autostart(false).is_ok());
         assert_eq!(get_autostart_value(), None);
     }
 
-    #[cfg(windows)]
     #[test]
+    #[ignore = "changes the real Windows Run key; run with --ignored"]
     fn test_sync_updates_stale_path() {
         let _lock = TEST_LOCK.lock().unwrap();
         let _guard = RegBackup::new();
@@ -434,11 +333,7 @@ mod tests {
             Some(r#""C:\Old\Path\owlmic.exe" --autostart"#.to_string())
         );
 
-        let cfg = Config {
-            start_with_computer: true,
-            ..Default::default()
-        };
-        assert!(sync_autostart(&cfg).is_ok());
+        assert!(sync_autostart(true).is_ok());
 
         let val = get_autostart_value().expect("value should be updated");
         let current_exe = env::current_exe().unwrap();
